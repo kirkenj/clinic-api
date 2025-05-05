@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Clinic.Persistence.Migrations
 {
-    [DbContext(typeof(InnoClinnicDbContext))]
+    [DbContext(typeof(ClinnicContext))]
     partial class InnoClinnicDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

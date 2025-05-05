@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Clinic.Persistence.Migrations
 {
-    [DbContext(typeof(InnoClinnicDbContext))]
+    [DbContext(typeof(ClinnicContext))]
     [Migration("20250430180053_init")]
     partial class init
     {

@@ -8,9 +8,9 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection RegisterPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<InnoClinnicDbContext>((sp, options) =>
+        services.AddDbContext<ClinnicContext>((sp, options) =>
         {
-            options.UseNpgsql(configuration.GetConnectionString(nameof(InnoClinnicDbContext)));
+            options.UseNpgsql(configuration.GetConnectionString("ClinicConnetion"));
         });
         return services;
     }
