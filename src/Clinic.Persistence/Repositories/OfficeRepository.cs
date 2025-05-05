@@ -20,10 +20,9 @@ public sealed class OfficeRepository : IOfficeRepository
         await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteAsync(uint id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(Office office, CancellationToken cancellationToken = default)
     {
-        var entity = await _context.FindAsync<Office>([id], cancellationToken: cancellationToken);
-        _context.Remove(entity!);
+        _context.Remove<Office>(office);
         await _context.SaveChangesAsync(cancellationToken);
     }
 

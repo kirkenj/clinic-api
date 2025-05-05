@@ -1,4 +1,5 @@
 ﻿using Clinic.Application.Features.Office.Commands.AddOfficeCommand;
+using Clinic.Application.Features.Office.Commands.DeleteOfficeCommand;
 using Clinic.Application.Features.Office.Commands.UpdateOfficeCommand;
 using Clinic.Application.Features.Office.Queries.GetAllOfficesQuery;
 using Clinic.Application.Features.Office.Queries.GetOfficeQuery;
@@ -16,24 +17,21 @@ public sealed class OfficesController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> GetAllAsync(CancellationToken cancellationToken)
     {
         var result = await mediator.Send(new GetAllOfficesQuery(), cancellationToken);
-        if (result.IsSuccess)
-        {
-            return Ok(result.Value);
-        }
-
-        return BadRequest();
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult> GetAsync(uint id, CancellationToken cancellationToken)
     {
         var result = await mediator.Send(new GetOfficeQuery(id), cancellationToken);
-        if (result.IsSuccess)
-        {
-            return Ok(result.Value);
-        }
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+    }
 
-        return BadRequest(result.Error);
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteAsync(uint id, CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(new DeleteOfficeCommand(id), cancellationToken);
+        return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 
     [HttpPost]
