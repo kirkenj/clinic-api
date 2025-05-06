@@ -10,7 +10,7 @@ public sealed class OfficeConfiguration : IEntityTypeConfiguration<Office>
     {
         builder.ToTable("Offices");
 
-        builder.HasKey(x => x.Id);
+        builder.HasKey(m => m.Id);
 
         builder.Property(m => m.Id)
             .UseIdentityColumn();
