@@ -12,13 +12,10 @@ public partial class PhoneNumberValidator<T> : PropertyValidator<T, string>
         if (!PhoneNumberRegex().IsMatch(value))
         {
             context.AddFailure(context.PropertyPath, $"'{context.PropertyPath}' is not a valid phone number. Example: 291234567; 331234567; 441234567; 251234567.");
-        }
-        else
-        {
-            return true;
+           return false;
         }
 
-        return false;
+        return true;
     }
 
 
