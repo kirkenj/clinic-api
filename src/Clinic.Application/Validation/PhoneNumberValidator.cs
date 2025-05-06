@@ -9,15 +9,8 @@ public partial class PhoneNumberValidator<T> : PropertyValidator<T, string>
 
     public override bool IsValid(ValidationContext<T> context, string value)
     {
-        if (!PhoneNumberRegex().IsMatch(value))
-        {
-            context.AddFailure(context.PropertyPath, $"'{context.PropertyPath}' is not a valid phone number. Example: 291234567; 331234567; 441234567; 251234567.");
-           return false;
-        }
-
-        return true;
+        return PhoneNumberRegex().IsMatch(value);
     }
-
 
     [GeneratedRegex(@"^(33|29|44|25)\d{7}$")]
     private static partial Regex PhoneNumberRegex();
