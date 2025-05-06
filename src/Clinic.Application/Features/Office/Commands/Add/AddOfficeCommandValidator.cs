@@ -1,7 +1,7 @@
 ﻿using Clinic.Application.Validation;
 using FluentValidation;
 
-namespace Clinic.Application.Features.Office.Commands.AddOfficeCommand;
+namespace Clinic.Application.Features.Office.Commands.Add;
 public sealed class AddOfficeCommandValidator : AbstractValidator<AddOfficeCommand>
 {
     public AddOfficeCommandValidator()

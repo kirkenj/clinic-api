@@ -2,7 +2,7 @@
 using Clinic.Domain.Office;
 using MediatR;
 
-namespace Clinic.Application.Features.Office.Commands.UpdateOfficeCommand;
+namespace Clinic.Application.Features.Office.Commands.Update;
 public sealed class UpdateOfficeCommandHandler(IOfficeRepository officeRepository,
     UpdateOfficeCommandValidator validator) : IRequestHandler<UpdateOfficeCommand, Result>
 {

@@ -1,8 +1,8 @@
-﻿using Clinic.Application.Features.Office.Commands.AddOfficeCommand;
-using Clinic.Application.Features.Office.Commands.DeleteOfficeCommand;
-using Clinic.Application.Features.Office.Commands.UpdateOfficeCommand;
-using Clinic.Application.Features.Office.Queries.GetAllOfficesQuery;
-using Clinic.Application.Features.Office.Queries.GetOfficeQuery;
+﻿using Clinic.Application.Features.Office.Commands.Add;
+using Clinic.Application.Features.Office.Commands.Delete;
+using Clinic.Application.Features.Office.Commands.Update;
+using Clinic.Application.Features.Office.Queries.GetAll;
+using Clinic.Application.Features.Office.Queries.Get;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

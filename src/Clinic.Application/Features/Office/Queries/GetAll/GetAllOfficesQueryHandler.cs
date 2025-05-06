@@ -3,7 +3,7 @@ using Clinic.Domain.Abstractions;
 using Clinic.Domain.Office;
 using MediatR;
 
-namespace Clinic.Application.Features.Office.Queries.GetAllOfficesQuery;
+namespace Clinic.Application.Features.Office.Queries.GetAll;
 public sealed class GetAllOfficesQueryHandler(IOfficeRepository officeRepository) : IRequestHandler<GetAllOfficesQuery, Result<IEnumerable<OfficeDto>>>
 {
     public async Task<Result<IEnumerable<OfficeDto>>> Handle(GetAllOfficesQuery request, CancellationToken cancellationToken)

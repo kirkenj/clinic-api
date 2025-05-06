@@ -1,7 +1,7 @@
 ﻿using Clinic.Domain.Abstractions;
 using MediatR;
 
-namespace Clinic.Application.Features.Office.Commands.UpdateOfficeCommand;
+namespace Clinic.Application.Features.Office.Commands.Update;
 
 public sealed record class UpdateOfficeCommand(
     uint Id,
@@ -9,5 +9,4 @@ public sealed record class UpdateOfficeCommand(
     string RegistryPhoneNumber,
     string Photo,
     string PhotoId) : IRequest<Result>
-{
-}
+{ }

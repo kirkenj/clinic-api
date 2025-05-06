@@ -2,7 +2,6 @@
 using Clinic.Domain.Abstractions;
 using MediatR;
 
-namespace Clinic.Application.Features.Office.Queries.GetAllOfficesQuery;
+namespace Clinic.Application.Features.Office.Queries.GetAll;
 public sealed class GetAllOfficesQuery : IRequest<Result<IEnumerable<OfficeDto>>>
-{
-}
+{ }
