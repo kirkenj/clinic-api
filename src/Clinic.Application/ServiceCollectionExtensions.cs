@@ -14,6 +14,7 @@ public static class ServiceCollectionExtensions
             cfg.RegisterServicesFromAssembly(executingAssembly);
         });
 
+        ValidatorOptions.Global.LanguageManager.Enabled = false;
         services.AddValidatorsFromAssembly(executingAssembly);
 
         return services;
