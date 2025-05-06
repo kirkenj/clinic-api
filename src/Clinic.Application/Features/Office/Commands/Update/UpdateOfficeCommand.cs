@@ -8,5 +8,6 @@ public sealed record class UpdateOfficeCommand(
     string Address,
     string RegistryPhoneNumber,
     string Photo,
-    string PhotoId) : IRequest<Result>
+    string PhotoId
+    ) : IRequest<Result>
 { }
