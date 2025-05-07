@@ -14,37 +14,37 @@ namespace Clinic.Api.Controllers;
 public sealed class OfficesController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync()
     {
-        var result = await mediator.Send(new GetAllOfficesQuery(), cancellationToken);
+        var result = await mediator.Send(new GetAllOfficesQuery(), HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetAsync(uint id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAsync(uint id)
     {
-        var result = await mediator.Send(new GetOfficeQuery(id), cancellationToken);
+        var result = await mediator.Send(new GetOfficeQuery(id), HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteAsync(uint id, CancellationToken cancellationToken)
+    public async Task<IActionResult> DeleteAsync(uint id)
     {
-        var result = await mediator.Send(new DeleteOfficeCommand(id), cancellationToken);
+        var result = await mediator.Send(new DeleteOfficeCommand(id), HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 
     [HttpPost]
-    public async Task<ActionResult> PostAsync(AddOfficeCommand request, CancellationToken cancellationToken)
+    public async Task<IActionResult> PostAsync(AddOfficeCommand request)
     {
-        var result = await mediator.Send(request, cancellationToken);
+        var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 
     [HttpPut]
-    public async Task<ActionResult> PutAsync(UpdateOfficeCommand request, CancellationToken cancellationToken)
+    public async Task<IActionResult> PutAsync(UpdateOfficeCommand request)
     {
-        var result = await mediator.Send(request, cancellationToken);
+        var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 }

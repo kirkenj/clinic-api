@@ -3,18 +3,14 @@ public sealed class OfficeDto
 {
     public uint Id { get; private set; }
     public string Address { get; private set; } = default!;
-    public string RegistryPhoneNumber { get; private set; } = default!;
-    public string Photo { get; private set; } = default!;
-    public string PhotoId { get; private set; } = default!;
+    public string PhoneNumber { get; private set; } = default!;
     public bool IsActive { get; private set; }
 
-    public static OfficeDto FromOffice(Domain.Office.Office office) => new OfficeDto
+    public static OfficeDto FromOffice(Domain.Office.Office office) => new()
     {
         Id = office.Id,
         Address = office.Address,
-        RegistryPhoneNumber = office.RegistryPhoneNumber,
-        Photo = office.Photo,
-        PhotoId = office.PhotoId,
+        PhoneNumber = office.PhoneNumber,
         IsActive = office.IsActive
     };
 }

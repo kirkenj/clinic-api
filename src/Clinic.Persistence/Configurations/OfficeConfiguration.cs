@@ -18,15 +18,12 @@ public sealed class OfficeConfiguration : IEntityTypeConfiguration<Office>
         builder.Property(m => m.Address)
             .IsRequired();
 
-        builder.Property(m => m.RegistryPhoneNumber)
+        builder.Property(m => m.PhoneNumber)
             .HasMaxLength(20)
             .IsRequired();
 
-        builder.Property(m => m.Photo)
-            .IsRequired();
-
-        builder.Property(m => m.PhotoId)
-            .IsRequired();
+        builder.HasIndex(m => m.PhoneNumber)
+            .IsUnique();
 
         builder.Property(m => m.IsActive)
             .IsRequired();

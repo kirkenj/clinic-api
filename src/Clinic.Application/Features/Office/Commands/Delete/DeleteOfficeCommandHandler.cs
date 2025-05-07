@@ -7,13 +7,13 @@ public sealed class DeleteOfficeCommandHandler(IOfficeRepository officeRepositor
 {
     public async Task<Result> Handle(DeleteOfficeCommand request, CancellationToken cancellationToken)
     {
-        var officeToRemove = await officeRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (officeToRemove == null)
+        var office = await officeRepository.GetByIdAsync(request.Id, cancellationToken);
+        if (office == null)
         {
             return OfficeErrors.NotFound(request.Id);
         }
 
-        await officeRepository.DeleteAsync(officeToRemove, cancellationToken);
+        await officeRepository.DeleteAsync(office, cancellationToken);
 
         return Result.Success();
     }

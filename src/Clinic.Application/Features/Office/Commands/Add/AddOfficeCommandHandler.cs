@@ -16,14 +16,14 @@ public sealed class AddOfficeCommandHandler(
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        if (await officeRepository.ExcistsByAddressAsync(request.Address, cancellationToken))
+        if (await officeRepository.ExistsByPhoneNumber(request.PhoneNumber, cancellationToken))
         {
-            return OfficeErrors.AddressAlreadyTaken(request.Address);
+            return OfficeErrors.PhoneAlreadyTaken(request.PhoneNumber);
         }
 
-        var officeToAdd = Domain.Office.Office.Create(request.Address, request.RegistryPhoneNumber, request.Photo, request.PhotoId);
+        var office = Domain.Office.Office.Create(request.Address, request.PhoneNumber);
 
-        await officeRepository.AddAsync(officeToAdd, cancellationToken);
+        await officeRepository.AddAsync(office, cancellationToken);
 
         return Result.Success();
     }

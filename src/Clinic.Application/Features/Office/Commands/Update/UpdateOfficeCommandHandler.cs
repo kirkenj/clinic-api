@@ -16,20 +16,21 @@ public sealed class UpdateOfficeCommandHandler(
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        var officeToUpdate = await officeRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (officeToUpdate == null)
+        var office = await officeRepository.GetByIdAsync(request.Id, cancellationToken);
+        if (office == null)
         {
             return OfficeErrors.NotFound(request.Id);
         }
 
-        if (officeToUpdate.Address != request.Address && await officeRepository.ExcistsByAddressAsync(request.Address, cancellationToken))
+        if (office.PhoneNumber != request.PhoneNumber 
+            && await officeRepository.ExistsByPhoneNumber(request.PhoneNumber, cancellationToken))
         {
-            return OfficeErrors.AddressAlreadyTaken(request.Address);
+            return OfficeErrors.PhoneAlreadyTaken(request.PhoneNumber);
         }
 
-        officeToUpdate.Update(request.Address, request.RegistryPhoneNumber, request.Photo, request.PhotoId);
+        office.Update(request.Address, request.PhoneNumber);
 
-        await officeRepository.UpdateAsync(officeToUpdate, cancellationToken);
+        await officeRepository.UpdateAsync(office, cancellationToken);
 
         return Result.Success();
     }

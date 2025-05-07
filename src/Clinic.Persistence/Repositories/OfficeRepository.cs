@@ -3,48 +3,41 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Clinic.Persistence.Repositories;
 
-public sealed class OfficeRepository : IOfficeRepository
+public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
 {
-    private readonly ClinnicContext _context;
-    private readonly DbSet<Office> _dbSet;
+    private readonly DbSet<Office> _dbSet = context.Set<Office>();
 
-    public OfficeRepository(ClinnicContext context)
+    public async Task AddAsync(Office office, CancellationToken cancellationToken)
     {
-        _context = context;
-        _dbSet = context.Set<Office>();
+        await context.AddAsync(office, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task AddAsync(Office obj, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(Office office, CancellationToken cancellationToken)
     {
-        await _context.AddAsync(obj, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        context.Remove(office);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteAsync(Office office, CancellationToken cancellationToken = default)
+    public async Task<bool> ExistsByPhoneNumber(string phoneNumber, CancellationToken cancellationToken)
     {
-        _context.Remove<Office>(office);
-        await _context.SaveChangesAsync(cancellationToken);
+        return await _dbSet.AnyAsync(o => o.PhoneNumber == phoneNumber, cancellationToken);
     }
 
-    public async Task<bool> ExcistsByAddressAsync(string address, CancellationToken cancellationToken = default)
-    {
-        return await _dbSet.AnyAsync(o => o.Address == address, cancellationToken);
-    }
-
-    public async Task<ICollection<Office>> GetAllAsync(bool asTracking, CancellationToken cancellationToken = default)
+    public async Task<ICollection<Office>> GetAllAsync(CancellationToken cancellationToken, bool asTracking)
     {
         var set = !asTracking ? _dbSet.AsNoTracking() : _dbSet;
         return await set.ToListAsync(cancellationToken);
     }
 
-    public async Task<Office?> GetByIdAsync(uint id, CancellationToken cancellationToken = default)
+    public async Task<Office?> GetByIdAsync(uint id, CancellationToken cancellationToken)
     {
         return await _dbSet.FindAsync([id], cancellationToken);
     }
 
-    public async Task UpdateAsync(Office newState, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(Office newState, CancellationToken cancellationToken)
     {
-        _context.Update(newState);
-        await _context.SaveChangesAsync(cancellationToken);
+        context.Update(newState);
+        await context.SaveChangesAsync(cancellationToken);
     }
 }

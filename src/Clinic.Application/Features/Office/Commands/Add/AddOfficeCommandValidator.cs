@@ -6,7 +6,7 @@ public sealed class AddOfficeCommandValidator : AbstractValidator<AddOfficeComma
 {
     public AddOfficeCommandValidator()
     {
-        RuleFor(c => c.RegistryPhoneNumber)
+        RuleFor(c => c.PhoneNumber)
             .BelarusianPhoneNumber();
 
         RuleFor(m => m.Address)
