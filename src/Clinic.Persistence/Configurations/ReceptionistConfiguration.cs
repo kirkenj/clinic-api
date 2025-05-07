@@ -1,4 +1,4 @@
-﻿using Clinic.Domain;
+﻿using Clinic.Domain.Receptionist;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

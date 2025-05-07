@@ -1,0 +1,30 @@
+﻿using Clinic.Domain.Abstractions;
+using Clinic.Domain.Office;
+using MediatR;
+
+namespace Clinic.Application.Features.Office.Commands.Add;
+public sealed class AddOfficeCommandHandler(
+    IOfficeRepository officeRepository,
+    AddOfficeCommandValidator validator
+    ) : IRequestHandler<AddOfficeCommand, Result>
+{
+    public async Task<Result> Handle(AddOfficeCommand request, CancellationToken cancellationToken)
+    {
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+        if (!validationResult.IsValid)
+        {
+            return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
+
+        if (await officeRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken))
+        {
+            return OfficeErrors.PhoneAlreadyTaken(request.PhoneNumber);
+        }
+
+        var office = Domain.Office.Office.Create(request.Address, request.PhoneNumber);
+
+        await officeRepository.AddAsync(office, cancellationToken);
+
+        return Result.Success();
+    }
+}

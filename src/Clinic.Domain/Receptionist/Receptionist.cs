@@ -1,11 +1,13 @@
-﻿namespace Clinic.Domain;
+﻿using Clinic.Domain.Abstractions;
+
+namespace Clinic.Domain.Receptionist;
 
 public sealed class Receptionist : BaseEntity, IAuditableEntity
 {
     private Receptionist() { }
 
-    private Receptionist(string firstName, string lastName, 
-        string middleName, string email, 
+    private Receptionist(string firstName, string lastName,
+        string middleName, string email,
         string phoneNumber)
     {
         IsActive = true;
@@ -32,16 +34,16 @@ public sealed class Receptionist : BaseEntity, IAuditableEntity
     public DateTimeOffset? UpdatedOnUtc { get; set; }
 
 
-    public static Receptionist Create(string firstName, string lastName, 
-        string middleName, string phoneNumber, 
+    public static Receptionist Create(string firstName, string lastName,
+        string middleName, string phoneNumber,
         string email) =>
-        new(firstName, lastName, 
-            middleName, email, 
+        new(firstName, lastName,
+            middleName, email,
             phoneNumber);
 
 
-    public void Update(string firstName, string lastName, 
-        string middleName, string phoneNumber, 
+    public void Update(string firstName, string lastName,
+        string middleName, string phoneNumber,
         string email)
     {
         PhoneNumber = phoneNumber;

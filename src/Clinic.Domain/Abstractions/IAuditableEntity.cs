@@ -1,4 +1,4 @@
-﻿namespace Clinic.Domain;
+﻿namespace Clinic.Domain.Abstractions;
 
 public interface IAuditableEntity
 {

@@ -1,14 +1,21 @@
+using Clinic.Application;
 using Clinic.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 // Add services to the container.
+builder.Services.AddLogging();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+builder.Services.RegisterApplicationServices();
 builder.Services.RegisterPersistenceServices(configuration);
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
