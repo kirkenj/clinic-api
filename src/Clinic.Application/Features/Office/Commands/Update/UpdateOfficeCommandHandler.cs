@@ -22,10 +22,12 @@ public sealed class UpdateOfficeCommandHandler(
             return OfficeErrors.NotFound(request.Id);
         }
 
-        if (office.PhoneNumber != request.PhoneNumber 
-            && await officeRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken))
+        if (office.PhoneNumber != request.PhoneNumber)
         {
-            return OfficeErrors.PhoneAlreadyTaken(request.PhoneNumber);
+            if (await officeRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken))
+            {
+                return OfficeErrors.PhoneAlreadyTaken(request.PhoneNumber);
+            }
         }
 
         office.Update(request.Address, request.PhoneNumber);
