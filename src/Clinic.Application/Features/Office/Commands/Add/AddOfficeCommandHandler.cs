@@ -16,7 +16,7 @@ public sealed class AddOfficeCommandHandler(
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        if (await officeRepository.ExistsByPhoneNumber(request.PhoneNumber, cancellationToken))
+        if (await officeRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken))
         {
             return OfficeErrors.PhoneAlreadyTaken(request.PhoneNumber);
         }

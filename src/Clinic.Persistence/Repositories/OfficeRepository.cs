@@ -19,7 +19,7 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<bool> ExistsByPhoneNumber(string phoneNumber, CancellationToken cancellationToken)
+    public async Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
     {
         return await _dbSet.AnyAsync(o => o.PhoneNumber == phoneNumber, cancellationToken);
     }

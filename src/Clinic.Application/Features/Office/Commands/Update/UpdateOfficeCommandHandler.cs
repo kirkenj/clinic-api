@@ -23,7 +23,7 @@ public sealed class UpdateOfficeCommandHandler(
         }
 
         if (office.PhoneNumber != request.PhoneNumber 
-            && await officeRepository.ExistsByPhoneNumber(request.PhoneNumber, cancellationToken))
+            && await officeRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken))
         {
             return OfficeErrors.PhoneAlreadyTaken(request.PhoneNumber);
         }
