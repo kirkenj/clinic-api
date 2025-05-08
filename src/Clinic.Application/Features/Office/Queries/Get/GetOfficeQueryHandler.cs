@@ -5,7 +5,8 @@ using MediatR;
 
 namespace Clinic.Application.Features.Office.Queries.Get;
 
-public sealed class GetOfficeQueryHandler(IOfficeRepository officeRepository) : IRequestHandler<GetOfficeQuery, Result<OfficeResponse>>
+public sealed class GetOfficeQueryHandler(IOfficeRepository officeRepository) 
+    : IRequestHandler<GetOfficeQuery, Result<OfficeResponse>>
 {
     public async Task<Result<OfficeResponse>> Handle(GetOfficeQuery request, CancellationToken cancellationToken)
     {

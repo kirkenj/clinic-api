@@ -106,7 +106,7 @@ namespace Clinic.Persistence.Migrations
                     b.ToTable("Receptionists", (string)null);
                 });
 
-            modelBuilder.Entity("Clinic.Domain.Speciallization.Speciallization", b =>
+            modelBuilder.Entity("Clinic.Domain.Specialization.Specialization", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -132,7 +132,7 @@ namespace Clinic.Persistence.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Speciallizations", (string)null);
+                    b.ToTable("Specializations", (string)null);
                 });
 #pragma warning restore 612, 618
         }

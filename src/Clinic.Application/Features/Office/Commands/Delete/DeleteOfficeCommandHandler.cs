@@ -3,7 +3,8 @@ using Clinic.Domain.Office;
 using MediatR;
 
 namespace Clinic.Application.Features.Office.Commands.Delete;
-public sealed class DeleteOfficeCommandHandler(IOfficeRepository officeRepository) : IRequestHandler<DeleteOfficeCommand, Result>
+public sealed class DeleteOfficeCommandHandler(IOfficeRepository officeRepository) 
+    : IRequestHandler<DeleteOfficeCommand, Result>
 {
     public async Task<Result> Handle(DeleteOfficeCommand request, CancellationToken cancellationToken)
     {

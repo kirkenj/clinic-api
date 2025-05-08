@@ -4,5 +4,5 @@ using MediatR;
 
 namespace Clinic.Application.Features.Office.Queries.Get;
 
-public sealed record class GetOfficeQuery(uint Id) : IRequest<Result<OfficeResponse>>
+public sealed record GetOfficeQuery(uint Id) : IRequest<Result<OfficeResponse>>
 { }

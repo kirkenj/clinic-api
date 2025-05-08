@@ -1,11 +1,11 @@
 ﻿using Clinic.Domain.Abstractions;
 
-namespace Clinic.Domain.Speciallization;
-public sealed class Speciallization : BaseEntity, IAuditableEntity
+namespace Clinic.Domain.Specialization;
+public sealed class Specialization : BaseEntity, IAuditableEntity
 {
-    private Speciallization() { }
+    private Specialization() { }
 
-    public Speciallization(string name)
+    public Specialization(string name)
     {
         Name = name;
         IsActive = true;
@@ -21,6 +21,6 @@ public sealed class Speciallization : BaseEntity, IAuditableEntity
         Name = name;
     }
 
-    public static Speciallization Create(string name)
-        => new Speciallization(name);
+    public static Specialization Create(string name)
+        => new Specialization(name);
 }

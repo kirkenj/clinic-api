@@ -1,5 +1,5 @@
 ﻿namespace Clinic.Application.Dtos.Office;
-public sealed record class OfficeResponse(
+public sealed record OfficeResponse(
     uint Id,
     string Address,
     string PhoneNumber,

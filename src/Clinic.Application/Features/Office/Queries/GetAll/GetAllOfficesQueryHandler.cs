@@ -4,7 +4,8 @@ using Clinic.Domain.Office;
 using MediatR;
 
 namespace Clinic.Application.Features.Office.Queries.GetAll;
-public sealed class GetAllOfficesQueryHandler(IOfficeRepository officeRepository) : IRequestHandler<GetAllOfficesQuery, Result<IEnumerable<OfficeResponse>>>
+public sealed class GetAllOfficesQueryHandler(IOfficeRepository officeRepository) 
+    : IRequestHandler<GetAllOfficesQuery, Result<IEnumerable<OfficeResponse>>>
 {
     public async Task<Result<IEnumerable<OfficeResponse>>> Handle(GetAllOfficesQuery request, CancellationToken cancellationToken)
     {

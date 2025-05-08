@@ -3,7 +3,5 @@ using MediatR;
 
 namespace Clinic.Application.Features.Office.Commands.Delete;
 
-public sealed record class DeleteOfficeCommand(
-    uint Id
-    ) : IRequest<Result>
+public sealed record DeleteOfficeCommand(uint Id) : IRequest<Result>
 { }

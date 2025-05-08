@@ -1,13 +1,13 @@
-﻿using Clinic.Domain.Speciallization;
+﻿using Clinic.Domain.Specialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Clinic.Persistence.Configurations;
-public sealed class SpeciallizationConfiguration : IEntityTypeConfiguration<Speciallization>
+public sealed class SpecializationConfiguration : IEntityTypeConfiguration<Specialization>
 {
-    public void Configure(EntityTypeBuilder<Speciallization> builder)
+    public void Configure(EntityTypeBuilder<Specialization> builder)
     {
-        builder.ToTable("Speciallizations");
+        builder.ToTable("Specializations");
 
         builder.HasKey(m => m.Id);
 
