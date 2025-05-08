@@ -16,12 +16,13 @@ public sealed class AddOfficeCommandHandler(
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        if (await officeRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken))
+        var trimmedPhone = request.PhoneNumber.Trim();
+        if (await officeRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken))
         {
             return OfficeErrors.PhoneAlreadyTaken(request.PhoneNumber);
         }
 
-        var office = Domain.Office.Office.Create(request.Address, request.PhoneNumber);
+        var office = Domain.Office.Office.Create(request.Address, trimmedPhone);
 
         await officeRepository.AddAsync(office, cancellationToken);
 

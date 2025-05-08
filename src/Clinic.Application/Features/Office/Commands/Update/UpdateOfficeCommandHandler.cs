@@ -22,15 +22,21 @@ public sealed class UpdateOfficeCommandHandler(
             return OfficeErrors.NotFound(request.Id);
         }
 
-        if (office.PhoneNumber != request.PhoneNumber)
+        if (!office.IsActive)
         {
-            if (await officeRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken))
+            return OfficeErrors.NotActive(office.Id);
+        }
+
+        var trimmedPhone = request.PhoneNumber.Trim();
+        if (office.PhoneNumber != trimmedPhone)
+        {
+            if (await officeRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken))
             {
-                return OfficeErrors.PhoneAlreadyTaken(request.PhoneNumber);
+                return OfficeErrors.PhoneAlreadyTaken(trimmedPhone);
             }
         }
 
-        office.Update(request.Address, request.PhoneNumber);
+        office.Update(request.Address, trimmedPhone);
 
         await officeRepository.UpdateAsync(office, cancellationToken);
 

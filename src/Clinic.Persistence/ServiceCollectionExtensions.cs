@@ -1,4 +1,5 @@
 ﻿using Clinic.Domain.Office;
+using Clinic.Domain.Specialization;
 using Clinic.Persistence.Interceptors;
 using Clinic.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,6 @@ public static class ServiceCollectionExtensions
         {
             var auditableEntitiesInterceptor = sp.GetRequiredService<AuditableEntitiesInterceptor>();
 
-
             options.UseNpgsql(configuration.GetConnectionString("ClinicConnetion"));
             options.AddInterceptors(auditableEntitiesInterceptor);
         });
@@ -23,6 +23,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<AuditableEntitiesInterceptor>();
 
         services.AddScoped<IOfficeRepository, OfficeRepository>();
+        services.AddScoped<ISpecializationRepository, SpecializationRepository>();
 
         return services;
     }

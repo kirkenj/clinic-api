@@ -1,8 +1,8 @@
 ﻿using Clinic.Application.Features.Office.Commands.Add;
 using Clinic.Application.Features.Office.Commands.Delete;
 using Clinic.Application.Features.Office.Commands.Update;
-using Clinic.Application.Features.Office.Queries.GetAll;
 using Clinic.Application.Features.Office.Queries.Get;
+using Clinic.Application.Features.Office.Queries.GetAll;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,14 +35,14 @@ public sealed class OfficesController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostAsync(AddOfficeCommand request)
+    public async Task<IActionResult> AddAsync(AddOfficeCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 
     [HttpPut]
-    public async Task<IActionResult> PutAsync(UpdateOfficeCommand request)
+    public async Task<IActionResult> UpdateAsync(UpdateOfficeCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);

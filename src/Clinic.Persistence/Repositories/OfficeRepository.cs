@@ -35,9 +35,9 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
         return await _dbSet.FindAsync([id], cancellationToken);
     }
 
-    public async Task UpdateAsync(Office newState, CancellationToken cancellationToken)
+    public async Task UpdateAsync(Office office, CancellationToken cancellationToken)
     {
-        context.Update(newState);
+        context.Update(office);
         await context.SaveChangesAsync(cancellationToken);
     }
 }
