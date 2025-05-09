@@ -15,6 +15,7 @@ public sealed class Specialization : BaseEntity, IAuditableEntity
     public string Name { get; private set; } = default!;
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? UpdatedOnUtc { get; set; }
+    public ICollection<Doctor.Doctor> Doctors { get; private set; } = default!;
 
     public void Update(string name)
     {
@@ -22,5 +23,5 @@ public sealed class Specialization : BaseEntity, IAuditableEntity
     }
 
     public static Specialization Create(string name)
-        => new Specialization(name);
+        => new(name);
 }

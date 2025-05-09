@@ -18,6 +18,7 @@ public sealed class Office : BaseEntity, IAuditableEntity
     public bool IsActive { get; private set; }
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? UpdatedOnUtc { get; set; }
+    public ICollection<Doctor.Doctor> Doctors { get; private set; } = default!;
 
     public void Update(string address, string registryPhoneNumber)
     {
