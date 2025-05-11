@@ -1,4 +1,5 @@
-﻿using Clinic.Domain.Office;
+﻿using Clinic.Domain.Doctor;
+using Clinic.Domain.Office;
 using Clinic.Domain.Specialization;
 using Clinic.Persistence.Interceptors;
 using Clinic.Persistence.Repositories;
@@ -24,6 +25,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IOfficeRepository, OfficeRepository>();
         services.AddScoped<ISpecializationRepository, SpecializationRepository>();
+        services.AddScoped<IDoctorRepository, DoctorRepository>();
 
         return services;
     }

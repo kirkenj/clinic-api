@@ -1,4 +1,4 @@
-﻿namespace Clinic.Application.Dtos.Specialization;
+﻿namespace Clinic.Application.Responses.Specialization;
 public sealed record SpecializationResponse(
     uint Id,
     string Name,

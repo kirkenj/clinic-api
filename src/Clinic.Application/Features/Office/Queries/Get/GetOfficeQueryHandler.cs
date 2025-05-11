@@ -1,4 +1,4 @@
-﻿using Clinic.Application.Dtos.Office;
+﻿using Clinic.Application.Responses.Office;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Office;
 using MediatR;

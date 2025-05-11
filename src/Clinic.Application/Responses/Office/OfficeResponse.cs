@@ -1,4 +1,4 @@
-﻿namespace Clinic.Application.Dtos.Office;
+﻿namespace Clinic.Application.Responses.Office;
 public sealed record OfficeResponse(
     uint Id,
     string Address,

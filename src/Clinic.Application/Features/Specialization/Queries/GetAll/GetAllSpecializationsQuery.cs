@@ -1,4 +1,4 @@
-﻿using Clinic.Application.Dtos.Specialization;
+﻿using Clinic.Application.Responses.Specialization;
 using Clinic.Domain.Abstractions;
 using MediatR;
 
