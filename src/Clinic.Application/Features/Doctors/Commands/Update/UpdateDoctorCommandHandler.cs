@@ -14,6 +14,8 @@ public sealed class UpdateDoctorCommandHandler(
 {
     public async Task<Result> Handle(UpdateDoctorCommand request, CancellationToken cancellationToken)
     {
+        request.TrimStringProperties();
+
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
@@ -59,45 +61,40 @@ public sealed class UpdateDoctorCommandHandler(
             }
         }
 
-        var trimmedPhone = request.PhoneNumber.Trim();
-        var hasSamePhone = string.Equals(doctor.PhoneNumber, trimmedPhone, StringComparison.InvariantCultureIgnoreCase);
-        if (!hasSamePhone) 
+        var hasSamePhone = string.Equals(doctor.PhoneNumber, request.PhoneNumber, StringComparison.InvariantCultureIgnoreCase);
+        if (!hasSamePhone)
         {
-            var isPhoneTaken = await receptionistRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+            var isPhoneTaken = await receptionistRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
             if (isPhoneTaken)
             {
-                return ReceptionistErrors.PhoneAlreadyTaken(trimmedPhone);
+                return ReceptionistErrors.PhoneAlreadyTaken(request.PhoneNumber);
             }
 
-            isPhoneTaken = await doctorRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+            isPhoneTaken = await doctorRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
             if (isPhoneTaken)
             {
-                return DoctorErrors.PhoneAlreadyTaken(trimmedPhone);
+                return DoctorErrors.PhoneAlreadyTaken(request.PhoneNumber);
             }
         }
 
-        var trimmedEmail = request.Email.Trim();
-        var hasSameEmail = string.Equals(doctor.Email, trimmedEmail, StringComparison.InvariantCultureIgnoreCase);
+        var hasSameEmail = string.Equals(doctor.Email, request.Email, StringComparison.InvariantCultureIgnoreCase);
         if (!hasSameEmail)
         {
-            var isEmailTaken = await receptionistRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
+            var isEmailTaken = await receptionistRepository.ExistsByEmailAsync(request.Email, cancellationToken);
             if (isEmailTaken)
             {
-                return ReceptionistErrors.EmailAlreadyTaken(trimmedEmail);
+                return ReceptionistErrors.EmailAlreadyTaken(request.Email);
             }
 
-            isEmailTaken = await doctorRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
+            isEmailTaken = await doctorRepository.ExistsByEmailAsync(request.Email, cancellationToken);
             if (isEmailTaken)
             {
-                return DoctorErrors.EmailAlreadyTaken(trimmedEmail);
+                return DoctorErrors.EmailAlreadyTaken(request.Email);
             }
         }
 
-        var trimmedFirstName = request.FirstName.Trim();
-        var trimmedLastName = request.LastName.Trim();
-        var trimmedMiddleName = request.MiddleName.Trim();
-        doctor.Update(trimmedFirstName, trimmedLastName, 
-            trimmedMiddleName, trimmedEmail, trimmedPhone, 
+        doctor.Update(request.FirstName, request.LastName,
+            request.MiddleName, request.Email, request.PhoneNumber,
             request.SpecializationId, request.OfficeId);
 
         await doctorRepository.UpdateAsync(doctor, cancellationToken);

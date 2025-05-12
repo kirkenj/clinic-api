@@ -15,36 +15,36 @@ public sealed class AddDoctorCommandHandler(
 {
     public async Task<Result> Handle(AddDoctorCommand request, CancellationToken cancellationToken)
     {
+        request.TrimStringProperties();
+
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        var trimmedPhone = request.PhoneNumber.Trim();
-        var isPhoneTaken = await receptionistRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+        var isPhoneTaken = await receptionistRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
         if (isPhoneTaken)
         {
-            return ReceptionistErrors.PhoneAlreadyTaken(trimmedPhone);
+            return ReceptionistErrors.PhoneAlreadyTaken(request.PhoneNumber);
         }
 
-        isPhoneTaken = await doctorRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+        isPhoneTaken = await doctorRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
         if (isPhoneTaken)
         {
-            return DoctorErrors.PhoneAlreadyTaken(trimmedPhone);
+            return DoctorErrors.PhoneAlreadyTaken(request.PhoneNumber);
         }
 
-        var trimmedEmail = request.Email.Trim();
-        var isEmailTaken = await receptionistRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
+        var isEmailTaken = await receptionistRepository.ExistsByEmailAsync(request.Email, cancellationToken);
         if (isEmailTaken)
         {
-            return ReceptionistErrors.EmailAlreadyTaken(trimmedEmail);
+            return ReceptionistErrors.EmailAlreadyTaken(request.Email);
         }
 
-        isEmailTaken = await doctorRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
+        isEmailTaken = await doctorRepository.ExistsByEmailAsync(request.Email, cancellationToken);
         if (isEmailTaken)
         {
-            return DoctorErrors.EmailAlreadyTaken(trimmedEmail);
+            return DoctorErrors.EmailAlreadyTaken(request.Email);
         }
 
         var office = await officeRepository.GetByIdAsync(request.OfficeId, cancellationToken);
@@ -69,11 +69,8 @@ public sealed class AddDoctorCommandHandler(
             return SpecializationErrors.NotActive(request.SpecializationId);
         }
 
-        var trimmedFirstName = request.FirstName.Trim();
-        var trimmedLastName = request.LastName.Trim();
-        var trimmedMiddleName = request.MiddleName.Trim();
-        var doctor = Doctor.Create(trimmedFirstName, trimmedLastName, 
-            trimmedMiddleName, trimmedEmail, trimmedPhone, 
+        var doctor = Doctor.Create(request.FirstName, request.LastName,
+            request.MiddleName, request.Email, request.PhoneNumber,
             request.SpecializationId, request.OfficeId);
 
         await doctorRepository.AddAsync(doctor, cancellationToken);

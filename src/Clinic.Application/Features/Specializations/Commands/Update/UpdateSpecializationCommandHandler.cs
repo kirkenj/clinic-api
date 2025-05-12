@@ -11,6 +11,8 @@ public sealed class UpdateSpecializationCommandHandler(
 {
     public async Task<Result> Handle(UpdateSpecializationCommand request, CancellationToken cancellationToken)
     {
+        request.TrimStringProperties();
+
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
@@ -28,18 +30,17 @@ public sealed class UpdateSpecializationCommandHandler(
             return SpecializationErrors.NotActive(specialization.Id);
         }
 
-        var trimmedName = request.Name.Trim();
-        var hasSameName = string.Equals(specialization.Name, trimmedName, StringComparison.InvariantCultureIgnoreCase);
+        var hasSameName = string.Equals(specialization.Name, request.Name, StringComparison.InvariantCultureIgnoreCase);
         if (!hasSameName)
         {
-            var isExists = await specializationRepository.ExistsByNameAsync(trimmedName, cancellationToken);
+            var isExists = await specializationRepository.ExistsByNameAsync(request.Name, cancellationToken);
             if (isExists)
             {
-                return SpecializationErrors.NameAlreadyTaken(trimmedName);
+                return SpecializationErrors.NameAlreadyTaken(request.Name);
             }
         }
 
-        specialization.Update(trimmedName);
+        specialization.Update(request.Name);
 
         await specializationRepository.UpdateAsync(specialization, cancellationToken);
 

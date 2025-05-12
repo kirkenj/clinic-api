@@ -12,20 +12,21 @@ public sealed class AddOfficeCommandHandler(
 {
     public async Task<Result> Handle(AddOfficeCommand request, CancellationToken cancellationToken)
     {
+        request.TrimStringProperties();
+
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        var trimmedPhone = request.PhoneNumber.Trim();
-        var isPhoneTaken = await officeRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+        var isPhoneTaken = await officeRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
         if (isPhoneTaken)
         {
-            return OfficeErrors.PhoneAlreadyTaken(trimmedPhone);
+            return OfficeErrors.PhoneAlreadyTaken(request.PhoneNumber);
         }
 
-        var office = Office.Create(request.Address, trimmedPhone);
+        var office = Office.Create(request.Address, request.PhoneNumber);
 
         await officeRepository.AddAsync(office, cancellationToken);
 

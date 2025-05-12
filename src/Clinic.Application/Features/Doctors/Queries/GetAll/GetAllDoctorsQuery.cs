@@ -3,5 +3,5 @@ using Clinic.Domain.Abstractions;
 using MediatR;
 
 namespace Clinic.Application.Features.Doctors.Queries.GetAll;
-public sealed record GetAllDoctorsQuery : IRequest<Result<IEnumerable<DoctorResponse>>>
+public sealed class GetAllDoctorsQuery : IRequest<Result<IEnumerable<DoctorResponse>>>
 { }

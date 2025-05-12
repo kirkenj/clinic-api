@@ -21,7 +21,7 @@ public sealed class ReceptionistsController(IMediator mediator) : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(uint id)
     {
-        var result = await mediator.Send(new GetReceptionistQuery(id), HttpContext.RequestAborted);
+        var result = await mediator.Send(new GetReceptionistQuery { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 

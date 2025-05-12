@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Clinic.Application.Validation;
+using FluentValidation;
 
 namespace Clinic.Application.Features.Specializations.Commands.Add;
 public sealed class AddSpecializationCommandValidator : AbstractValidator<AddSpecializationCommand>
@@ -6,6 +7,6 @@ public sealed class AddSpecializationCommandValidator : AbstractValidator<AddSpe
     public AddSpecializationCommandValidator()
     {
         RuleFor(c => c.Name)
-            .NotEmpty();
+            .TitleField();
     }
 }
