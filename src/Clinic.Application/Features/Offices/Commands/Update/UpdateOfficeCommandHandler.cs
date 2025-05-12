@@ -29,7 +29,7 @@ public sealed class UpdateOfficeCommandHandler(
         }
 
         var trimmedPhone = request.PhoneNumber.Trim();
-        if (office.PhoneNumber != trimmedPhone)
+        if (string.Equals(office.PhoneNumber, trimmedPhone, StringComparison.InvariantCultureIgnoreCase))
         {
             var isPhoneTaken = await officeRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
             if (isPhoneTaken)

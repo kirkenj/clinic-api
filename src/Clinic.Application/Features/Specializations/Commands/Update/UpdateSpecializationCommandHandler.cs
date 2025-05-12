@@ -29,7 +29,7 @@ public sealed class UpdateSpecializationCommandHandler(
         }
 
         var trimmedName = request.Name.Trim();
-        if (specialization.Name != trimmedName)
+        if (string.Equals(specialization.Name, trimmedName, StringComparison.InvariantCultureIgnoreCase))
         {
             var isExists = await specializationRepository.ExistsByNameAsync(trimmedName, cancellationToken);
             if (isExists)
