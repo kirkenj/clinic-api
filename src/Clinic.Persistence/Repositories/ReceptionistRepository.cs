@@ -14,7 +14,7 @@ public class ReceptionistRepository(ClinnicContext context) : IReceptionistRepos
 
     public async Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(o => o.PhoneNumber == email, cancellationToken);
+        return await _dbSet.AnyAsync(o => o.Email == email, cancellationToken);
     }
 
     public async Task<ICollection<Receptionist>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
