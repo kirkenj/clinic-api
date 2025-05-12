@@ -5,7 +5,8 @@ using MediatR;
 
 namespace Clinic.Application.Features.Doctors.Commands.Update;
 public sealed class UpdateDoctorCommandHandler(
-    IDoctorRepository DoctorRepository,
+    IReceptionistRepository receptionistRepository,
+    IDoctorRepository doctorRepository,
     ISpecializationRepository specializationRepository,
     IOfficeRepository officeRepository,
     UpdateDoctorCommandValidator validator
@@ -19,7 +20,7 @@ public sealed class UpdateDoctorCommandHandler(
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        var doctor = await DoctorRepository.GetByIdAsync(request.Id, cancellationToken);
+        var doctor = await doctorRepository.GetByIdAsync(request.Id, cancellationToken);
         if (doctor is null)
         {
             return DoctorErrors.NotFound(request.Id);
@@ -59,9 +60,16 @@ public sealed class UpdateDoctorCommandHandler(
         }
 
         var trimmedPhone = request.PhoneNumber.Trim();
-        if (doctor.PhoneNumber != trimmedPhone)
+        var hasSamePhone = string.Equals(doctor.PhoneNumber, trimmedPhone, StringComparison.InvariantCultureIgnoreCase);
+        if (!hasSamePhone) 
         {
-            var isPhoneTaken = await DoctorRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+            var isPhoneTaken = await receptionistRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+            if (isPhoneTaken)
+            {
+                return ReceptionistErrors.PhoneAlreadyTaken(trimmedPhone);
+            }
+
+            isPhoneTaken = await doctorRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
             if (isPhoneTaken)
             {
                 return DoctorErrors.PhoneAlreadyTaken(trimmedPhone);
@@ -69,19 +77,30 @@ public sealed class UpdateDoctorCommandHandler(
         }
 
         var trimmedEmail = request.Email.Trim();
-        if (doctor.Email != trimmedEmail)
+        var hasSameEmail = string.Equals(doctor.Email, trimmedEmail, StringComparison.InvariantCultureIgnoreCase);
+        if (!hasSameEmail)
         {
-            var isEmailTaken = await DoctorRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
+            var isEmailTaken = await receptionistRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
+            if (isEmailTaken)
+            {
+                return ReceptionistErrors.EmailAlreadyTaken(trimmedEmail);
+            }
+
+            isEmailTaken = await doctorRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
             if (isEmailTaken)
             {
                 return DoctorErrors.EmailAlreadyTaken(trimmedEmail);
             }
         }
 
-        doctor.Update(request.FirstName, request.LastName, request.MiddleName,
-            trimmedEmail, trimmedPhone, request.SpecializationId, request.OfficeId);
+        var trimmedFirstName = request.FirstName.Trim();
+        var trimmedLastName = request.LastName.Trim();
+        var trimmedMiddleName = request.MiddleName.Trim();
+        doctor.Update(trimmedFirstName, trimmedLastName, 
+            trimmedMiddleName, trimmedEmail, trimmedPhone, 
+            request.SpecializationId, request.OfficeId);
 
-        await DoctorRepository.UpdateAsync(doctor, cancellationToken);
+        await doctorRepository.UpdateAsync(doctor, cancellationToken);
 
         return Result.Success();
     }

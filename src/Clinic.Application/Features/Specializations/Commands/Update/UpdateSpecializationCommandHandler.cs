@@ -29,7 +29,8 @@ public sealed class UpdateSpecializationCommandHandler(
         }
 
         var trimmedName = request.Name.Trim();
-        if (specialization.Name != trimmedName)
+        var hasSameName = string.Equals(specialization.Name, trimmedName, StringComparison.InvariantCultureIgnoreCase);
+        if (!hasSameName)
         {
             var isExists = await specializationRepository.ExistsByNameAsync(trimmedName, cancellationToken);
             if (isExists)

@@ -7,6 +7,7 @@ using MediatR;
 namespace Clinic.Application.Features.Doctors.Commands.Add;
 public sealed class AddDoctorCommandHandler(
     IDoctorRepository doctorRepository,
+    IReceptionistRepository receptionistRepository,
     ISpecializationRepository specializationRepository,
     IOfficeRepository officeRepository,
     AddDoctorCommandValidator validator
@@ -21,14 +22,26 @@ public sealed class AddDoctorCommandHandler(
         }
 
         var trimmedPhone = request.PhoneNumber.Trim();
-        var isPhoneTaken = await doctorRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+        var isPhoneTaken = await receptionistRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+        if (isPhoneTaken)
+        {
+            return ReceptionistErrors.PhoneAlreadyTaken(trimmedPhone);
+        }
+
+        isPhoneTaken = await doctorRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
         if (isPhoneTaken)
         {
             return DoctorErrors.PhoneAlreadyTaken(trimmedPhone);
         }
 
         var trimmedEmail = request.Email.Trim();
-        var isEmailTaken = await doctorRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
+        var isEmailTaken = await receptionistRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
+        if (isEmailTaken)
+        {
+            return ReceptionistErrors.EmailAlreadyTaken(trimmedEmail);
+        }
+
+        isEmailTaken = await doctorRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
         if (isEmailTaken)
         {
             return DoctorErrors.EmailAlreadyTaken(trimmedEmail);
@@ -56,9 +69,12 @@ public sealed class AddDoctorCommandHandler(
             return SpecializationErrors.NotActive(request.SpecializationId);
         }
 
-
-        var doctor = Doctor.Create(request.FirstName, request.LastName, request.MiddleName,
-            trimmedEmail, trimmedPhone, request.SpecializationId, request.OfficeId);
+        var trimmedFirstName = request.FirstName.Trim();
+        var trimmedLastName = request.LastName.Trim();
+        var trimmedMiddleName = request.MiddleName.Trim();
+        var doctor = Doctor.Create(trimmedFirstName, trimmedLastName, 
+            trimmedMiddleName, trimmedEmail, trimmedPhone, 
+            request.SpecializationId, request.OfficeId);
 
         await doctorRepository.AddAsync(doctor, cancellationToken);
 
