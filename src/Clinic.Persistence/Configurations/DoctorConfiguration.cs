@@ -1,4 +1,4 @@
-﻿using Clinic.Domain.Doctor;
+﻿using Clinic.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -32,6 +32,9 @@ public sealed class DoctorConfiguration : IEntityTypeConfiguration<Doctor>
         builder.Property(m => m.PhoneNumber)
             .IsRequired()
             .HasMaxLength(50);
+
+        builder.HasIndex(m => m.PhoneNumber)
+            .IsUnique();
 
         builder.Property(m => m.Email)
             .IsRequired()

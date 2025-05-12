@@ -1,8 +1,8 @@
-﻿using Clinic.Application.Features.Doctor.Commands.Add;
-using Clinic.Application.Features.Doctor.Commands.Delete;
-using Clinic.Application.Features.Doctor.Commands.Update;
-using Clinic.Application.Features.Doctor.Queries.Get;
-using Clinic.Application.Features.Doctor.Queries.GetAll;
+﻿using Clinic.Application.Features.Doctors.Commands.Add;
+using Clinic.Application.Features.Doctors.Commands.Delete;
+using Clinic.Application.Features.Doctors.Commands.Update;
+using Clinic.Application.Features.Doctors.Queries.Get;
+using Clinic.Application.Features.Doctors.Queries.GetAll;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

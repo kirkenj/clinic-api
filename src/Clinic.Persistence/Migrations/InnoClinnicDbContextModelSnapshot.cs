@@ -22,7 +22,7 @@ namespace Clinic.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Clinic.Domain.Doctor.Doctor", b =>
+            modelBuilder.Entity("Clinic.Domain.Entities.Doctor", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -77,12 +77,15 @@ namespace Clinic.Persistence.Migrations
 
                     b.HasIndex("OfficeId");
 
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique();
+
                     b.HasIndex("SpecializationId");
 
                     b.ToTable("Doctors", (string)null);
                 });
 
-            modelBuilder.Entity("Clinic.Domain.Office.Office", b =>
+            modelBuilder.Entity("Clinic.Domain.Entities.Office", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -116,7 +119,7 @@ namespace Clinic.Persistence.Migrations
                     b.ToTable("Offices", (string)null);
                 });
 
-            modelBuilder.Entity("Clinic.Domain.Receptionist.Receptionist", b =>
+            modelBuilder.Entity("Clinic.Domain.Entities.Receptionist", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -166,7 +169,7 @@ namespace Clinic.Persistence.Migrations
                     b.ToTable("Receptionists", (string)null);
                 });
 
-            modelBuilder.Entity("Clinic.Domain.Specialization.Specialization", b =>
+            modelBuilder.Entity("Clinic.Domain.Entities.Specialization", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -195,15 +198,15 @@ namespace Clinic.Persistence.Migrations
                     b.ToTable("Specializations", (string)null);
                 });
 
-            modelBuilder.Entity("Clinic.Domain.Doctor.Doctor", b =>
+            modelBuilder.Entity("Clinic.Domain.Entities.Doctor", b =>
                 {
-                    b.HasOne("Clinic.Domain.Office.Office", "Office")
+                    b.HasOne("Clinic.Domain.Entities.Office", "Office")
                         .WithMany("Doctors")
                         .HasForeignKey("OfficeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Clinic.Domain.Specialization.Specialization", "Speciallization")
+                    b.HasOne("Clinic.Domain.Entities.Specialization", "Speciallization")
                         .WithMany("Doctors")
                         .HasForeignKey("SpecializationId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -214,12 +217,12 @@ namespace Clinic.Persistence.Migrations
                     b.Navigation("Speciallization");
                 });
 
-            modelBuilder.Entity("Clinic.Domain.Office.Office", b =>
+            modelBuilder.Entity("Clinic.Domain.Entities.Office", b =>
                 {
                     b.Navigation("Doctors");
                 });
 
-            modelBuilder.Entity("Clinic.Domain.Specialization.Specialization", b =>
+            modelBuilder.Entity("Clinic.Domain.Entities.Specialization", b =>
                 {
                     b.Navigation("Doctors");
                 });

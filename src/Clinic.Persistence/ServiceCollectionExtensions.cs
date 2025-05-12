@@ -1,6 +1,4 @@
-﻿using Clinic.Domain.Doctor;
-using Clinic.Domain.Office;
-using Clinic.Domain.Specialization;
+﻿using Clinic.Domain.Repositories;
 using Clinic.Persistence.Interceptors;
 using Clinic.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
