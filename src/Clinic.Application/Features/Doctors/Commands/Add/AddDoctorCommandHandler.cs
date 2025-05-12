@@ -7,6 +7,7 @@ using MediatR;
 namespace Clinic.Application.Features.Doctors.Commands.Add;
 public sealed class AddDoctorCommandHandler(
     IDoctorRepository doctorRepository,
+    IReceptionistRepository receptionistRepository,
     ISpecializationRepository specializationRepository,
     IOfficeRepository officeRepository,
     AddDoctorCommandValidator validator
@@ -21,15 +22,27 @@ public sealed class AddDoctorCommandHandler(
         }
 
         var trimmedPhone = request.PhoneNumber.Trim();
-        var isPhoneTaken = await doctorRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
-        if (isPhoneTaken)
+        var isPhoneTakenByReceptionist = await receptionistRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+        if (isPhoneTakenByReceptionist)
+        {
+            return ReceptionistErrors.PhoneAlreadyTaken(trimmedPhone);
+        }
+
+        var isPhoneTakenByDoctor = await doctorRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+        if (isPhoneTakenByDoctor)
         {
             return DoctorErrors.PhoneAlreadyTaken(trimmedPhone);
         }
 
         var trimmedEmail = request.Email.Trim();
-        var isEmailTaken = await doctorRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
-        if (isEmailTaken)
+        var isEmailTakenByReceptionist = await receptionistRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
+        if (isEmailTakenByReceptionist)
+        {
+            return ReceptionistErrors.EmailAlreadyTaken(trimmedEmail);
+        }
+
+        var isEmailTakenByDoctor = await doctorRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
+        if (isEmailTakenByDoctor)
         {
             return DoctorErrors.EmailAlreadyTaken(trimmedEmail);
         }
