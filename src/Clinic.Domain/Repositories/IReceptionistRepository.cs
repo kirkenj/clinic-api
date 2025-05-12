@@ -5,7 +5,7 @@ public interface IReceptionistRepository
 {
     public Task<Receptionist?> GetByIdAsync(uint id, CancellationToken cancellationToken);
     public Task<ICollection<Receptionist>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false);
-    public Task UpdateAsync(Receptionist Doctor, CancellationToken cancellationToken);
+    public Task UpdateAsync(Receptionist receptionist, CancellationToken cancellationToken);
     public Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken);
     public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken);
 }

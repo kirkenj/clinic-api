@@ -1,4 +1,6 @@
-﻿using Clinic.Domain.Abstractions;
+﻿using System.Numerics;
+using Clinic.Domain.Abstractions;
+using Clinic.Domain.Entities;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
 using MediatR;
@@ -30,39 +32,39 @@ public sealed class UpdateReceptionistCommandHandler(
         }
 
         var trimmedPhone = request.PhoneNumber.Trim();
-        if (receptionist.PhoneNumber != trimmedPhone)
+        if (string.Equals(receptionist.PhoneNumber, trimmedPhone, StringComparison.InvariantCultureIgnoreCase))
         {
-            var isPhoneTakenByReceptionist = await receptionistRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
-            if (isPhoneTakenByReceptionist)
+            var isPhoneTaken = await receptionistRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+            if (isPhoneTaken)
             {
                 return ReceptionistErrors.PhoneAlreadyTaken(trimmedPhone);
             }
 
-            var isPhoneTakenByDoctor = await doctorRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
-            if (isPhoneTakenByDoctor)
+            isPhoneTaken = await doctorRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+            if (isPhoneTaken)
             {
                 return DoctorErrors.PhoneAlreadyTaken(trimmedPhone);
             }
         }
 
         var trimmedEmail = request.Email.Trim();
-        if (receptionist.Email != trimmedEmail)
+        if (string.Equals(receptionist.Email, trimmedEmail, StringComparison.InvariantCultureIgnoreCase))
         {
-            var isEmailTakenByReceptionist = await receptionistRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
-            if (isEmailTakenByReceptionist)
+            var isEmailTaken = await receptionistRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
+            if (isEmailTaken)
             {
                 return ReceptionistErrors.EmailAlreadyTaken(trimmedEmail);
             }
 
-            var isEmailTakenByDoctor = await doctorRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
-            if (isEmailTakenByDoctor)
+            isEmailTaken = await doctorRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
+            if (isEmailTaken)
             {
                 return DoctorErrors.EmailAlreadyTaken(trimmedEmail);
             }
         }
 
-        receptionist.Update(request.FirstName, request.LastName, request.MiddleName,
-            trimmedEmail, trimmedPhone);
+        receptionist.Update(request.FirstName.Trim(), request.LastName.Trim(), 
+            request.MiddleName.Trim(), trimmedEmail, trimmedPhone);
 
         await receptionistRepository.UpdateAsync(receptionist, cancellationToken);
 

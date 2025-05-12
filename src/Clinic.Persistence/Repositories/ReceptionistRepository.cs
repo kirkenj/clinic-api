@@ -9,18 +9,19 @@ public class ReceptionistRepository(ClinnicContext context) : IReceptionistRepos
 
     public async Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(o => o.PhoneNumber == phoneNumber, cancellationToken);
+        return await _dbSet.AnyAsync(r => r.PhoneNumber == phoneNumber, cancellationToken);
     }
 
     public async Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(o => o.Email == email, cancellationToken);
+        return await _dbSet.AnyAsync(r => r.Email == email, cancellationToken);
     }
 
     public async Task<ICollection<Receptionist>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
     {
-        var set = includeTracking ? _dbSet : _dbSet.AsNoTracking();
-        return await set.ToListAsync(cancellationToken);
+        return includeTracking 
+            ? await _dbSet.AsNoTracking().ToListAsync(cancellationToken)
+            : await _dbSet.ToListAsync(cancellationToken);
     }
 
     public async Task<Receptionist?> GetByIdAsync(uint id, CancellationToken cancellationToken)
@@ -28,9 +29,9 @@ public class ReceptionistRepository(ClinnicContext context) : IReceptionistRepos
         return await _dbSet.FindAsync([id], cancellationToken);
     }
 
-    public async Task UpdateAsync(Receptionist Receptionist, CancellationToken cancellationToken)
+    public async Task UpdateAsync(Receptionist receptionist, CancellationToken cancellationToken)
     {
-        context.Update(Receptionist);
+        context.Update(receptionist);
         await context.SaveChangesAsync(cancellationToken);
     }
 }

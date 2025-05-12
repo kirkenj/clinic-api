@@ -26,9 +26,10 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
     }
 
     public async Task<ICollection<Office>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
-    {
-        var set = includeTracking ? _dbSet : _dbSet.AsNoTracking();
-        return await set.ToListAsync(cancellationToken);
+    {    
+        return includeTracking 
+            ? await _dbSet.AsNoTracking().ToListAsync(cancellationToken)
+            : await _dbSet.ToListAsync(cancellationToken);
     }
 
     public async Task<Office?> GetByIdAsync(uint id, CancellationToken cancellationToken)

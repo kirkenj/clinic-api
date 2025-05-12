@@ -9,7 +9,7 @@ public sealed class GetAllReceptionistsQueryHandler(IReceptionistRepository rece
 {
     public async Task<Result<IEnumerable<ReceptionistResponse>>> Handle(GetAllReceptionistsQuery request, CancellationToken cancellationToken)
     {
-        var Receptionists = await receptionistRepository.GetAllAsync(cancellationToken, false);
-        return Result.Success(ReceptionistResponse.FromReceptionistCollection(Receptionists));
+        var receptionists = await receptionistRepository.GetAllAsync(cancellationToken, false);
+        return Result.Success(ReceptionistResponse.FromReceptionistCollection(receptionists));
     }
 }

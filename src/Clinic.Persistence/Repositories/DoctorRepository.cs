@@ -22,18 +22,19 @@ public sealed class DoctorRepository(ClinnicContext context) : IDoctorRepository
 
     public async Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(o => o.PhoneNumber == phoneNumber, cancellationToken);
+        return await _dbSet.AnyAsync(d => d.PhoneNumber == phoneNumber, cancellationToken);
     }
 
     public async Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(o => o.Email == email, cancellationToken);
+        return await _dbSet.AnyAsync(d => d.Email == email, cancellationToken);
     }
 
     public async Task<ICollection<Doctor>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
-    {
-        var set = includeTracking ? _dbSet : _dbSet.AsNoTracking();
-        return await set.ToListAsync(cancellationToken);
+    {    
+        return includeTracking 
+            ? await _dbSet.AsNoTracking().ToListAsync(cancellationToken)
+            : await _dbSet.ToListAsync(cancellationToken);
     }
 
     public async Task<Doctor?> GetByIdAsync(uint id, CancellationToken cancellationToken)

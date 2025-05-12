@@ -21,13 +21,14 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
 
     public async Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(o => o.Name == name, cancellationToken);
+        return await _dbSet.AnyAsync(s => s.Name == name, cancellationToken);
     }
 
     public async Task<ICollection<Specialization>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
     {
-        var set = includeTracking ? _dbSet : _dbSet.AsNoTracking();
-        return await set.ToListAsync(cancellationToken);
+        return includeTracking 
+            ? await _dbSet.AsNoTracking().ToListAsync(cancellationToken)
+            : await _dbSet.ToListAsync(cancellationToken);
     }
 
     public async Task<Specialization?> GetByIdAsync(uint id, CancellationToken cancellationToken)

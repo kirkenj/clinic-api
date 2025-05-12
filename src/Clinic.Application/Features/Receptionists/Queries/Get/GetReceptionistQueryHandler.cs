@@ -11,13 +11,13 @@ public sealed class GetReceptionistQueryHandler(IReceptionistRepository receptio
 {
     public async Task<Result<ReceptionistResponse>> Handle(GetReceptionistQuery request, CancellationToken cancellationToken)
     {
-        var Receptionist = await receptionistRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (Receptionist is null)
+        var receptionist = await receptionistRepository.GetByIdAsync(request.Id, cancellationToken);
+        if (receptionist is null)
         {
             return Result.Failure<ReceptionistResponse>(
                 ReceptionistErrors.NotFound(request.Id));
         }
 
-        return ReceptionistResponse.FromReceptionist(Receptionist);
+        return ReceptionistResponse.FromReceptionist(receptionist);
     }
 }
