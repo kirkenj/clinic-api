@@ -6,6 +6,15 @@ public sealed class UpdateReceptionistCommandValidator : AbstractValidator<Updat
 {
     public UpdateReceptionistCommandValidator()
     {
+        RuleFor(c => c.FirstName)
+            .TitleField();
+
+        RuleFor(c => c.LastName)
+            .TitleField();
+
+        RuleFor(c => c.MiddleName)
+            .TitleField();
+
         RuleFor(c => c.PhoneNumber)
             .BelarusianPhoneNumber();
 

@@ -4,5 +4,7 @@ using MediatR;
 
 namespace Clinic.Application.Features.Receptionists.Queries.Get;
 
-public sealed record GetReceptionistQuery(uint Id) : IRequest<Result<ReceptionistResponse>>
-{ }
+public sealed class GetReceptionistQuery : IRequest<Result<ReceptionistResponse>>
+{
+    public uint Id { get; set; }
+}

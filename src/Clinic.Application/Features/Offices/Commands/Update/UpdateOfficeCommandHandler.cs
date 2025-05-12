@@ -11,6 +11,8 @@ public sealed class UpdateOfficeCommandHandler(
 {
     public async Task<Result> Handle(UpdateOfficeCommand request, CancellationToken cancellationToken)
     {
+        request.TrimStringProperties();
+
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
@@ -28,18 +30,17 @@ public sealed class UpdateOfficeCommandHandler(
             return OfficeErrors.NotActive(office.Id);
         }
 
-        var trimmedPhone = request.PhoneNumber.Trim();
-        var hasSamePhone = string.Equals(office.PhoneNumber, trimmedPhone, StringComparison.InvariantCultureIgnoreCase);
-        if (!hasSamePhone) 
+        var hasSamePhone = string.Equals(office.PhoneNumber, request.PhoneNumber, StringComparison.InvariantCultureIgnoreCase);
+        if (!hasSamePhone)
         {
-            var isPhoneTaken = await officeRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+            var isPhoneTaken = await officeRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
             if (isPhoneTaken)
             {
-                return OfficeErrors.PhoneAlreadyTaken(trimmedPhone);
+                return OfficeErrors.PhoneAlreadyTaken(request.PhoneNumber);
             }
         }
 
-        office.Update(request.Address, trimmedPhone);
+        office.Update(request.Address, request.PhoneNumber);
 
         await officeRepository.UpdateAsync(office, cancellationToken);
 
