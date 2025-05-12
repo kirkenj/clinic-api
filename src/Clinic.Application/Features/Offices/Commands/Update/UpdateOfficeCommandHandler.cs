@@ -29,7 +29,8 @@ public sealed class UpdateOfficeCommandHandler(
         }
 
         var trimmedPhone = request.PhoneNumber.Trim();
-        if (string.Equals(office.PhoneNumber, trimmedPhone, StringComparison.InvariantCultureIgnoreCase))
+        var hasSamePhone = string.Equals(office.PhoneNumber, trimmedPhone, StringComparison.InvariantCultureIgnoreCase);
+        if (!hasSamePhone) 
         {
             var isPhoneTaken = await officeRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
             if (isPhoneTaken)

@@ -69,9 +69,11 @@ public sealed class AddDoctorCommandHandler(
             return SpecializationErrors.NotActive(request.SpecializationId);
         }
 
-
-        var doctor = Doctor.Create(request.FirstName.Trim(), request.LastName.Trim(), 
-            request.MiddleName.Trim(), trimmedEmail, trimmedPhone, 
+        var trimmedFirstName = request.FirstName.Trim();
+        var trimmedLastName = request.LastName.Trim();
+        var trimmedMiddleName = request.MiddleName.Trim();
+        var doctor = Doctor.Create(trimmedFirstName, trimmedLastName, 
+            trimmedMiddleName, trimmedEmail, trimmedPhone, 
             request.SpecializationId, request.OfficeId);
 
         await doctorRepository.AddAsync(doctor, cancellationToken);

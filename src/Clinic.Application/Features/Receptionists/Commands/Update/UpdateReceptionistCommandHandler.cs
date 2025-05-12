@@ -32,7 +32,8 @@ public sealed class UpdateReceptionistCommandHandler(
         }
 
         var trimmedPhone = request.PhoneNumber.Trim();
-        if (string.Equals(receptionist.PhoneNumber, trimmedPhone, StringComparison.InvariantCultureIgnoreCase))
+        var hasSamePhone = string.Equals(receptionist.PhoneNumber, trimmedPhone, StringComparison.InvariantCultureIgnoreCase);
+        if (!hasSamePhone)
         {
             var isPhoneTaken = await receptionistRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
             if (isPhoneTaken)
@@ -48,7 +49,8 @@ public sealed class UpdateReceptionistCommandHandler(
         }
 
         var trimmedEmail = request.Email.Trim();
-        if (string.Equals(receptionist.Email, trimmedEmail, StringComparison.InvariantCultureIgnoreCase))
+        var hasSameEmail = string.Equals(receptionist.Email, trimmedEmail, StringComparison.InvariantCultureIgnoreCase);
+        if (!hasSameEmail)
         {
             var isEmailTaken = await receptionistRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
             if (isEmailTaken)
@@ -63,8 +65,12 @@ public sealed class UpdateReceptionistCommandHandler(
             }
         }
 
-        receptionist.Update(request.FirstName.Trim(), request.LastName.Trim(), 
-            request.MiddleName.Trim(), trimmedEmail, trimmedPhone);
+
+        var trimmedFirstName = request.FirstName.Trim();
+        var trimmedLastName = request.LastName.Trim();
+        var trimmedMiddleName = request.MiddleName.Trim();
+        receptionist.Update(trimmedFirstName, trimmedLastName, 
+            trimmedMiddleName, trimmedPhone, trimmedEmail);
 
         await receptionistRepository.UpdateAsync(receptionist, cancellationToken);
 

@@ -60,7 +60,8 @@ public sealed class UpdateDoctorCommandHandler(
         }
 
         var trimmedPhone = request.PhoneNumber.Trim();
-        if (string.Equals(doctor.PhoneNumber, trimmedPhone, StringComparison.InvariantCultureIgnoreCase))
+        var hasSamePhone = string.Equals(doctor.PhoneNumber, trimmedPhone, StringComparison.InvariantCultureIgnoreCase);
+        if (!hasSamePhone) 
         {
             var isPhoneTaken = await receptionistRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
             if (isPhoneTaken)
@@ -76,7 +77,8 @@ public sealed class UpdateDoctorCommandHandler(
         }
 
         var trimmedEmail = request.Email.Trim();
-        if (string.Equals(doctor.Email, trimmedEmail, StringComparison.InvariantCultureIgnoreCase))
+        var hasSameEmail = string.Equals(doctor.Email, trimmedEmail, StringComparison.InvariantCultureIgnoreCase);
+        if (!hasSameEmail)
         {
             var isEmailTaken = await receptionistRepository.ExistsByEmailAsync(trimmedEmail, cancellationToken);
             if (isEmailTaken)
@@ -91,8 +93,11 @@ public sealed class UpdateDoctorCommandHandler(
             }
         }
 
-        doctor.Update(request.FirstName.Trim(), request.LastName.Trim(), 
-            request.MiddleName.Trim(), trimmedEmail, trimmedPhone, 
+        var trimmedFirstName = request.FirstName.Trim();
+        var trimmedLastName = request.LastName.Trim();
+        var trimmedMiddleName = request.MiddleName.Trim();
+        doctor.Update(trimmedFirstName, trimmedLastName, 
+            trimmedMiddleName, trimmedEmail, trimmedPhone, 
             request.SpecializationId, request.OfficeId);
 
         await doctorRepository.UpdateAsync(doctor, cancellationToken);
