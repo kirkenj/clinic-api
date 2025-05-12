@@ -19,9 +19,10 @@ public sealed class AddOfficeCommandHandler(
         }
 
         var trimmedPhone = request.PhoneNumber.Trim();
-        if (await officeRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken))
+        var isPhoneTaken = await officeRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+        if (isPhoneTaken)
         {
-            return OfficeErrors.PhoneAlreadyTaken(request.PhoneNumber);
+            return OfficeErrors.PhoneAlreadyTaken(trimmedPhone);
         }
 
         var office = Office.Create(request.Address, trimmedPhone);

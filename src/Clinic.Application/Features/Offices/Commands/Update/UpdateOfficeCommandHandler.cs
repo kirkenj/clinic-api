@@ -31,7 +31,8 @@ public sealed class UpdateOfficeCommandHandler(
         var trimmedPhone = request.PhoneNumber.Trim();
         if (office.PhoneNumber != trimmedPhone)
         {
-            if (await officeRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken))
+            var isPhoneTaken = await officeRepository.ExistsByPhoneNumberAsync(trimmedPhone, cancellationToken);
+            if (isPhoneTaken)
             {
                 return OfficeErrors.PhoneAlreadyTaken(trimmedPhone);
             }

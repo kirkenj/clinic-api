@@ -30,7 +30,6 @@ public sealed class UpdateDoctorCommandHandler(
             return DoctorErrors.NotActive(doctor.Id);
         }
 
-
         if (request.OfficeId != doctor.OfficeId)
         {
             var office = await officeRepository.GetByIdAsync(request.OfficeId, cancellationToken);
