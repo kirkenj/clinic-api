@@ -22,7 +22,70 @@ namespace Clinic.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Clinic.Domain.Office.Office", b =>
+            modelBuilder.Entity("Clinic.Domain.Entities.Doctor", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("MiddleName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<long>("OfficeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<long>("SpecializationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("UpdatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("OfficeId");
+
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique();
+
+                    b.HasIndex("SpecializationId");
+
+                    b.ToTable("Doctors", (string)null);
+                });
+
+            modelBuilder.Entity("Clinic.Domain.Entities.Office", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -56,7 +119,7 @@ namespace Clinic.Persistence.Migrations
                     b.ToTable("Offices", (string)null);
                 });
 
-            modelBuilder.Entity("Clinic.Domain.Receptionist.Receptionist", b =>
+            modelBuilder.Entity("Clinic.Domain.Entities.Receptionist", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -106,7 +169,7 @@ namespace Clinic.Persistence.Migrations
                     b.ToTable("Receptionists", (string)null);
                 });
 
-            modelBuilder.Entity("Clinic.Domain.Specialization.Specialization", b =>
+            modelBuilder.Entity("Clinic.Domain.Entities.Specialization", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -133,6 +196,35 @@ namespace Clinic.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Specializations", (string)null);
+                });
+
+            modelBuilder.Entity("Clinic.Domain.Entities.Doctor", b =>
+                {
+                    b.HasOne("Clinic.Domain.Entities.Office", "Office")
+                        .WithMany("Doctors")
+                        .HasForeignKey("OfficeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Clinic.Domain.Entities.Specialization", "Speciallization")
+                        .WithMany("Doctors")
+                        .HasForeignKey("SpecializationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Office");
+
+                    b.Navigation("Speciallization");
+                });
+
+            modelBuilder.Entity("Clinic.Domain.Entities.Office", b =>
+                {
+                    b.Navigation("Doctors");
+                });
+
+            modelBuilder.Entity("Clinic.Domain.Entities.Specialization", b =>
+                {
+                    b.Navigation("Doctors");
                 });
 #pragma warning restore 612, 618
         }

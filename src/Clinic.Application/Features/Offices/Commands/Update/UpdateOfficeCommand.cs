@@ -1,0 +1,11 @@
+﻿using Clinic.Domain.Abstractions;
+using MediatR;
+
+namespace Clinic.Application.Features.Offices.Commands.Update;
+
+public sealed record UpdateOfficeCommand(
+    uint Id,
+    string Address,
+    string PhoneNumber
+    ) : IRequest<Result>
+{ }

@@ -1,4 +1,4 @@
-﻿using Clinic.Domain.Specialization;
+﻿using Clinic.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

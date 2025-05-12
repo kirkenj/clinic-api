@@ -1,4 +1,5 @@
-﻿using Clinic.Domain.Office;
+﻿using Clinic.Domain.Entities;
+using Clinic.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Clinic.Persistence.Repositories;
@@ -24,9 +25,9 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
         return await _dbSet.AnyAsync(o => o.PhoneNumber == phoneNumber, cancellationToken);
     }
 
-    public async Task<ICollection<Office>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking)
+    public async Task<ICollection<Office>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
     {
-        var set = !includeTracking ? _dbSet.AsNoTracking() : _dbSet;
+        var set = includeTracking ? _dbSet : _dbSet.AsNoTracking();
         return await set.ToListAsync(cancellationToken);
     }
 

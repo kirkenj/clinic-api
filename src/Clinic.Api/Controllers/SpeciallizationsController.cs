@@ -1,8 +1,8 @@
-﻿using Clinic.Application.Features.Specialization.Commands.Add;
-using Clinic.Application.Features.Specialization.Commands.Delete;
-using Clinic.Application.Features.Specialization.Commands.Update;
-using Clinic.Application.Features.Specialization.Queries.Get;
-using Clinic.Application.Features.Specialization.Queries.GetAll;
+﻿using Clinic.Application.Features.Specializations.Commands.Add;
+using Clinic.Application.Features.Specializations.Commands.Delete;
+using Clinic.Application.Features.Specializations.Commands.Update;
+using Clinic.Application.Features.Specializations.Queries.Get;
+using Clinic.Application.Features.Specializations.Queries.GetAll;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

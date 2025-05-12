@@ -1,4 +1,5 @@
-﻿using Clinic.Domain.Specialization;
+﻿using Clinic.Domain.Entities;
+using Clinic.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Clinic.Persistence.Repositories;
@@ -25,7 +26,7 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
 
     public async Task<ICollection<Specialization>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
     {
-        var set = !includeTracking ? _dbSet.AsNoTracking() : _dbSet;
+        var set = includeTracking ? _dbSet : _dbSet.AsNoTracking();
         return await set.ToListAsync(cancellationToken);
     }
 
