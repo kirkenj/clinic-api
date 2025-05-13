@@ -22,12 +22,12 @@ public sealed class PatientRepository(ClinnicContext context) : IPatientReposito
 
     public async Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(d => d.PhoneNumber == phoneNumber, cancellationToken);
+        return await _dbSet.AnyAsync(p => p.PhoneNumber == phoneNumber, cancellationToken);
     }
 
     public async Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(d => d.Email == email, cancellationToken);
+        return await _dbSet.AnyAsync(p => p.Email == email, cancellationToken);
     }
 
     public async Task<ICollection<Patient>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
