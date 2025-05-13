@@ -26,7 +26,7 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
 
     public async Task<ICollection<Specialization>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
     {
-        return includeTracking 
+        return includeTracking
             ? await _dbSet.AsNoTracking().ToListAsync(cancellationToken)
             : await _dbSet.ToListAsync(cancellationToken);
     }

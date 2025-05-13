@@ -1,5 +1,4 @@
-﻿using System;
-using Clinic.Application.Extensions;
+﻿using Clinic.Application.Extensions;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;

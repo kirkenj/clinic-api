@@ -19,7 +19,7 @@ public class ReceptionistRepository(ClinnicContext context) : IReceptionistRepos
 
     public async Task<ICollection<Receptionist>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
     {
-        return includeTracking 
+        return includeTracking
             ? await _dbSet.AsNoTracking().ToListAsync(cancellationToken)
             : await _dbSet.ToListAsync(cancellationToken);
     }

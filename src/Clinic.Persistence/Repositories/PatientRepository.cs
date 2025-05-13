@@ -31,8 +31,8 @@ public sealed class PatientRepository(ClinnicContext context) : IPatientReposito
     }
 
     public async Task<ICollection<Patient>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
-    {    
-        return includeTracking 
+    {
+        return includeTracking
             ? await _dbSet.AsNoTracking().ToListAsync(cancellationToken)
             : await _dbSet.ToListAsync(cancellationToken);
     }

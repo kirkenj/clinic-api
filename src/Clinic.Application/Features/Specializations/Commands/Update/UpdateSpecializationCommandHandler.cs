@@ -32,7 +32,7 @@ public sealed class UpdateSpecializationCommandHandler(
         }
 
         var hasSameName = specialization.Name.HasSameValue(request.Name);
-        if(!hasSameName)
+        if (!hasSameName)
         {
             var isExists = await specializationRepository.ExistsByNameAsync(request.Name, cancellationToken);
             if (isExists)
