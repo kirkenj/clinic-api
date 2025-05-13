@@ -1,4 +1,5 @@
-﻿using Clinic.Domain.Abstractions;
+﻿using Clinic.Application.Extensions;
+using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
 using MediatR;
@@ -31,7 +32,7 @@ public sealed class UpdateReceptionistCommandHandler(
             return ReceptionistErrors.NotActive(receptionist.Id);
         }
 
-        var hasSamePhone = string.Equals(receptionist.PhoneNumber, request.PhoneNumber, StringComparison.InvariantCultureIgnoreCase);
+        var hasSamePhone = receptionist.PhoneNumber.HasSameValue(request.PhoneNumber);
         if (!hasSamePhone)
         {
             var isPhoneTaken = await receptionistRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
@@ -47,7 +48,7 @@ public sealed class UpdateReceptionistCommandHandler(
             }
         }
 
-        var hasSameEmail = string.Equals(receptionist.Email, request.Email, StringComparison.InvariantCultureIgnoreCase);
+        var hasSameEmail = receptionist.Email.HasSameValue(request.Email);
         if (!hasSameEmail)
         {
             var isEmailTaken = await receptionistRepository.ExistsByEmailAsync(request.Email, cancellationToken);
