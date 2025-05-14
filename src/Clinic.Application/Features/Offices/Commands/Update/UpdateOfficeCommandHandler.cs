@@ -1,4 +1,5 @@
-﻿using Clinic.Domain.Abstractions;
+﻿using Clinic.Application.Extensions;
+using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
 using MediatR;
@@ -30,7 +31,7 @@ public sealed class UpdateOfficeCommandHandler(
             return OfficeErrors.NotActive(office.Id);
         }
 
-        var hasSamePhone = string.Equals(office.PhoneNumber, request.PhoneNumber, StringComparison.InvariantCultureIgnoreCase);
+        var hasSamePhone = office.PhoneNumber.HasSameValue(request.PhoneNumber);
         if (!hasSamePhone)
         {
             var isPhoneTaken = await officeRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);

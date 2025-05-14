@@ -1,4 +1,5 @@
-﻿using Clinic.Domain.Abstractions;
+﻿using Clinic.Application.Extensions;
+using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
 using MediatR;
@@ -30,7 +31,7 @@ public sealed class UpdateSpecializationCommandHandler(
             return SpecializationErrors.NotActive(specialization.Id);
         }
 
-        var hasSameName = string.Equals(specialization.Name, request.Name, StringComparison.InvariantCultureIgnoreCase);
+        var hasSameName = specialization.Name.HasSameValue(request.Name);
         if (!hasSameName)
         {
             var isExists = await specializationRepository.ExistsByNameAsync(request.Name, cancellationToken);
