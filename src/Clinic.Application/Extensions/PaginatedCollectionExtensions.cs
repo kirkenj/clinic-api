@@ -8,6 +8,7 @@ public static class PaginatedCollectionExtensions
         Func<TSourse, TDestination> selectDelegate)
     {
         var officeResponses = source.Items.Select(selectDelegate).ToArray();
-        return new PaginatedCollection<TDestination>(officeResponses, source.Page, source.PageSize, source.TotalCount);
+        return new PaginatedCollection<TDestination>(officeResponses, source.Page, 
+            source.PageSize, source.TotalCount);
     }
 }
