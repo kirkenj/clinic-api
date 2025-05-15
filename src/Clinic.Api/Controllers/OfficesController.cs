@@ -3,6 +3,7 @@ using Clinic.Application.Features.Offices.Commands.Delete;
 using Clinic.Application.Features.Offices.Commands.Update;
 using Clinic.Application.Features.Offices.Queries.Get;
 using Clinic.Application.Features.Offices.Queries.GetAll;
+using Clinic.Application.Features.Offices.Queries.GetPaginated;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +18,13 @@ public sealed class OfficesController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetAllAsync()
     {
         var result = await mediator.Send(new GetAllOfficesQuery(), HttpContext.RequestAborted);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+    }
+
+    [HttpGet("page")]
+    public async Task<IActionResult> GetPaginatedAsync(uint page, uint pageSize)
+    {
+        var result = await mediator.Send(new GetPaginatedOfficesRequest() { Page = page, PageSize = pageSize }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
