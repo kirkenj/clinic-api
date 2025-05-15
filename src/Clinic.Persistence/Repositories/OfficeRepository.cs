@@ -38,21 +38,18 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
         return await _dbSet.FindAsync([id], cancellationToken);
     }
 
-    public async Task<PaginatedCollection<Office>> GetPaginatedAsync(uint page, uint pageSize, CancellationToken cancellationToken, bool includeTracking = false)
+    public async Task<PaginatedCollection<Office>> GetPaginatedAsync(uint page, uint pageSize, CancellationToken cancellationToken)
     {
-        var set = includeTracking
-            ? _dbSet.AsNoTracking()
-            : _dbSet;
+        var totalCount = await _dbSet.CountAsync(cancellationToken);
 
-        var totalCount = (uint)await set.CountAsync(cancellationToken);
-
-        var collectoin = await set
+        var collection = await _dbSet.OrderBy(o => o.Id)
+            .AsNoTracking()
             .OrderBy(o => o.Id)
             .Skip((int)((page - 1) * pageSize))
             .Take((int)pageSize)
             .ToListAsync(cancellationToken);
 
-        return new PaginatedCollection<Office>(collectoin, page, pageSize, totalCount);
+        return new PaginatedCollection<Office>(collection, page, pageSize, totalCount);
     }
 
     public async Task UpdateAsync(Office office, CancellationToken cancellationToken)

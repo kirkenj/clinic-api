@@ -8,16 +8,12 @@ public sealed class AddPatientCommandValidator : AbstractValidator<AddPatientCom
     {
         RuleFor(c => c.FirstName)
             .TitleField();
-
         RuleFor(c => c.LastName)
             .TitleField();
-
         RuleFor(c => c.MiddleName)
             .TitleField();
-
         RuleFor(c => c.PhoneNumber)
             .BelarusianPhoneNumber();
-
         RuleFor(m => m.Email)
             .EmailAddress();
     }

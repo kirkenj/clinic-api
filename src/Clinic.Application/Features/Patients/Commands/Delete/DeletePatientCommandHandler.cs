@@ -16,7 +16,6 @@ public sealed class DeletePatientCommandHandler(IPatientRepository patientReposi
         }
 
         await patientRepository.DeleteAsync(patient, cancellationToken);
-
         return Result.Success();
     }
 }

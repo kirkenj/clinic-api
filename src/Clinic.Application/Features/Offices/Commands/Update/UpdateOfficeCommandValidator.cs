@@ -8,7 +8,6 @@ public sealed class UpdateOfficeCommandValidator : AbstractValidator<UpdateOffic
     {
         RuleFor(c => c.PhoneNumber)
             .BelarusianPhoneNumber();
-
         RuleFor(m => m.Address)
             .Address();
     }

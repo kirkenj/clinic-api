@@ -8,7 +8,6 @@ public sealed class AddOfficeCommandValidator : AbstractValidator<AddOfficeComma
     {
         RuleFor(c => c.PhoneNumber)
             .BelarusianPhoneNumber();
-
         RuleFor(m => m.Address)
             .Address();
     }

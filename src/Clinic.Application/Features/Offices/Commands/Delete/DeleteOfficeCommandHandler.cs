@@ -16,7 +16,6 @@ public sealed class DeleteOfficeCommandHandler(IOfficeRepository officeRepositor
         }
 
         await officeRepository.DeleteAsync(office, cancellationToken);
-
         return Result.Success();
     }
 }

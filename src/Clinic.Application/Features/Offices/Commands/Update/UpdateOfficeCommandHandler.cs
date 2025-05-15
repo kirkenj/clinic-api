@@ -5,15 +5,14 @@ using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Offices.Commands.Update;
-public sealed class UpdateOfficeCommandHandler(
-    IOfficeRepository officeRepository,
-    UpdateOfficeCommandValidator validator
-    ) : IRequestHandler<UpdateOfficeCommand, Result>
+public sealed class UpdateOfficeCommandHandler
+    (IOfficeRepository officeRepository,
+    UpdateOfficeCommandValidator validator)
+    : IRequestHandler<UpdateOfficeCommand, Result>
 {
     public async Task<Result> Handle(UpdateOfficeCommand request, CancellationToken cancellationToken)
     {
         request.TrimStringProperties();
-
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
@@ -42,9 +41,7 @@ public sealed class UpdateOfficeCommandHandler(
         }
 
         office.Update(request.Address, request.PhoneNumber);
-
         await officeRepository.UpdateAsync(office, cancellationToken);
-
         return Result.Success();
     }
 }

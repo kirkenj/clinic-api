@@ -16,7 +16,6 @@ public sealed class DeleteSpecializationCommandHandler(ISpecializationRepository
         }
 
         await specializationRepository.DeleteAsync(specialization, cancellationToken);
-
         return Result.Success();
     }
 }
