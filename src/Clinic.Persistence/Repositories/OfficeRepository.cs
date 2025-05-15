@@ -1,4 +1,5 @@
-﻿using Clinic.Domain.Entities;
+﻿using Clinic.Domain.Abstractions;
+using Clinic.Domain.Entities;
 using Clinic.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,17 +38,21 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
         return await _dbSet.FindAsync([id], cancellationToken);
     }
 
-    public async Task<ICollection<Office>> GetPaginatedAsync(uint page, uint pageSize, CancellationToken cancellationToken, bool includeTracking = false)
+    public async Task<PaginatedCollection<Office>> GetPaginatedAsync(uint page, uint pageSize, CancellationToken cancellationToken, bool includeTracking = false)
     {
         var set = includeTracking
             ? _dbSet.AsNoTracking()
             : _dbSet;
 
-        return await set
+        var totalCount = (uint)await set.CountAsync(cancellationToken);
+
+        var collectoin = await set
             .OrderBy(o => o.Id)
             .Skip((int)((page - 1) * pageSize))
             .Take((int)pageSize)
             .ToListAsync(cancellationToken);
+
+        return new PaginatedCollection<Office>(collectoin, page, pageSize, totalCount);
     }
 
     public async Task UpdateAsync(Office office, CancellationToken cancellationToken)
