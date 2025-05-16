@@ -11,7 +11,10 @@ public sealed class DeletePatientCommandHandler(IPatientRepository patientReposi
     public async Task<Result> Handle(DeletePatientCommand request, CancellationToken cancellationToken)
     {
         var patient = await patientRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (patient is null) return PatientErrors.NotFound(request.Id);
+        if (patient is null)
+        {
+            return PatientErrors.NotFound(request.Id);
+        }
 
         await patientRepository.DeleteAsync(patient, cancellationToken);
         return Result.Success();

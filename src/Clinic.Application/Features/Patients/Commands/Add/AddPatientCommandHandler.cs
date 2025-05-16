@@ -17,13 +17,21 @@ public sealed class AddPatientCommandHandler
 
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
+        {
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
 
         var isPhoneTaken = await patientRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
-        if (isPhoneTaken) return PatientErrors.PhoneAlreadyTaken(request.PhoneNumber);
+        if (isPhoneTaken)
+        {
+            return PatientErrors.PhoneAlreadyTaken(request.PhoneNumber);
+        }
 
         var isEmailTaken = await patientRepository.ExistsByEmailAsync(request.Email, cancellationToken);
-        if (isEmailTaken) return PatientErrors.EmailAlreadyTaken(request.Email);
+        if (isEmailTaken)
+        {
+            return PatientErrors.EmailAlreadyTaken(request.Email);
+        }
 
         var patient = Patient.Create(request.FirstName, request.LastName,
             request.MiddleName, request.Email, request.PhoneNumber);

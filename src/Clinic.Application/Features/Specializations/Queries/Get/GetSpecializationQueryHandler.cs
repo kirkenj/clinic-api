@@ -14,8 +14,10 @@ public sealed class GetSpecializationQueryHandler(ISpecializationRepository spec
     {
         var specialization = await specializationRepository.GetByIdAsync(request.Id, cancellationToken);
         if (specialization is null)
+        {
             return Result.Failure<SpecializationResponse>(
                 SpecializationErrors.NotFound(request.Id));
+        }
 
         return SpecializationResponse.FromSpecialization(specialization);
     }

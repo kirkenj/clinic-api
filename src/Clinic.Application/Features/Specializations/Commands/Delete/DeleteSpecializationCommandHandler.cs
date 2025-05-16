@@ -11,7 +11,10 @@ public sealed class DeleteSpecializationCommandHandler(ISpecializationRepository
     public async Task<Result> Handle(DeleteSpecializationCommand request, CancellationToken cancellationToken)
     {
         var specialization = await specializationRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (specialization is null) return SpecializationErrors.NotFound(request.Id);
+        if (specialization is null)
+        {
+            return SpecializationErrors.NotFound(request.Id);
+        }
 
         await specializationRepository.DeleteAsync(specialization, cancellationToken);
         return Result.Success();

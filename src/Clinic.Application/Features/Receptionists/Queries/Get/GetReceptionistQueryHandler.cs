@@ -14,8 +14,10 @@ public sealed class GetReceptionistQueryHandler(IReceptionistRepository receptio
     {
         var receptionist = await receptionistRepository.GetByIdAsync(request.Id, cancellationToken);
         if (receptionist is null)
+        {
             return Result.Failure<ReceptionistResponse>(
                 ReceptionistErrors.NotFound(request.Id));
+        }
 
         return ReceptionistResponse.FromReceptionist(receptionist);
     }

@@ -17,10 +17,12 @@ public sealed class AuditableEntitiesInterceptor(ILogger<AuditableEntitiesInterc
         var dbContext = eventData.Context;
 
         if (dbContext is null)
+        {
             return base.SavingChangesAsync(
                 eventData,
                 result,
                 cancellationToken);
+        }
 
         var entries =
             dbContext
@@ -30,10 +32,14 @@ public sealed class AuditableEntitiesInterceptor(ILogger<AuditableEntitiesInterc
         foreach (var entityEntry in entries)
         {
             if (entityEntry.State == EntityState.Added)
+            {
                 entityEntry.Property(a => a.CreatedOnUtc).CurrentValue = DateTime.UtcNow;
+            }
 
             if (entityEntry.State == EntityState.Modified)
+            {
                 entityEntry.Property(a => a.UpdatedOnUtc).CurrentValue = DateTime.UtcNow;
+            }
         }
 
         return base.SavingChangesAsync(

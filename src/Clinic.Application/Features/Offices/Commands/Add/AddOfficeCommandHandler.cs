@@ -17,10 +17,15 @@ public sealed class AddOfficeCommandHandler
 
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
+        {
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
 
         var isPhoneTaken = await officeRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
-        if (isPhoneTaken) return OfficeErrors.PhoneAlreadyTaken(request.PhoneNumber);
+        if (isPhoneTaken)
+        {
+            return OfficeErrors.PhoneAlreadyTaken(request.PhoneNumber);
+        }
 
         var office = Office.Create(request.Address, request.PhoneNumber);
 

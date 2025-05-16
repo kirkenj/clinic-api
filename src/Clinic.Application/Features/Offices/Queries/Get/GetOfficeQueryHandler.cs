@@ -13,8 +13,10 @@ public sealed class GetOfficeQueryHandler(IOfficeRepository officeRepository)
     {
         var office = await officeRepository.GetByIdAsync(request.Id, cancellationToken);
         if (office is null)
+        {
             return Result.Failure<OfficeResponse>(
                 OfficeErrors.NotFound(request.Id));
+        }
 
         return OfficeResponse.FromOffice(office);
     }

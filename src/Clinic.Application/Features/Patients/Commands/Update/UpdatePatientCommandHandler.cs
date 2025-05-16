@@ -17,25 +17,39 @@ public sealed class UpdatePatientCommandHandler(
 
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
+        {
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
 
         var patient = await patientRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (patient is null) return PatientErrors.NotFound(request.Id);
+        if (patient is null)
+        {
+            return PatientErrors.NotFound(request.Id);
+        }
 
-        if (!patient.IsActive) return PatientErrors.NotActive(patient.Id);
+        if (!patient.IsActive)
+        {
+            return PatientErrors.NotActive(patient.Id);
+        }
 
         var hasSamePhone = patient.PhoneNumber.HasSameValue(request.PhoneNumber);
         if (!hasSamePhone)
         {
             var isPhoneTaken = await patientRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
-            if (isPhoneTaken) return PatientErrors.PhoneAlreadyTaken(request.PhoneNumber);
+            if (isPhoneTaken)
+            {
+                return PatientErrors.PhoneAlreadyTaken(request.PhoneNumber);
+            }
         }
 
         var hasSameEmail = patient.Email.HasSameValue(request.Email);
         if (!hasSameEmail)
         {
             var isEmailTaken = await patientRepository.ExistsByEmailAsync(request.Email, cancellationToken);
-            if (isEmailTaken) return PatientErrors.EmailAlreadyTaken(request.Email);
+            if (isEmailTaken)
+            {
+                return PatientErrors.EmailAlreadyTaken(request.Email);
+            }
         }
 
         patient.Update(request.FirstName, request.LastName,

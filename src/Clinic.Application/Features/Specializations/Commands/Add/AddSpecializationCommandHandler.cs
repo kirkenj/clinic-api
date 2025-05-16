@@ -16,10 +16,15 @@ public sealed class AddSpecializationCommandHandler
         request.TrimStringProperties();
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
+        {
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
 
         var isExists = await specializationRepository.ExistsByNameAsync(request.Name, cancellationToken);
-        if (isExists) return SpecializationErrors.NameAlreadyTaken(request.Name);
+        if (isExists)
+        {
+            return SpecializationErrors.NameAlreadyTaken(request.Name);
+        }
 
         var specialization = Specialization.Create(request.Name);
         await specializationRepository.AddAsync(specialization, cancellationToken);

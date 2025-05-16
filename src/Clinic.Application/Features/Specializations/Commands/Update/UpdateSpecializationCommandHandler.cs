@@ -16,18 +16,29 @@ public sealed class UpdateSpecializationCommandHandler
         request.TrimStringProperties();
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
+        {
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
 
         var specialization = await specializationRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (specialization is null) return SpecializationErrors.NotFound(request.Id);
+        if (specialization is null)
+        {
+            return SpecializationErrors.NotFound(request.Id);
+        }
 
-        if (!specialization.IsActive) return SpecializationErrors.NotActive(specialization.Id);
+        if (!specialization.IsActive)
+        {
+            return SpecializationErrors.NotActive(specialization.Id);
+        }
 
         var hasSameName = specialization.Name.HasSameValue(request.Name);
         if (!hasSameName)
         {
             var isExists = await specializationRepository.ExistsByNameAsync(request.Name, cancellationToken);
-            if (isExists) return SpecializationErrors.NameAlreadyTaken(request.Name);
+            if (isExists)
+            {
+                return SpecializationErrors.NameAlreadyTaken(request.Name);
+            }
         }
 
         specialization.Update(request.Name);
