@@ -5,6 +5,6 @@ using MediatR;
 namespace Clinic.Application.Features.Offices.Queries.GetPaginated;
 public class GetPaginatedOfficesRequest : IRequest<Result<PaginatedCollection<OfficeResponse>>>
 {
-    public uint Page { get; set; }
-    public uint PageSize { get; set; }
+    public int Page { get; set; }
+    public int PageSize { get; set; }
 }

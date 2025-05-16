@@ -5,7 +5,9 @@ public class GetPaginatedOfficesRequestValidator : AbstractValidator<GetPaginate
 {
     public GetPaginatedOfficesRequestValidator()
     {
-        RuleFor(r => r.Page).NotEmpty();
-        RuleFor(r => r.PageSize).NotEmpty();
+        RuleFor(r => r.Page)
+            .GreaterThan(0);
+        RuleFor(r => r.PageSize)
+            .GreaterThan(0);
     }
 }
