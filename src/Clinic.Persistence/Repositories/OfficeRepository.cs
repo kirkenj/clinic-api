@@ -26,7 +26,7 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
         return await _dbSet.AnyAsync(o => o.PhoneNumber == phoneNumber, cancellationToken);
     }
 
-    public async Task<ICollection<Office>> GetAllAsync(CancellationToken cancellationToken, 
+    public async Task<ICollection<Office>> GetAllAsync(CancellationToken cancellationToken,
         bool includeTracking = false)
     {
         return includeTracking
@@ -39,7 +39,7 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
         return await _dbSet.FindAsync([id], cancellationToken);
     }
 
-    public async Task<PaginatedCollection<Office>> GetPaginatedAsync(int page, int pageSize, 
+    public async Task<PaginatedCollection<Office>> GetPaginatedAsync(int page, int pageSize,
         CancellationToken cancellationToken)
     {
         var totalCount = await _dbSet.CountAsync(cancellationToken);

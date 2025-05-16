@@ -1,9 +1,12 @@
 ﻿using Clinic.Domain.Abstractions;
 
 namespace Clinic.Domain.Entities;
+
 public sealed class Specialization : BaseEntity, IAuditableEntity
 {
-    private Specialization() { }
+    private Specialization()
+    {
+    }
 
     public Specialization(string name)
     {
@@ -13,9 +16,9 @@ public sealed class Specialization : BaseEntity, IAuditableEntity
 
     public bool IsActive { get; private set; }
     public string Name { get; private set; } = default!;
+    public ICollection<Doctor> Doctors { get; private set; } = default!;
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? UpdatedOnUtc { get; set; }
-    public ICollection<Doctor> Doctors { get; private set; } = default!;
 
     public void Update(string name)
     {
@@ -24,6 +27,6 @@ public sealed class Specialization : BaseEntity, IAuditableEntity
 
     public static Specialization Create(string name)
     {
-        return new(name);
+        return new Specialization(name);
     }
 }

@@ -12,9 +12,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.RegisterApplicationServices();
 builder.Services.RegisterPersistenceServices(configuration);
 
-builder.Host.UseSerilog((context, configuration) =>
+builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
-    configuration.ReadFrom.Configuration(context.Configuration);
+    loggerConfiguration.ReadFrom.Configuration(context.Configuration);
 });
 
 var app = builder.Build();

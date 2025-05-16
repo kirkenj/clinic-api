@@ -6,13 +6,14 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Clinic.Application.Features.Offices.Queries.GetPaginated;
-public class GetPaginatedOfficesRequestHandler
-    (ILogger<GetPaginatedOfficesRequestHandler> logger,
+
+public class GetPaginatedOfficesRequestHandler(ILogger<GetPaginatedOfficesRequestHandler> logger,
     IOfficeRepository officeRepository,
-    GetPaginatedOfficesRequestValidator validator) 
-    : IRequestHandler<GetPaginatedOfficesRequest, Result<PaginatedCollection<OfficeResponse>>>
+    GetPaginatedOfficesRequestValidator validator) : IRequestHandler<GetPaginatedOfficesRequest,
+    Result<PaginatedCollection<OfficeResponse>>>
 {
-    public async Task<Result<PaginatedCollection<OfficeResponse>>> Handle(GetPaginatedOfficesRequest request, CancellationToken cancellationToken)
+    public async Task<Result<PaginatedCollection<OfficeResponse>>> Handle(GetPaginatedOfficesRequest request,
+        CancellationToken cancellationToken)
     {
         logger.LogInformation("GetPaginatedOfficesRequest: {@request}", request);
         var validationResult = validator.Validate(request);
@@ -23,7 +24,8 @@ public class GetPaginatedOfficesRequestHandler
                 Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage)));
         }
 
-        var paginatedOffices = await officeRepository.GetPaginatedAsync(request.Page, request.PageSize, cancellationToken);
+        var paginatedOffices =
+            await officeRepository.GetPaginatedAsync(request.Page, request.PageSize, cancellationToken);
         var officeResponse = paginatedOffices.Select(OfficeResponse.FromOffice);
         logger.LogInformation("PaginatedOfficesResponse: {@response}", officeResponse);
         return Result.Success(officeResponse);

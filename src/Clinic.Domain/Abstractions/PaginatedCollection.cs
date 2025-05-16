@@ -1,4 +1,5 @@
 ﻿namespace Clinic.Domain.Abstractions;
+
 public sealed class PaginatedCollection<T>(
     ICollection<T> items,
     int page,

@@ -3,6 +3,7 @@ using Clinic.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Clinic.Persistence.Repositories;
+
 public class SpecializationRepository(ClinnicContext context) : ISpecializationRepository
 {
     private readonly DbSet<Specialization> _dbSet = context.Set<Specialization>();
@@ -24,7 +25,8 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
         return await _dbSet.AnyAsync(s => s.Name == name, cancellationToken);
     }
 
-    public async Task<ICollection<Specialization>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
+    public async Task<ICollection<Specialization>> GetAllAsync(CancellationToken cancellationToken,
+        bool includeTracking = false)
     {
         return includeTracking
             ? await _dbSet.AsNoTracking().ToListAsync(cancellationToken)

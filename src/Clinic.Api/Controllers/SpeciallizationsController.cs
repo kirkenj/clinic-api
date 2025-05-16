@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Clinic.Api.Controllers;
 
-
 [Route("api/[controller]")]
 [ApiController]
 public sealed class SpecializationsController(IMediator mediator) : ControllerBase
@@ -23,14 +22,14 @@ public sealed class SpecializationsController(IMediator mediator) : ControllerBa
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(uint id)
     {
-        var result = await mediator.Send(new GetSpecializationQuery(id), HttpContext.RequestAborted);
+        var result = await mediator.Send(new GetSpecializationQuery { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(uint id)
     {
-        var result = await mediator.Send(new DeleteSpecializationCommand(id), HttpContext.RequestAborted);
+        var result = await mediator.Send(new DeleteSpecializationCommand { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 

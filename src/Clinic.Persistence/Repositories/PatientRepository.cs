@@ -30,7 +30,8 @@ public sealed class PatientRepository(ClinnicContext context) : IPatientReposito
         return await _dbSet.AnyAsync(p => p.Email == email, cancellationToken);
     }
 
-    public async Task<ICollection<Patient>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
+    public async Task<ICollection<Patient>> GetAllAsync(CancellationToken cancellationToken,
+        bool includeTracking = false)
     {
         return includeTracking
             ? await _dbSet.AsNoTracking().ToListAsync(cancellationToken)

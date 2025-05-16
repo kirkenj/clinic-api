@@ -2,6 +2,7 @@
 using FluentValidation;
 
 namespace Clinic.Application.Features.Patients.Commands.Add;
+
 public sealed class AddPatientCommandValidator : AbstractValidator<AddPatientCommand>
 {
     public AddPatientCommandValidator()

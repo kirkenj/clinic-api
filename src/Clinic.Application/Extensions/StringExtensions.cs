@@ -1,4 +1,5 @@
 ﻿namespace Clinic.Application.Extensions;
+
 public static class StringExtensions
 {
     public static bool HasSameValue(this string a, string b,

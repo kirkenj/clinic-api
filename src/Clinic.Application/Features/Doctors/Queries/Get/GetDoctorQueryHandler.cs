@@ -13,10 +13,8 @@ public sealed class GetDoctorQueryHandler(IDoctorRepository doctorRepository)
     {
         var doctor = await doctorRepository.GetByIdAsync(request.Id, cancellationToken);
         if (doctor is null)
-        {
             return Result.Failure<DoctorResponse>(
                 DoctorErrors.NotFound(request.Id));
-        }
 
         return DoctorResponse.FromDoctor(doctor);
     }

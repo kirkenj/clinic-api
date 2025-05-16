@@ -4,16 +4,14 @@ using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Offices.Commands.Delete;
+
 public sealed class DeleteOfficeCommandHandler(IOfficeRepository officeRepository)
     : IRequestHandler<DeleteOfficeCommand, Result>
 {
     public async Task<Result> Handle(DeleteOfficeCommand request, CancellationToken cancellationToken)
     {
         var office = await officeRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (office is null)
-        {
-            return OfficeErrors.NotFound(request.Id);
-        }
+        if (office is null) return OfficeErrors.NotFound(request.Id);
 
         await officeRepository.DeleteAsync(office, cancellationToken);
         return Result.Success();

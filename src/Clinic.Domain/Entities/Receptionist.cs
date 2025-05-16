@@ -4,7 +4,9 @@ namespace Clinic.Domain.Entities;
 
 public sealed class Receptionist : BaseEntity, IAuditableEntity
 {
-    private Receptionist() { }
+    private Receptionist()
+    {
+    }
 
     private Receptionist(string firstName, string lastName,
         string middleName, string email,
@@ -49,7 +51,7 @@ public sealed class Receptionist : BaseEntity, IAuditableEntity
         string middleName, string phoneNumber,
         string email)
     {
-        return new(firstName, lastName,
+        return new Receptionist(firstName, lastName,
             middleName, email,
             phoneNumber);
     }

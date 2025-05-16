@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 
 namespace Clinic.Application.Features.Offices.Queries.GetPaginated;
+
 public class GetPaginatedOfficesRequestValidator : AbstractValidator<GetPaginatedOfficesRequest>
 {
     public GetPaginatedOfficesRequestValidator()

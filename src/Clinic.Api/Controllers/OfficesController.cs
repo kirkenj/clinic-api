@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Clinic.Api.Controllers;
 
-
 [Route("api/[controller]")]
 [ApiController]
 public sealed class OfficesController(IMediator mediator) : ControllerBase
@@ -22,9 +21,10 @@ public sealed class OfficesController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("page")]
-    public async Task<IActionResult> GetPaginatedAsync(uint page, uint pageSize)
+    public async Task<IActionResult> GetPaginatedAsync(int page, int pageSize)
     {
-        var result = await mediator.Send(new GetPaginatedOfficesRequest() { Page = page, PageSize = pageSize }, HttpContext.RequestAborted);
+        var result = await mediator.Send(new GetPaginatedOfficesRequest { Page = page, PageSize = pageSize },
+            HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 

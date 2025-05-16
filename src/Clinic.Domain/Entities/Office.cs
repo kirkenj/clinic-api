@@ -4,7 +4,9 @@ namespace Clinic.Domain.Entities;
 
 public sealed class Office : BaseEntity, IAuditableEntity
 {
-    private Office() { }
+    private Office()
+    {
+    }
 
     private Office(string address, string registryPhoneNumber)
     {
@@ -16,9 +18,9 @@ public sealed class Office : BaseEntity, IAuditableEntity
     public string Address { get; private set; } = default!;
     public string PhoneNumber { get; private set; } = default!;
     public bool IsActive { get; private set; }
+    public ICollection<Doctor> Doctors { get; private set; } = default!;
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? UpdatedOnUtc { get; set; }
-    public ICollection<Doctor> Doctors { get; private set; } = default!;
 
     public void Update(string address, string registryPhoneNumber)
     {
@@ -28,6 +30,6 @@ public sealed class Office : BaseEntity, IAuditableEntity
 
     public static Office Create(string address, string registryPhoneNumber)
     {
-        return new(address, registryPhoneNumber);
+        return new Office(address, registryPhoneNumber);
     }
 }

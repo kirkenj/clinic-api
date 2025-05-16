@@ -1,6 +1,7 @@
 ﻿using Clinic.Domain.Abstractions;
 
 namespace Clinic.Application.Extensions;
+
 public static class PaginatedCollectionExtensions
 {
     public static PaginatedCollection<TDestination> Select<TSourse, TDestination>(
@@ -8,7 +9,7 @@ public static class PaginatedCollectionExtensions
         Func<TSourse, TDestination> selectDelegate)
     {
         var officeResponses = source.Items.Select(selectDelegate).ToArray();
-        return new PaginatedCollection<TDestination>(officeResponses, source.Page, 
+        return new PaginatedCollection<TDestination>(officeResponses, source.Page,
             source.PageSize, source.TotalCount);
     }
 }

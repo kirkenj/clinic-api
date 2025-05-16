@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Clinic.Api.Controllers;
 
-
 [Route("api/[controller]")]
 [ApiController]
 public sealed class ReceptionistsController(IMediator mediator) : ControllerBase
