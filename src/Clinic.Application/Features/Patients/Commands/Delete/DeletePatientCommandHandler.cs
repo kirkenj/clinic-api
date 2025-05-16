@@ -4,6 +4,7 @@ using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Patients.Commands.Delete;
+
 public sealed class DeletePatientCommandHandler(IPatientRepository patientRepository)
     : IRequestHandler<DeletePatientCommand, Result>
 {
@@ -16,7 +17,6 @@ public sealed class DeletePatientCommandHandler(IPatientRepository patientReposi
         }
 
         await patientRepository.DeleteAsync(patient, cancellationToken);
-
         return Result.Success();
     }
 }

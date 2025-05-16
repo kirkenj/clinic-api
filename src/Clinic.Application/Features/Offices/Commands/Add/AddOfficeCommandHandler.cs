@@ -5,10 +5,11 @@ using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Offices.Commands.Add;
-public sealed class AddOfficeCommandHandler(
-    IOfficeRepository officeRepository,
-    AddOfficeCommandValidator validator
-    ) : IRequestHandler<AddOfficeCommand, Result>
+
+public sealed class AddOfficeCommandHandler
+    (IOfficeRepository officeRepository,
+        AddOfficeCommandValidator validator)
+    : IRequestHandler<AddOfficeCommand, Result>
 {
     public async Task<Result> Handle(AddOfficeCommand request, CancellationToken cancellationToken)
     {

@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Clinic.Api.Controllers;
 
-
 [Route("api/[controller]")]
 [ApiController]
 public sealed class PatientsController(IMediator mediator) : ControllerBase

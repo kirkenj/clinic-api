@@ -9,10 +9,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection RegisterApplicationServices(this IServiceCollection services)
     {
         var executingAssembly = Assembly.GetExecutingAssembly();
-        services.AddMediatR(cfg =>
-        {
-            cfg.RegisterServicesFromAssembly(executingAssembly);
-        });
+        services.AddMediatR(cfg => { cfg.RegisterServicesFromAssembly(executingAssembly); });
 
         ValidatorOptions.Global.LanguageManager.Enabled = false;
         services.AddValidatorsFromAssembly(executingAssembly);

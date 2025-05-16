@@ -1,10 +1,12 @@
 ﻿using Clinic.Domain.Abstractions;
 
 namespace Clinic.Domain.Entities;
+
 public class Patient : BaseEntity, IAuditableEntity
 {
     private Patient()
-    { }
+    {
+    }
 
     private Patient(string firstName, string lastName,
         string middleName, string email,
@@ -39,11 +41,11 @@ public class Patient : BaseEntity, IAuditableEntity
     }
 
     public static Patient Create(string firstName, string lastName,
-                string middleName, string email,
-                string phoneNumber)
+        string middleName, string email,
+        string phoneNumber)
     {
-        return new(firstName, lastName,
-                   middleName, email,
-                   phoneNumber);
+        return new Patient(firstName, lastName,
+            middleName, email,
+            phoneNumber);
     }
 }

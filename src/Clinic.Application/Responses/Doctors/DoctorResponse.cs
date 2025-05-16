@@ -1,6 +1,7 @@
 ﻿using Clinic.Domain.Entities;
 
 namespace Clinic.Application.Responses.Doctors;
+
 public sealed record DoctorResponse(
     uint Id,
     string FirstName,
@@ -11,10 +12,11 @@ public sealed record DoctorResponse(
     uint SpecializationId,
     uint OfficeId,
     bool IsActive
-    )
+)
 {
-    public static DoctorResponse FromDoctor(Doctor doctor) =>
-        new(
+    public static DoctorResponse FromDoctor(Doctor doctor)
+    {
+        return new DoctorResponse(
             doctor.Id,
             doctor.FirstName,
             doctor.MiddleName,
@@ -24,8 +26,11 @@ public sealed record DoctorResponse(
             doctor.OfficeId,
             doctor.SpecializationId,
             doctor.IsActive
-            );
+        );
+    }
 
-    public static IEnumerable<DoctorResponse> FromDoctorCollection(IEnumerable<Doctor> doctors) =>
-            doctors.Select(FromDoctor);
+    public static IEnumerable<DoctorResponse> FromDoctorCollection(IEnumerable<Doctor> doctors)
+    {
+        return doctors.Select(FromDoctor);
+    }
 }

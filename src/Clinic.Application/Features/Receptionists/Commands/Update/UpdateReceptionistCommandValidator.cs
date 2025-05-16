@@ -2,6 +2,7 @@
 using FluentValidation;
 
 namespace Clinic.Application.Features.Receptionists.Commands.Update;
+
 public sealed class UpdateReceptionistCommandValidator : AbstractValidator<UpdateReceptionistCommand>
 {
     public UpdateReceptionistCommandValidator()

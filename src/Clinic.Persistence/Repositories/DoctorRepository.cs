@@ -8,15 +8,15 @@ public sealed class DoctorRepository(ClinnicContext context) : IDoctorRepository
 {
     private readonly DbSet<Doctor> _dbSet = context.Set<Doctor>();
 
-    public async Task AddAsync(Doctor Doctor, CancellationToken cancellationToken)
+    public async Task AddAsync(Doctor doctor, CancellationToken cancellationToken)
     {
-        await context.AddAsync(Doctor, cancellationToken);
+        await context.AddAsync(doctor, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteAsync(Doctor Doctor, CancellationToken cancellationToken)
+    public async Task DeleteAsync(Doctor doctor, CancellationToken cancellationToken)
     {
-        context.Remove(Doctor);
+        context.Remove(doctor);
         await context.SaveChangesAsync(cancellationToken);
     }
 
@@ -30,7 +30,8 @@ public sealed class DoctorRepository(ClinnicContext context) : IDoctorRepository
         return await _dbSet.AnyAsync(d => d.Email == email, cancellationToken);
     }
 
-    public async Task<ICollection<Doctor>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
+    public async Task<ICollection<Doctor>> GetAllAsync(CancellationToken cancellationToken,
+        bool includeTracking = false)
     {
         return includeTracking
             ? await _dbSet.AsNoTracking().ToListAsync(cancellationToken)
@@ -42,9 +43,9 @@ public sealed class DoctorRepository(ClinnicContext context) : IDoctorRepository
         return await _dbSet.FindAsync([id], cancellationToken);
     }
 
-    public async Task UpdateAsync(Doctor Doctor, CancellationToken cancellationToken)
+    public async Task UpdateAsync(Doctor doctor, CancellationToken cancellationToken)
     {
-        context.Update(Doctor);
+        context.Update(doctor);
         await context.SaveChangesAsync(cancellationToken);
     }
 }

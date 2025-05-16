@@ -5,10 +5,11 @@ using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Patients.Commands.Add;
-public sealed class AddPatientCommandHandler(
-    IPatientRepository patientRepository,
-    AddPatientCommandValidator validator
-    ) : IRequestHandler<AddPatientCommand, Result>
+
+public sealed class AddPatientCommandHandler
+    (IPatientRepository patientRepository,
+        AddPatientCommandValidator validator)
+    : IRequestHandler<AddPatientCommand, Result>
 {
     public async Task<Result> Handle(AddPatientCommand request, CancellationToken cancellationToken)
     {
@@ -34,9 +35,7 @@ public sealed class AddPatientCommandHandler(
 
         var patient = Patient.Create(request.FirstName, request.LastName,
             request.MiddleName, request.Email, request.PhoneNumber);
-
         await patientRepository.AddAsync(patient, cancellationToken);
-
         return Result.Success();
     }
 }

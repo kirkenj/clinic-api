@@ -5,18 +5,18 @@ using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Doctors.Commands.Update;
-public sealed class UpdateDoctorCommandHandler(
-    IReceptionistRepository receptionistRepository,
-    IDoctorRepository doctorRepository,
-    ISpecializationRepository specializationRepository,
-    IOfficeRepository officeRepository,
-    UpdateDoctorCommandValidator validator
-    ) : IRequestHandler<UpdateDoctorCommand, Result>
+
+public sealed class UpdateDoctorCommandHandler
+    (IReceptionistRepository receptionistRepository,
+        IDoctorRepository doctorRepository,
+        ISpecializationRepository specializationRepository,
+        IOfficeRepository officeRepository,
+        UpdateDoctorCommandValidator validator)
+    : IRequestHandler<UpdateDoctorCommand, Result>
 {
     public async Task<Result> Handle(UpdateDoctorCommand request, CancellationToken cancellationToken)
     {
         request.TrimStringProperties();
-
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
@@ -50,7 +50,8 @@ public sealed class UpdateDoctorCommandHandler(
 
         if (request.SpecializationId != doctor.SpecializationId)
         {
-            var specialization = await specializationRepository.GetByIdAsync(request.SpecializationId, cancellationToken);
+            var specialization =
+                await specializationRepository.GetByIdAsync(request.SpecializationId, cancellationToken);
             if (specialization is null)
             {
                 return SpecializationErrors.NotFound(request.SpecializationId);
@@ -65,7 +66,8 @@ public sealed class UpdateDoctorCommandHandler(
         var hasSamePhone = doctor.PhoneNumber.HasSameValue(request.PhoneNumber);
         if (!hasSamePhone)
         {
-            var isPhoneTaken = await receptionistRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
+            var isPhoneTaken =
+                await receptionistRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
             if (isPhoneTaken)
             {
                 return ReceptionistErrors.PhoneAlreadyTaken(request.PhoneNumber);
@@ -97,9 +99,7 @@ public sealed class UpdateDoctorCommandHandler(
         doctor.Update(request.FirstName, request.LastName,
             request.MiddleName, request.Email, request.PhoneNumber,
             request.SpecializationId, request.OfficeId);
-
         await doctorRepository.UpdateAsync(doctor, cancellationToken);
-
         return Result.Success();
     }
 }

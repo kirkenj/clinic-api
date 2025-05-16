@@ -5,11 +5,12 @@ using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Receptionists.Commands.Update;
+
 public sealed class UpdateReceptionistCommandHandler(
     IReceptionistRepository receptionistRepository,
     IDoctorRepository doctorRepository,
     UpdateReceptionistCommandValidator validator
-    ) : IRequestHandler<UpdateReceptionistCommand, Result>
+) : IRequestHandler<UpdateReceptionistCommand, Result>
 {
     public async Task<Result> Handle(UpdateReceptionistCommand request, CancellationToken cancellationToken)
     {
@@ -35,7 +36,8 @@ public sealed class UpdateReceptionistCommandHandler(
         var hasSamePhone = receptionist.PhoneNumber.HasSameValue(request.PhoneNumber);
         if (!hasSamePhone)
         {
-            var isPhoneTaken = await receptionistRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
+            var isPhoneTaken =
+                await receptionistRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
             if (isPhoneTaken)
             {
                 return ReceptionistErrors.PhoneAlreadyTaken(request.PhoneNumber);

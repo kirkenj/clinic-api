@@ -3,6 +3,7 @@ using Clinic.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Clinic.Persistence.Repositories;
+
 public class ReceptionistRepository(ClinnicContext context) : IReceptionistRepository
 {
     private readonly DbSet<Receptionist> _dbSet = context.Set<Receptionist>();
@@ -17,7 +18,8 @@ public class ReceptionistRepository(ClinnicContext context) : IReceptionistRepos
         return await _dbSet.AnyAsync(r => r.Email == email, cancellationToken);
     }
 
-    public async Task<ICollection<Receptionist>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false)
+    public async Task<ICollection<Receptionist>> GetAllAsync(CancellationToken cancellationToken,
+        bool includeTracking = false)
     {
         return includeTracking
             ? await _dbSet.AsNoTracking().ToListAsync(cancellationToken)

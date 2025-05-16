@@ -5,10 +5,11 @@ using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Patients.Commands.Update;
+
 public sealed class UpdatePatientCommandHandler(
     IPatientRepository patientRepository,
     UpdatePatientCommandValidator validator
-    ) : IRequestHandler<UpdatePatientCommand, Result>
+) : IRequestHandler<UpdatePatientCommand, Result>
 {
     public async Task<Result> Handle(UpdatePatientCommand request, CancellationToken cancellationToken)
     {

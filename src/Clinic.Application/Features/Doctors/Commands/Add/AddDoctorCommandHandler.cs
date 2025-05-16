@@ -5,25 +5,26 @@ using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Doctors.Commands.Add;
-public sealed class AddDoctorCommandHandler(
-    IDoctorRepository doctorRepository,
-    IReceptionistRepository receptionistRepository,
-    ISpecializationRepository specializationRepository,
-    IOfficeRepository officeRepository,
-    AddDoctorCommandValidator validator
-    ) : IRequestHandler<AddDoctorCommand, Result>
+
+public sealed class AddDoctorCommandHandler
+    (IDoctorRepository doctorRepository,
+        IReceptionistRepository receptionistRepository,
+        ISpecializationRepository specializationRepository,
+        IOfficeRepository officeRepository,
+        AddDoctorCommandValidator validator)
+    : IRequestHandler<AddDoctorCommand, Result>
 {
     public async Task<Result> Handle(AddDoctorCommand request, CancellationToken cancellationToken)
     {
         request.TrimStringProperties();
-
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        var isPhoneTaken = await receptionistRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
+        var isPhoneTaken =
+            await receptionistRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
         if (isPhoneTaken)
         {
             return ReceptionistErrors.PhoneAlreadyTaken(request.PhoneNumber);
@@ -72,9 +73,7 @@ public sealed class AddDoctorCommandHandler(
         var doctor = Doctor.Create(request.FirstName, request.LastName,
             request.MiddleName, request.Email, request.PhoneNumber,
             request.SpecializationId, request.OfficeId);
-
         await doctorRepository.AddAsync(doctor, cancellationToken);
-
         return Result.Success();
     }
 }

@@ -2,6 +2,7 @@
 using FluentValidation;
 
 namespace Clinic.Application.Features.Patients.Commands.Update;
+
 public sealed class UpdatePatientCommandValidator : AbstractValidator<UpdatePatientCommand>
 {
     public UpdatePatientCommandValidator()

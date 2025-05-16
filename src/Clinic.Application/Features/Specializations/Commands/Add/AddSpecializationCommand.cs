@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Clinic.Application.Features.Specializations.Commands.Add;
 
-public sealed record AddSpecializationCommand : IRequest<Result>
+public sealed class AddSpecializationCommand : IRequest<Result>
 {
     public string Name { get; set; } = default!;
 

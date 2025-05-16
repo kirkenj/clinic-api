@@ -9,13 +9,14 @@ namespace Clinic.Persistence;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection RegisterPersistenceServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection RegisterPersistenceServices(this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddDbContext<ClinnicContext>((sp, options) =>
         {
             var auditableEntitiesInterceptor = sp.GetRequiredService<AuditableEntitiesInterceptor>();
 
-            options.UseNpgsql(configuration.GetConnectionString("ClinicConnetion"));
+            options.UseNpgsql(configuration.GetConnectionString("ClinicConnection"));
             options.AddInterceptors(auditableEntitiesInterceptor);
         });
 

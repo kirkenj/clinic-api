@@ -4,12 +4,14 @@ using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Receptionists.Queries.GetAll;
+
 public sealed class GetAllReceptionistsQueryHandler(IReceptionistRepository receptionistRepository)
     : IRequestHandler<GetAllReceptionistsQuery, Result<IEnumerable<ReceptionistResponse>>>
 {
-    public async Task<Result<IEnumerable<ReceptionistResponse>>> Handle(GetAllReceptionistsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<ReceptionistResponse>>> Handle(GetAllReceptionistsQuery request,
+        CancellationToken cancellationToken)
     {
-        var receptionists = await receptionistRepository.GetAllAsync(cancellationToken, false);
+        var receptionists = await receptionistRepository.GetAllAsync(cancellationToken);
         return Result.Success(ReceptionistResponse.FromReceptionistCollection(receptionists));
     }
 }

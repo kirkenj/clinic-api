@@ -5,15 +5,15 @@ using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Specializations.Commands.Add;
-public sealed class AddSpecializationCommandHandler(
-    ISpecializationRepository specializationRepository,
-    AddSpecializationCommandValidator validator
-    ) : IRequestHandler<AddSpecializationCommand, Result>
+
+public sealed class AddSpecializationCommandHandler
+    (ISpecializationRepository specializationRepository,
+        AddSpecializationCommandValidator validator)
+    : IRequestHandler<AddSpecializationCommand, Result>
 {
     public async Task<Result> Handle(AddSpecializationCommand request, CancellationToken cancellationToken)
     {
         request.TrimStringProperties();
-
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
@@ -27,9 +27,7 @@ public sealed class AddSpecializationCommandHandler(
         }
 
         var specialization = Specialization.Create(request.Name);
-
         await specializationRepository.AddAsync(specialization, cancellationToken);
-
         return Result.Success();
     }
 }
