@@ -12,6 +12,7 @@ public interface ISpecializationRepository
 
     public Task<PaginatedCollection<Specialization>> GetPaginatedAsync(int page, int pageSize,
         CancellationToken cancellationToken);
+
     public Task AddAsync(Specialization specialization, CancellationToken cancellationToken);
     public Task UpdateAsync(Specialization specialization, CancellationToken cancellationToken);
     public Task DeleteAsync(Specialization specialization, CancellationToken cancellationToken);

@@ -1,4 +1,5 @@
-﻿using Clinic.Application.Features.Patients.Commands.Add;
+﻿using System.ComponentModel.DataAnnotations;
+using Clinic.Application.Features.Patients.Commands.Add;
 using Clinic.Application.Features.Patients.Commands.Delete;
 using Clinic.Application.Features.Patients.Commands.Update;
 using Clinic.Application.Features.Patients.Queries.Get;
@@ -21,28 +22,28 @@ public sealed class PatientController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetPatientAsync(uint id)
+    public async Task<IActionResult> GetPatientAsync([FromQuery] [Required] uint id)
     {
         var result = await mediator.Send(new GetPatientQuery { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeletePatientAsync(uint id)
+    public async Task<IActionResult> DeletePatientAsync([FromQuery] [Required] uint id)
     {
         var result = await mediator.Send(new DeletePatientCommand { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddPatientAsync(AddPatientCommand request)
+    public async Task<IActionResult> AddPatientAsync([FromBody] [Required] AddPatientCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdatePatientAsync(UpdatePatientCommand request)
+    public async Task<IActionResult> UpdatePatientAsync([FromBody] [Required] UpdatePatientCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);

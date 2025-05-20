@@ -1,4 +1,5 @@
-﻿using Clinic.Application.Features.Receptionists.Commands.Update;
+﻿using System.ComponentModel.DataAnnotations;
+using Clinic.Application.Features.Receptionists.Commands.Update;
 using Clinic.Application.Features.Receptionists.Queries.Get;
 using Clinic.Application.Features.Receptionists.Queries.GetPaginated;
 using MediatR;
@@ -19,14 +20,14 @@ public sealed class ReceptionistController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetReceptionistAsync(uint id)
+    public async Task<IActionResult> GetReceptionistAsync([FromQuery] [Required] uint id)
     {
         var result = await mediator.Send(new GetReceptionistQuery { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateReceptionistAsync(UpdateReceptionistCommand request)
+    public async Task<IActionResult> UpdateReceptionistAsync([FromBody] [Required] UpdateReceptionistCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);

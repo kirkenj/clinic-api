@@ -12,6 +12,7 @@ public interface IReceptionistRepository
 
     public Task<PaginatedCollection<Receptionist>> GetPaginatedAsync(int page, int pageSize,
         CancellationToken cancellationToken);
+
     public Task UpdateAsync(Receptionist receptionist, CancellationToken cancellationToken);
     public Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken);
     public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken);

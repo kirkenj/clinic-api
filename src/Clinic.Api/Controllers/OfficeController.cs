@@ -1,4 +1,5 @@
-﻿using Clinic.Application.Features.Offices.Commands.Add;
+﻿using System.ComponentModel.DataAnnotations;
+using Clinic.Application.Features.Offices.Commands.Add;
 using Clinic.Application.Features.Offices.Commands.Delete;
 using Clinic.Application.Features.Offices.Commands.Update;
 using Clinic.Application.Features.Offices.Queries.Get;
@@ -21,28 +22,28 @@ public sealed class OfficeController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetOfficeAsync(uint id)
+    public async Task<IActionResult> GetOfficeAsync([FromQuery] [Required] uint id)
     {
         var result = await mediator.Send(new GetOfficeQuery { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteOfficeAsync(uint id)
+    public async Task<IActionResult> DeleteOfficeAsync([FromQuery] [Required] uint id)
     {
         var result = await mediator.Send(new DeleteOfficeCommand { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddOfficeAsync(AddOfficeCommand request)
+    public async Task<IActionResult> AddOfficeAsync([FromBody] [Required] AddOfficeCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateOfficeAsync(UpdateOfficeCommand request)
+    public async Task<IActionResult> UpdateOfficeAsync([FromBody] [Required] UpdateOfficeCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);

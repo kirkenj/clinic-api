@@ -1,4 +1,5 @@
-﻿using Clinic.Application.Features.Specializations.Commands.Add;
+﻿using System.ComponentModel.DataAnnotations;
+using Clinic.Application.Features.Specializations.Commands.Add;
 using Clinic.Application.Features.Specializations.Commands.Delete;
 using Clinic.Application.Features.Specializations.Commands.Update;
 using Clinic.Application.Features.Specializations.Queries.Get;
@@ -21,28 +22,29 @@ public sealed class SpecializationController(IMediator mediator) : ControllerBas
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetSpecializationAsync(uint id)
+    public async Task<IActionResult> GetSpecializationAsync([FromQuery] [Required] uint id)
     {
         var result = await mediator.Send(new GetSpecializationQuery { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteSpecializationAsync(uint id)
+    public async Task<IActionResult> DeleteSpecializationAsync([FromQuery] [Required] uint id)
     {
         var result = await mediator.Send(new DeleteSpecializationCommand { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddSpecializationAsync(AddSpecializationCommand request)
+    public async Task<IActionResult> AddSpecializationAsync([FromBody] [Required] AddSpecializationCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateSpecializationAsync(UpdateSpecializationCommand request)
+    public async Task<IActionResult> UpdateSpecializationAsync(
+        [FromBody] [Required] UpdateSpecializationCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
