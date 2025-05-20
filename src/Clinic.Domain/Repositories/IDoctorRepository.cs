@@ -1,4 +1,5 @@
-﻿using Clinic.Domain.Entities;
+﻿using Clinic.Domain.Abstractions;
+using Clinic.Domain.Entities;
 
 namespace Clinic.Domain.Repositories;
 
@@ -6,6 +7,10 @@ public interface IDoctorRepository
 {
     public Task<Doctor?> GetByIdAsync(uint id, CancellationToken cancellationToken);
     public Task<ICollection<Doctor>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false);
+
+    public Task<PaginatedCollection<Doctor>> GetPaginatedAsync(int page, int pageSize,
+        CancellationToken cancellationToken);
+
     public Task AddAsync(Doctor doctor, CancellationToken cancellationToken);
     public Task UpdateAsync(Doctor doctor, CancellationToken cancellationToken);
     public Task DeleteAsync(Doctor doctor, CancellationToken cancellationToken);

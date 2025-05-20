@@ -1,8 +1,9 @@
-﻿using Clinic.Application.Features.Specializations.Commands.Add;
+﻿using System.ComponentModel.DataAnnotations;
+using Clinic.Application.Features.Specializations.Commands.Add;
 using Clinic.Application.Features.Specializations.Commands.Delete;
 using Clinic.Application.Features.Specializations.Commands.Update;
 using Clinic.Application.Features.Specializations.Queries.Get;
-using Clinic.Application.Features.Specializations.Queries.GetAll;
+using Clinic.Application.Features.Specializations.Queries.GetPaginated;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,38 +11,40 @@ namespace Clinic.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public sealed class SpecializationsController(IMediator mediator) : ControllerBase
+public sealed class SpecializationController(IMediator mediator) : ControllerBase
 {
-    [HttpGet]
-    public async Task<IActionResult> GetAllAsync()
+    [HttpGet("paged")]
+    public async Task<IActionResult> GetPaginatedSpecializationsAsync(int page, int pageSize)
     {
-        var result = await mediator.Send(new GetAllSpecializationsQuery(), HttpContext.RequestAborted);
+        var result = await mediator.Send(new GetPaginatedSpecializationsRequest { Page = page, PageSize = pageSize },
+            HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetAsync(uint id)
+    public async Task<IActionResult> GetSpecializationAsync([FromQuery] [Required] uint id)
     {
         var result = await mediator.Send(new GetSpecializationQuery { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(uint id)
+    public async Task<IActionResult> DeleteSpecializationAsync([FromQuery] [Required] uint id)
     {
         var result = await mediator.Send(new DeleteSpecializationCommand { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddAsync(AddSpecializationCommand request)
+    public async Task<IActionResult> AddSpecializationAsync([FromBody] [Required] AddSpecializationCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateAsync(UpdateSpecializationCommand request)
+    public async Task<IActionResult> UpdateSpecializationAsync(
+        [FromBody] [Required] UpdateSpecializationCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
