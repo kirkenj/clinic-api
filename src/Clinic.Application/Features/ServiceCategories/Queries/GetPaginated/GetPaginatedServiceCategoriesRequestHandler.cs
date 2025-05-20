@@ -7,7 +7,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Clinic.Application.Features.ServiceCategories.Queries.GetPaginated;
 
-public class GetPaginatedServiceCategoriesRequestHandler(ILogger<GetPaginatedServiceCategoriesRequestHandler> logger,
+public class GetPaginatedServiceCategoriesRequestHandler
+(ILogger<GetPaginatedServiceCategoriesRequestHandler> logger,
     IServiceCategoryRepository serviceCategoryRepository,
     GetPaginatedServiceCategoriesRequestValidator validator) : IRequestHandler<GetPaginatedServiceCategoriesRequest,
     Result<PaginatedCollection<ServiceCategoryResponse>>>

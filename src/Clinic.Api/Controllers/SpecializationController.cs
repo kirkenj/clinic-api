@@ -32,14 +32,14 @@ public sealed class SpecializationController(IMediator mediator) : ControllerBas
     public async Task<IActionResult> DeleteSpecializationAsync([FromRoute] [Required] uint id)
     {
         var result = await mediator.Send(new DeleteSpecializationCommand { Id = id }, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
     [HttpPost]
     public async Task<IActionResult> AddSpecializationAsync([FromBody] [Required] AddSpecializationCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
     [HttpPut]

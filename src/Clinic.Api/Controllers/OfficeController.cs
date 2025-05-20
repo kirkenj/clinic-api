@@ -32,20 +32,20 @@ public sealed class OfficeController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> DeleteOfficeAsync([FromRoute] [Required] uint id)
     {
         var result = await mediator.Send(new DeleteOfficeCommand { Id = id }, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
     [HttpPost]
     public async Task<IActionResult> AddOfficeAsync([FromBody] [Required] AddOfficeCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
     [HttpPut]
     public async Task<IActionResult> UpdateOfficeAsync([FromBody] [Required] UpdateOfficeCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 }

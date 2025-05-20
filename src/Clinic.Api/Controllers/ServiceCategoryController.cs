@@ -32,14 +32,14 @@ public sealed class ServiceCategoryController(IMediator mediator) : ControllerBa
     public async Task<IActionResult> DeleteServiceCategoryAsync([FromRoute] [Required] uint id)
     {
         var result = await mediator.Send(new DeleteServiceCategoryCommand { Id = id }, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
     [HttpPost]
     public async Task<IActionResult> AddServiceCategoryAsync([FromBody] [Required] AddServiceCategoryCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
     [HttpPut]
@@ -47,6 +47,6 @@ public sealed class ServiceCategoryController(IMediator mediator) : ControllerBa
         [FromBody] [Required] UpdateServiceCategoryCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 }

@@ -32,20 +32,20 @@ public sealed class DoctorController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> DeleteDoctorAsync([FromRoute] [Required] uint id)
     {
         var result = await mediator.Send(new DeleteDoctorCommand { Id = id }, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
     [HttpPost]
     public async Task<IActionResult> AddDoctorAsync([FromBody] [Required] AddDoctorCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
     [HttpPut]
     public async Task<IActionResult> UpdateDoctorAsync([FromBody] [Required] UpdateDoctorCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 }

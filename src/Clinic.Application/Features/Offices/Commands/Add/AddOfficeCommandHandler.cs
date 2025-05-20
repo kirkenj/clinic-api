@@ -28,9 +28,7 @@ public sealed class AddOfficeCommandHandler
         }
 
         var office = Office.Create(request.Address, request.PhoneNumber);
-
         await officeRepository.AddAsync(office, cancellationToken);
-
         return Result.Success();
     }
 }

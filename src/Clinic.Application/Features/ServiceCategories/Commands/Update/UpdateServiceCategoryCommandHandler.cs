@@ -31,8 +31,8 @@ public sealed class UpdateServiceCategoryCommandHandler
             return ServiceCategoryErrors.NotActive(serviceCategory.Id);
         }
 
-        var hasNamePhone = serviceCategory.Name.HasSameValue(request.Name);
-        if (!hasNamePhone)
+        var hasSameName = serviceCategory.Name.HasSameValue(request.Name);
+        if (!hasSameName)
         {
             var isNameTaken =
                 await serviceCategoryRepository.ExistsByNameAsync(request.Name, cancellationToken);

@@ -29,9 +29,7 @@ public sealed class AddServiceCategoryCommandHandler
         }
 
         var serviceCategory = ServiceCategory.Create(request.Name, request.Duration);
-
         await serviceCategoryRepository.AddAsync(serviceCategory, cancellationToken);
-
         return Result.Success();
     }
 }
