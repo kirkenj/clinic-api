@@ -22,14 +22,14 @@ public sealed class SpecializationController(IMediator mediator) : ControllerBas
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetSpecializationAsync([FromQuery] [Required] uint id)
+    public async Task<IActionResult> GetSpecializationAsync([FromRoute] [Required] uint id)
     {
         var result = await mediator.Send(new GetSpecializationQuery { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteSpecializationAsync([FromQuery] [Required] uint id)
+    public async Task<IActionResult> DeleteSpecializationAsync([FromRoute] [Required] uint id)
     {
         var result = await mediator.Send(new DeleteSpecializationCommand { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
