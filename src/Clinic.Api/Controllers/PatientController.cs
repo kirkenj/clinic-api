@@ -22,14 +22,14 @@ public sealed class PatientController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetPatientAsync([FromRoute] [Required] uint id)
+    public async Task<IActionResult> GetPatientAsync([FromQuery] [Required] uint id)
     {
         var result = await mediator.Send(new GetPatientQuery { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeletePatientAsync([FromRoute] [Required] uint id)
+    public async Task<IActionResult> DeletePatientAsync([FromQuery] [Required] uint id)
     {
         var result = await mediator.Send(new DeletePatientCommand { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);

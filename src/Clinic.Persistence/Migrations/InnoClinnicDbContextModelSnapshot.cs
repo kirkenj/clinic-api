@@ -222,35 +222,6 @@ namespace Clinic.Persistence.Migrations
                     b.ToTable("Receptionists", (string)null);
                 });
 
-            modelBuilder.Entity("Clinic.Domain.Entities.ServiceCategory", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTimeOffset>("CreatedOnUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<TimeSpan>("Duration")
-                        .HasColumnType("interval");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset?>("UpdatedOnUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ServiceCategories", (string)null);
-                });
-
             modelBuilder.Entity("Clinic.Domain.Entities.Specialization", b =>
                 {
                     b.Property<long>("Id")

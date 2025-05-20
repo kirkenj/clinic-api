@@ -22,14 +22,14 @@ public sealed class OfficeController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetOfficeAsync([FromRoute] [Required] uint id)
+    public async Task<IActionResult> GetOfficeAsync([FromQuery] [Required] uint id)
     {
         var result = await mediator.Send(new GetOfficeQuery { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteOfficeAsync([FromRoute] [Required] uint id)
+    public async Task<IActionResult> DeleteOfficeAsync([FromQuery] [Required] uint id)
     {
         var result = await mediator.Send(new DeleteOfficeCommand { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
