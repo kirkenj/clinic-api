@@ -69,9 +69,7 @@ public sealed class UpdateReceptionistCommandHandler(
 
         receptionist.Update(request.FirstName, request.LastName,
             request.MiddleName, request.PhoneNumber, request.Email);
-
         await receptionistRepository.UpdateAsync(receptionist, cancellationToken);
-
         return Result.Success();
     }
 }

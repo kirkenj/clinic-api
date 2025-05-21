@@ -22,30 +22,30 @@ public sealed class PatientController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetPatientAsync([FromQuery] [Required] uint id)
+    public async Task<IActionResult> GetPatientAsync([FromRoute] [Required] uint id)
     {
         var result = await mediator.Send(new GetPatientQuery { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeletePatientAsync([FromQuery] [Required] uint id)
+    public async Task<IActionResult> DeletePatientAsync([FromRoute] [Required] uint id)
     {
         var result = await mediator.Send(new DeletePatientCommand { Id = id }, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
     [HttpPost]
     public async Task<IActionResult> AddPatientAsync([FromBody] [Required] AddPatientCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
     [HttpPut]
     public async Task<IActionResult> UpdatePatientAsync([FromBody] [Required] UpdatePatientCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 }

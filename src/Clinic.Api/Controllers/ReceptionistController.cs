@@ -20,7 +20,7 @@ public sealed class ReceptionistController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetReceptionistAsync([FromQuery] [Required] uint id)
+    public async Task<IActionResult> GetReceptionistAsync([FromRoute] [Required] uint id)
     {
         var result = await mediator.Send(new GetReceptionistQuery { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
@@ -30,6 +30,6 @@ public sealed class ReceptionistController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UpdateReceptionistAsync([FromBody] [Required] UpdateReceptionistCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 }
