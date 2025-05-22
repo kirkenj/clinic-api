@@ -30,7 +30,7 @@ public sealed class Doctor : BaseEntity, IAuditableEntity
     public string PhoneNumber { get; private set; } = default!;
     public string Email { get; private set; } = default!;
     public uint SpecializationId { get; private set; }
-    public Specialization Speciallization { get; private set; } = default!;
+    public Specialization Specialization { get; private set; } = default!;
     public uint OfficeId { get; private set; }
     public Office Office { get; private set; } = default!;
     public DateTimeOffset CreatedOnUtc { get; set; }

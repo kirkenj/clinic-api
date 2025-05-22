@@ -30,4 +30,10 @@ public static class RuleBuilderOptionsExtensions
             .NotEmpty()
             .MaxTrimmedLength(maxTrimmedLength);
     }
+
+    public static IRuleBuilderOptions<T, decimal> Price<T>(this IRuleBuilder<T, decimal> ruleBuilder,
+        decimal minimalValue = 0)
+    {
+        return ruleBuilder.GreaterThanOrEqualTo(minimalValue);
+    }
 }

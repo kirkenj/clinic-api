@@ -1,0 +1,60 @@
+﻿using Clinic.Domain.Abstractions;
+using Clinic.Domain.Entities;
+using Clinic.Domain.Errors;
+using Clinic.Domain.Repositories;
+using MediatR;
+
+namespace Clinic.Application.Features.Services.Commands.Add;
+
+public sealed class AddServiceCommandHandler
+    (IServiceRepository serviceRepository,
+    IServiceCategoryRepository serviceCategoryRepository,
+    ISpecializationRepository specializationRepository,
+    AddServiceCommandValidator validator)
+    : IRequestHandler<AddServiceCommand, Result>
+{
+    public async Task<Result> Handle(AddServiceCommand request, CancellationToken cancellationToken)
+    {
+        request.TrimStringProperties();
+
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+        if (!validationResult.IsValid)
+        {
+            return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
+
+        var isNameTaken = await serviceRepository.ExistsByNameAsync(request.Name, cancellationToken);
+        if (isNameTaken)
+        {
+            return ServiceErrors.NameAlreadyTaken(request.Name);
+        }
+
+        var specialization =
+            await specializationRepository.GetByIdAsync(request.SpecializationId, cancellationToken);
+        if (specialization is null)
+        {
+            return SpecializationErrors.NotFound(request.SpecializationId);
+        }
+
+        if (!specialization.IsActive)
+        {
+            return SpecializationErrors.NotActive(request.SpecializationId);
+        }
+
+        var serviceCategory =
+            await serviceCategoryRepository.GetByIdAsync(request.ServiceCategoryId, cancellationToken);
+        if (serviceCategory is null)
+        {
+            return ServiceCategoryErrors.NotFound(request.ServiceCategoryId);
+        }
+
+        if (!serviceCategory.IsActive)
+        {
+            return ServiceCategoryErrors.NotActive(request.ServiceCategoryId);
+        }
+
+        var service = Service.Create(request.Name, request.Price, request.SpecializationId, request.ServiceCategoryId);
+        await serviceRepository.AddAsync(service, cancellationToken);
+        return Result.Success();
+    }
+}
