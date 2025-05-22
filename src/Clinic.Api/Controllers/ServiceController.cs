@@ -36,7 +36,7 @@ public sealed class ServiceController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostAsync([FromBody] [Required] AddServiceCommand request)
+    public async Task<IActionResult> AddServiceAsync([FromBody] [Required] AddServiceCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
