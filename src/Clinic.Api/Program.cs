@@ -9,7 +9,7 @@ builder.Services.AddLogging();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.RegisterApplicationServices();
+builder.Services.RegisterApplicationServices(configuration);
 builder.Services.RegisterPersistenceServices(configuration);
 
 builder.Host.UseSerilog((context, loggerConfiguration) =>

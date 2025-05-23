@@ -17,6 +17,7 @@ public sealed class Specialization : BaseEntity, IAuditableEntity
     public bool IsActive { get; private set; }
     public string Name { get; private set; } = default!;
     public ICollection<Doctor> Doctors { get; private set; } = default!;
+    public ICollection<Service> Services { get; private set; } = default!;
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? UpdatedOnUtc { get; set; }
 

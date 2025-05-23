@@ -47,7 +47,7 @@ public sealed class DoctorConfiguration : IEntityTypeConfiguration<Doctor>
         builder.Property(m => m.SpecializationId)
             .IsRequired();
 
-        builder.HasOne(m => m.Speciallization)
+        builder.HasOne(m => m.Specialization)
             .WithMany(m => m.Doctors)
             .HasForeignKey(m => m.SpecializationId)
             .OnDelete(DeleteBehavior.Restrict);

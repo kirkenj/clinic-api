@@ -18,6 +18,7 @@ public class ServiceCategory : BaseEntity, IAuditableEntity
     public string Name { get; private set; }
     public TimeSpan Duration { get; private set; }
     public bool IsActive { get; private set; }
+    public ICollection<Service> Services { get; private set; } = default!;
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? UpdatedOnUtc { get; set; }
 
