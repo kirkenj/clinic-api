@@ -8,8 +8,8 @@ using Microsoft.Extensions.Options;
 
 namespace Clinic.Application.Features.Services.Commands.Update;
 
-public sealed class UpdateServiceCommandHandler(
-    IServiceRepository serviceRepository,
+public sealed class UpdateServiceCommandHandler
+    (IServiceRepository serviceRepository,
     ISpecializationRepository specializationRepository,
     IServiceCategoryRepository serviceCategoryRepository,
     UpdateServiceCommandValidator validator,
