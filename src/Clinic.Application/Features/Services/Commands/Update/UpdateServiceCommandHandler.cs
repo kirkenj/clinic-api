@@ -48,8 +48,8 @@ public sealed class UpdateServiceCommandHandler
 
         if (request.Price != service.Price)
         {
-            if (request.Price > serviceOptions.Value.MaximalCost 
-                || request.Price < serviceOptions.Value.MinimalCost)
+            if (request.Price > serviceOptions.Value.MaximalCost || 
+                request.Price < serviceOptions.Value.MinimalCost)
             {
                 return ServiceErrors.PriceOutOfRange(serviceOptions.Value.MinimalCost,
                     serviceOptions.Value.MaximalCost);
