@@ -8,8 +8,8 @@ using Microsoft.Extensions.Options;
 
 namespace Clinic.Application.Features.Services.Commands.Update;
 
-public sealed class UpdateServiceCommandHandler
-    (IServiceRepository serviceRepository,
+public sealed class UpdateServiceCommandHandler(
+    IServiceRepository serviceRepository,
     ISpecializationRepository specializationRepository,
     IServiceCategoryRepository serviceCategoryRepository,
     UpdateServiceCommandValidator validator,
@@ -48,9 +48,11 @@ public sealed class UpdateServiceCommandHandler
 
         if (request.Price != service.Price)
         {
-            if (request.Price > serviceOptions.Value.MaximalCost || request.Price < serviceOptions.Value.MinimalCost)
+            if (request.Price > serviceOptions.Value.MaximalCost 
+                || request.Price < serviceOptions.Value.MinimalCost)
             {
-                return ServiceErrors.PriceOutOfRange(serviceOptions.Value.MinimalCost, serviceOptions.Value.MaximalCost);
+                return ServiceErrors.PriceOutOfRange(serviceOptions.Value.MinimalCost,
+                    serviceOptions.Value.MaximalCost);
             }
         }
 

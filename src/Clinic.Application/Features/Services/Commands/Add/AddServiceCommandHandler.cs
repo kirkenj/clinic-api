@@ -26,9 +26,11 @@ public sealed class AddServiceCommandHandler
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        if (request.Price > serviceOptions.Value.MaximalCost || request.Price < serviceOptions.Value.MinimalCost)
+        if (request.Price > serviceOptions.Value.MaximalCost 
+            || request.Price < serviceOptions.Value.MinimalCost)
         {
-            return ServiceErrors.PriceOutOfRange(serviceOptions.Value.MinimalCost, serviceOptions.Value.MaximalCost);
+            return ServiceErrors.PriceOutOfRange(serviceOptions.Value.MinimalCost, 
+                serviceOptions.Value.MaximalCost);
         }
 
         var isNameTaken = await serviceRepository.ExistsByNameAsync(request.Name, cancellationToken);
