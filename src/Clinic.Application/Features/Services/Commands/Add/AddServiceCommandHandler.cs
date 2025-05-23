@@ -1,8 +1,10 @@
-﻿using Clinic.Domain.Abstractions;
+﻿using Clinic.Application.Options;
+using Clinic.Domain.Abstractions;
 using Clinic.Domain.Entities;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
 using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace Clinic.Application.Features.Services.Commands.Add;
 
@@ -10,7 +12,8 @@ public sealed class AddServiceCommandHandler
     (IServiceRepository serviceRepository,
     IServiceCategoryRepository serviceCategoryRepository,
     ISpecializationRepository specializationRepository,
-    AddServiceCommandValidator validator)
+    AddServiceCommandValidator validator,
+    IOptions<ServiceOptions> serviceOptions)
     : IRequestHandler<AddServiceCommand, Result>
 {
     public async Task<Result> Handle(AddServiceCommand request, CancellationToken cancellationToken)
@@ -21,6 +24,11 @@ public sealed class AddServiceCommandHandler
         if (!validationResult.IsValid)
         {
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
+
+        if (request.Price > serviceOptions.Value.MaximalCost || request.Price < serviceOptions.Value.MinimalCost)
+        {
+            return ServiceErrors.PriceOutOfRange(serviceOptions.Value.MinimalCost, serviceOptions.Value.MaximalCost);
         }
 
         var isNameTaken = await serviceRepository.ExistsByNameAsync(request.Name, cancellationToken);

@@ -1,8 +1,10 @@
 ﻿using Clinic.Application.Extensions;
+using Clinic.Application.Options;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
 using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace Clinic.Application.Features.Services.Commands.Update;
 
@@ -10,7 +12,8 @@ public sealed class UpdateServiceCommandHandler
     (IServiceRepository serviceRepository,
     ISpecializationRepository specializationRepository,
     IServiceCategoryRepository serviceCategoryRepository,
-    UpdateServiceCommandValidator validator)
+    UpdateServiceCommandValidator validator,
+    IOptions<ServiceOptions> serviceOptions)
     : IRequestHandler<UpdateServiceCommand, Result>
 {
     public async Task<Result> Handle(UpdateServiceCommand request, CancellationToken cancellationToken)
@@ -40,6 +43,14 @@ public sealed class UpdateServiceCommandHandler
             if (isNameTaken)
             {
                 return ServiceErrors.NameAlreadyTaken(request.Name);
+            }
+        }
+
+        if (request.Price != service.Price)
+        {
+            if (request.Price > serviceOptions.Value.MaximalCost || request.Price < serviceOptions.Value.MinimalCost)
+            {
+                return ServiceErrors.PriceOutOfRange(serviceOptions.Value.MinimalCost, serviceOptions.Value.MaximalCost);
             }
         }
 

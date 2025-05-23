@@ -18,4 +18,9 @@ public static class ServiceErrors
     {
         return new Error("Service.NameAlreadyTaken", $"Name '{name}' is already taken by other service");
     }
+
+    public static Error PriceOutOfRange(decimal minimalValue, decimal maximalValue)
+    {
+        return new Error("Service.PriceOutOfRange", $"Price has to be in range between '{minimalValue}' and '{maximalValue}'.");
+    }
 }
