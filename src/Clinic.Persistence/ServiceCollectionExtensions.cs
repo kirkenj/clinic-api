@@ -1,11 +1,11 @@
-﻿using Clinic.Domain.Repositories;
-using Clinic.Persistence.Interceptors;
-using Clinic.Persistence.Repositories;
+﻿using Clinic.DapperPersistence.Interceptors;
+using Clinic.DapperPersistence.Repositories;
+using Clinic.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Clinic.Persistence;
+namespace Clinic.DapperPersistence;
 
 public static class ServiceCollectionExtensions
 {

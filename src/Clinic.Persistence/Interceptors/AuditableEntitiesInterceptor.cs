@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 
-namespace Clinic.Persistence.Interceptors;
+namespace Clinic.DapperPersistence.Interceptors;
 
 public sealed class AuditableEntitiesInterceptor(ILogger<AuditableEntitiesInterceptor> logger) : SaveChangesInterceptor
 {

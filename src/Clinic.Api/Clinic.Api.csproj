@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Clinic.Application\Clinic.Application.csproj" />
-    <ProjectReference Include="..\Clinic.Persistence\Clinic.Persistence.csproj" />
+    <ProjectReference Include="..\Clinic.DapperPersistence\Clinic.DapperPersistence.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Clinic.Persistence.Configurations;
+namespace Clinic.DapperPersistence.Configurations;
 
 public sealed class SpecializationConfiguration : IEntityTypeConfiguration<Specialization>
 {
