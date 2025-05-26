@@ -3,7 +3,7 @@ using Clinic.Domain.Entities;
 using Clinic.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-namespace Clinic.Persistence.Repositories;
+namespace Clinic.DapperPersistence.Repositories;
 
 public sealed class PatientRepository(ClinnicContext context) : IPatientRepository
 {

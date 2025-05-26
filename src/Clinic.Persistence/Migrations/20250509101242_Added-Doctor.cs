@@ -3,7 +3,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Clinic.Persistence.Migrations
+namespace Clinic.DapperPersistence.Migrations
 {
     /// <inheritdoc />
     public partial class AddedDoctor : Migration

@@ -1,5 +1,5 @@
 using Clinic.Application;
-using Clinic.Persistence;
+using Clinic.DapperPersistence;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);

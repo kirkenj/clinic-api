@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Clinic.Persistence;
+namespace Clinic.DapperPersistence;
 
 public class ClinnicContext(DbContextOptions<ClinnicContext> dbContextOptions) : DbContext(dbContextOptions)
 {

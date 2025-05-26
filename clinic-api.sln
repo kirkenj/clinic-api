@@ -11,9 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clinic.Infrastructure", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clinic.Domain", "src\Clinic.Domain\Clinic.Domain.csproj", "{9DE80F92-7044-33ED-5567-C74F416322B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clinic.Persistence", "src\Clinic.Persistence\Clinic.Persistence.csproj", "{748D588F-A09E-8823-6A72-98A4D87201B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clinic.EFPersistence", "src\Clinic.Persistence\Clinic.EFPersistence.csproj", "{748D588F-A09E-8823-6A72-98A4D87201B1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clinic.Shared", "src\Clinic.Shared\Clinic.Shared.csproj", "{E3A8F9CC-B032-B913-C05D-4EFB4D84503C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clinic.DapperPersistence", "src\Clinic.DapperPersistence\Clinic.DapperPersistence.csproj", "{7F3C8462-7B2C-468A-848D-942B4A38F8BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{E3A8F9CC-B032-B913-C05D-4EFB4D84503C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3A8F9CC-B032-B913-C05D-4EFB4D84503C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3A8F9CC-B032-B913-C05D-4EFB4D84503C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F3C8462-7B2C-468A-848D-942B4A38F8BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F3C8462-7B2C-468A-848D-942B4A38F8BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F3C8462-7B2C-468A-848D-942B4A38F8BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F3C8462-7B2C-468A-848D-942B4A38F8BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
