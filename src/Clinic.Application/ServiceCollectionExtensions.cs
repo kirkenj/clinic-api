@@ -17,6 +17,9 @@ public static class ServiceCollectionExtensions
         var serviceOptionsConfiguration = configuration.GetSection("ServiceOptions");
         services.Configure<ServiceOptions>(serviceOptionsConfiguration);
 
+        var appointmentsOptionsConfiguration = configuration.GetSection("AppointmentsOptions");
+        services.Configure<AppointmentsOptions>(appointmentsOptionsConfiguration);
+
         ValidatorOptions.Global.LanguageManager.Enabled = false;
         services.AddValidatorsFromAssembly(executingAssembly);
 

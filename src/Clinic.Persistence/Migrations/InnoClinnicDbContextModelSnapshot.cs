@@ -22,6 +22,55 @@ namespace Clinic.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Clinic.Domain.Entities.Appointment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("DoctorId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsBooked")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("PatientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ServiceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("UpdatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DoctorId");
+
+                    b.HasIndex("PatientId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.HasIndex("DateTime", "DoctorId")
+                        .IsUnique();
+
+                    b.HasIndex("DateTime", "PatientId")
+                        .IsUnique();
+
+                    b.ToTable("Appointments", (string)null);
+                });
+
             modelBuilder.Entity("Clinic.Domain.Entities.Doctor", b =>
                 {
                     b.Property<long>("Id")
@@ -244,9 +293,6 @@ namespace Clinic.Persistence.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
-                    b.Property<long>("ServiceCategoryId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("SpecializationId")
                         .HasColumnType("bigint");
 
@@ -258,40 +304,9 @@ namespace Clinic.Persistence.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.HasIndex("ServiceCategoryId");
-
                     b.HasIndex("SpecializationId");
 
                     b.ToTable("Services", (string)null);
-                });
-
-            modelBuilder.Entity("Clinic.Domain.Entities.ServiceCategory", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTimeOffset>("CreatedOnUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<TimeSpan>("Duration")
-                        .HasColumnType("interval");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset?>("UpdatedOnUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ServiceCategories", (string)null);
                 });
 
             modelBuilder.Entity("Clinic.Domain.Entities.Specialization", b =>
@@ -323,6 +338,33 @@ namespace Clinic.Persistence.Migrations
                     b.ToTable("Specializations", (string)null);
                 });
 
+            modelBuilder.Entity("Clinic.Domain.Entities.Appointment", b =>
+                {
+                    b.HasOne("Clinic.Domain.Entities.Doctor", "Doctor")
+                        .WithMany("Appointments")
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Clinic.Domain.Entities.Patient", "Patient")
+                        .WithMany("Appointments")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Clinic.Domain.Entities.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Patient");
+
+                    b.Navigation("Service");
+                });
+
             modelBuilder.Entity("Clinic.Domain.Entities.Doctor", b =>
                 {
                     b.HasOne("Clinic.Domain.Entities.Office", "Office")
@@ -344,21 +386,18 @@ namespace Clinic.Persistence.Migrations
 
             modelBuilder.Entity("Clinic.Domain.Entities.Service", b =>
                 {
-                    b.HasOne("Clinic.Domain.Entities.ServiceCategory", "ServiceCategory")
-                        .WithMany("Services")
-                        .HasForeignKey("ServiceCategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Clinic.Domain.Entities.Specialization", "Specialization")
                         .WithMany("Services")
                         .HasForeignKey("SpecializationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("ServiceCategory");
-
                     b.Navigation("Specialization");
+                });
+
+            modelBuilder.Entity("Clinic.Domain.Entities.Doctor", b =>
+                {
+                    b.Navigation("Appointments");
                 });
 
             modelBuilder.Entity("Clinic.Domain.Entities.Office", b =>
@@ -366,9 +405,9 @@ namespace Clinic.Persistence.Migrations
                     b.Navigation("Doctors");
                 });
 
-            modelBuilder.Entity("Clinic.Domain.Entities.ServiceCategory", b =>
+            modelBuilder.Entity("Clinic.Domain.Entities.Patient", b =>
                 {
-                    b.Navigation("Services");
+                    b.Navigation("Appointments");
                 });
 
             modelBuilder.Entity("Clinic.Domain.Entities.Specialization", b =>

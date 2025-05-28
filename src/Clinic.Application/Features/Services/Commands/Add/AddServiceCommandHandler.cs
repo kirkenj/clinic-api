@@ -10,7 +10,6 @@ namespace Clinic.Application.Features.Services.Commands.Add;
 
 public sealed class AddServiceCommandHandler
     (IServiceRepository serviceRepository,
-    IServiceCategoryRepository serviceCategoryRepository,
     ISpecializationRepository specializationRepository,
     AddServiceCommandValidator validator,
     IOptions<ServiceOptions> serviceOptions)
@@ -51,19 +50,7 @@ public sealed class AddServiceCommandHandler
             return SpecializationErrors.NotActive(request.SpecializationId);
         }
 
-        var serviceCategory =
-            await serviceCategoryRepository.GetByIdAsync(request.ServiceCategoryId, cancellationToken);
-        if (serviceCategory is null)
-        {
-            return ServiceCategoryErrors.NotFound(request.ServiceCategoryId);
-        }
-
-        if (!serviceCategory.IsActive)
-        {
-            return ServiceCategoryErrors.NotActive(request.ServiceCategoryId);
-        }
-
-        var service = Service.Create(request.Name, request.Price, request.SpecializationId, request.ServiceCategoryId);
+        var service = Service.Create(request.Name, request.Price, request.SpecializationId);
         await serviceRepository.AddAsync(service, cancellationToken);
         return Result.Success();
     }

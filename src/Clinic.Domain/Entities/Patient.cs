@@ -26,6 +26,7 @@ public class Patient : BaseEntity, IAuditableEntity
     public string MiddleName { get; private set; } = default!;
     public string PhoneNumber { get; private set; } = default!;
     public string Email { get; private set; } = default!;
+    public ICollection<Appointment> Appointments { get; private set; } = default!;
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? UpdatedOnUtc { get; set; }
 
