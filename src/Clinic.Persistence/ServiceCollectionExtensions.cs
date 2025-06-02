@@ -15,8 +15,8 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<ClinnicContext>((sp, options) =>
         {
             var auditableEntitiesInterceptor = sp.GetRequiredService<AuditableEntitiesInterceptor>();
-
-            options.UseNpgsql(configuration.GetConnectionString("ClinicConnection"));
+            var cString = configuration.GetConnectionString("ClinicConnection");
+            options.UseNpgsql(cString);
             options.AddInterceptors(auditableEntitiesInterceptor);
         });
 
