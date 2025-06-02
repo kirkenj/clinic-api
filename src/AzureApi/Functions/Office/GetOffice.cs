@@ -7,9 +7,9 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace AzureApi.Functions.Office;
 
-public class Get(IMediator mediator)
+public class GetOffice(IMediator mediator)
 {
-    [Function("office_one")]
+    [Function("GetOffice")]
     public async Task<IActionResult> Run(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = "office/{id}")]
         HttpRequest req,

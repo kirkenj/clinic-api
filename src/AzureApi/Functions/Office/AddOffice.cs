@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Clinic.Application.Features.Offices.Commands.Update;
+using Clinic.Application.Features.Offices.Commands.Add;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,15 +7,15 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace AzureApi.Functions.Office;
 
-public class Update(IMediator mediator)
+public class AddOffice(IMediator mediator)
 {
-    [Function("office_update")]
-    public async Task<IActionResult> UpdateOfficeAsync(
-        [HttpTrigger(AuthorizationLevel.Function, "put", Route = "office")]
+    [Function("AddOffice")]
+    public async Task<IActionResult> AddOfficeAsync(
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = "office")]
         HttpRequest req)
     {
         var bodyString = await new StreamReader(req.Body).ReadToEndAsync(req.HttpContext.RequestAborted);
-        var request = JsonSerializer.Deserialize<UpdateOfficeCommand>(bodyString, JsonSerializerOptions.Web);
+        var request = JsonSerializer.Deserialize<AddOfficeCommand>(bodyString, JsonSerializerOptions.Web);
         if (request is null)
         {
             return new BadRequestResult();

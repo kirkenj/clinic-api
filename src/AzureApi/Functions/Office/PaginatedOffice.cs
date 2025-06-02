@@ -6,10 +6,10 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace AzureApi.Functions.Office;
 
-public class GetPaginated(IMediator mediator)
+public class PaginatedOffice(IMediator mediator)
 {
-    [Function("office_page")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req,
+    [Function("PaginatedOffice")]
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "office/page")] HttpRequest req,
         int page, int pageSize)
     {
         var result = await mediator.Send(new GetPaginatedOfficesRequest { Page = page, PageSize = pageSize },

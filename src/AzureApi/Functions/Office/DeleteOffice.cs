@@ -7,9 +7,9 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace AzureApi.Functions.Office;
 
-public class Delete(IMediator mediator)
+public class DeleteOffice(IMediator mediator)
 {
-    [Function("office_delete")]
+    [Function("DeleteOffice")]
     public async Task<IActionResult> DeleteOfficeAsync(
         [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "office/{id}")]
         HttpRequest req,
