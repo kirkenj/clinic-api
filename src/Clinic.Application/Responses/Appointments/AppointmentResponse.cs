@@ -18,8 +18,8 @@ public sealed record AppointmentResponse(
             appointment.PatientId,
             appointment.DoctorId,
             appointment.ServiceId,
-            appointment.IsBooked,
-            appointment.IsApproved
+            appointment.IsApprovedByUser,
+            appointment.IsApprovedByClinic
         );
     }
 

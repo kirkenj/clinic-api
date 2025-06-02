@@ -1,20 +1,18 @@
-﻿using Clinic.Application.Extensions;
-using Clinic.Application.Options;
+﻿using Clinic.Application.Services.SlotService;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
 using MediatR;
-using Microsoft.Extensions.Options;
 
 namespace Clinic.Application.Features.Appointments.Commands.Update;
 
-public sealed class UpdateAppointmentCommandHandler
-    (IAppointmentRepository appointmentRepository,
+public sealed class UpdateAppointmentCommandHandler(
+    IAppointmentRepository appointmentRepository,
     IPatientRepository patientRepository,
     IDoctorRepository doctorRepository,
     IServiceRepository serviceRepository,
     UpdateAppointmentCommandValidator validator,
-    IOptions<AppointmentsOptions> options)
+    ISlotService slotService)
     : IRequestHandler<UpdateAppointmentCommand, Result>
 {
     public async Task<Result> Handle(UpdateAppointmentCommand request, CancellationToken cancellationToken)
@@ -26,23 +24,10 @@ public sealed class UpdateAppointmentCommandHandler
                 (validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        request.DateTime = request.DateTime
-            .NormalizeDateTimeToMinutePeriod(options.Value.TimeSlotSizeMinutes);
-
-        var requestDayOfWeek = request.DateTime.DayOfWeek;
-        if (requestDayOfWeek < options.Value.WorkWeekDayStart || 
-            requestDayOfWeek > options.Value.WorkWeekDayEnd)
+        var slot = slotService.GetSlot(request.DateTime);
+        if (slot == null)
         {
-            return AppointmentErrors.InvalidDayOfWeek
-                (requestDayOfWeek, options.Value.WorkWeekDayStart, options.Value.WorkWeekDayEnd);
-        }
-
-        var requestTimeOfDay = request.DateTime.TimeOfDay;
-        if (requestTimeOfDay < options.Value.WorkTimeStart || 
-            requestTimeOfDay > options.Value.WorkTimeStart)
-        {
-            return AppointmentErrors.InvalidTimeOfDay
-                (requestTimeOfDay, options.Value.WorkTimeStart, options.Value.WorkTimeEnd);
+            return AppointmentErrors.NoSlotsFound(request.DateTime);
         }
 
         var appointment = await appointmentRepository
@@ -52,7 +37,7 @@ public sealed class UpdateAppointmentCommandHandler
             return AppointmentErrors.NotFound(request.Id);
         }
 
-        if (appointment.IsBooked && appointment.IsApproved)
+        if (appointment.IsApprovedByUser && appointment.IsApprovedByClinic)
         {
             return AppointmentErrors.AppointmentIsApproved(appointment.Id);
         }
@@ -102,13 +87,16 @@ public sealed class UpdateAppointmentCommandHandler
             }
         }
 
-        var hasSamePatientDate = request.DateTime == appointment.DateTime && 
-                                 request.PatientId == appointment.PatientId;
+
+        var hasSameDate = slot.SlotStart == appointment.DateTimeStart &&
+                          slot.SlotEnd == appointment.DateTimeEnd;
+
+        var hasSamePatientDate = hasSameDate && request.PatientId == appointment.PatientId;
         if (!hasSamePatientDate)
         {
             var isPatientAvailable = await appointmentRepository
                 .ExistsApprovedWithPatientAndDatetimeAsync
-                    (request.PatientId, request.DateTime, cancellationToken);
+                    (request.PatientId, slot.SlotStart, slot.SlotEnd, cancellationToken);
             if (isPatientAvailable)
             {
                 return AppointmentErrors
@@ -116,13 +104,12 @@ public sealed class UpdateAppointmentCommandHandler
             }
         }
 
-        var hasSameDoctorDate = request.DateTime == appointment.DateTime && 
-                                request.DoctorId == appointment.DoctorId;
+        var hasSameDoctorDate = hasSameDate && request.DoctorId == appointment.DoctorId;
         if (!hasSameDoctorDate)
         {
             var isDoctorAvailable = await appointmentRepository
                 .ExistsApprovedWithDoctorAndDatetimeAsync
-                    (request.DoctorId, request.DateTime, cancellationToken);
+                    (request.DoctorId, slot.SlotStart, slot.SlotEnd, cancellationToken);
             if (isDoctorAvailable)
             {
                 return AppointmentErrors
@@ -130,8 +117,10 @@ public sealed class UpdateAppointmentCommandHandler
             }
         }
 
-        appointment.Update(request.DoctorId, request.PatientId, 
-            request.ServiceId, request.DateTime);
+        appointment.Update(request.DoctorId, request.PatientId,
+            request.ServiceId, slot.SlotStart, slot.SlotEnd, 
+            request.IsConfirmedByUser, request.IsConfirmedByClinic,
+            request.Status);
         await appointmentRepository.UpdateAsync(appointment, cancellationToken);
         return Result.Success();
     }

@@ -27,22 +27,21 @@ public static class AppointmentErrors
             $"Appoint with id '{appointmentId}' is approved");
     }
 
-    public static Error InvalidDayOfWeek(DayOfWeek dayOfWeek, DayOfWeek startDayOfWorkingWeek,
-        DayOfWeek endDayOfWorkingWeek)
-    {
-        return new Error("Appointment.InvalidDayOfWeek",
-            $"'{dayOfWeek}' is invalid working day in clinic. It works between '{startDayOfWorkingWeek}' and '{endDayOfWorkingWeek}'");
-    }
-
-    public static Error InvalidTimeOfDay(TimeSpan timeOfDay, TimeSpan workingDayTimeStart, TimeSpan workingDayTimeEnd)
-    {
-        return new Error("Appointment.InvalidDayOfWeek",
-            $"'{timeOfDay}' is invalid working time in clinic. It works between '{workingDayTimeStart}' and '{workingDayTimeEnd}'");
-    }
-
     public static Error AppointmentIsNotApprovedByClinic(uint appointmentId)
     {
-        return new Error("Appointment.AppointmentIsApproved",
+        return new Error("Appointment.AppointmentIsNotApprovedByClinic",
             $"Appoint with id '{appointmentId}' is not approved by clinic");
+    }
+
+    public static Error AppointmentIsNotApprovedByUser(uint appointmentId)
+    {
+        return new Error("Appointment.AppointmentIsNotApprovedByUser",
+            $"Appoint with id '{appointmentId}' is not approved by user");
+    }
+
+    public static Error NoSlotsFound(DateTime dateTime)
+    {
+        return new Error("Appointment.InvalidDayOfWeek",
+            $"No slots found at '{dateTime}'");
     }
 }

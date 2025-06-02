@@ -33,16 +33,19 @@ namespace Clinic.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedOnUtc")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("DateTime")
+                    b.Property<DateTime>("DateTimeEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DateTimeStart")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<long>("DoctorId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("IsApproved")
+                    b.Property<bool>("IsApprovedByClinic")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsBooked")
+                    b.Property<bool>("IsApprovedByUser")
                         .HasColumnType("boolean");
 
                     b.Property<long>("PatientId")
@@ -62,13 +65,16 @@ namespace Clinic.Persistence.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.HasIndex("DateTime", "DoctorId")
+                    b.HasIndex("DateTimeStart", "DoctorId")
                         .IsUnique();
 
-                    b.HasIndex("DateTime", "PatientId")
+                    b.HasIndex("DateTimeStart", "PatientId")
                         .IsUnique();
 
-                    b.ToTable("Appointments", (string)null);
+                    b.ToTable("Appointments", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_DateStart_DateEnd", "'DateTimeEnd' > 'DateTimeStart'");
+                        });
                 });
 
             modelBuilder.Entity("Clinic.Domain.Entities.Doctor", b =>

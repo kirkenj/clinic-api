@@ -21,6 +21,13 @@ public sealed class DoctorRepository(ClinnicContext context) : IDoctorRepository
         await context.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<Doctor>> GetBySpecializationAsync(uint specializationId,
+        CancellationToken cancellationToken)
+    {
+        return await _dbSet.Where(d => d.SpecializationId == specializationId && d.IsActive)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
     {
         return await _dbSet.AnyAsync(d => d.PhoneNumber == phoneNumber, cancellationToken);

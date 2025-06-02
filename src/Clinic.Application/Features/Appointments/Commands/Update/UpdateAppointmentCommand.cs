@@ -10,4 +10,8 @@ public sealed class UpdateAppointmentCommand : IRequest<Result>
     public uint DoctorId { get; set; }
     public uint ServiceId { get; set; }
     public DateTime DateTime { get; set; }
+    public bool IsConfirmedByUser { get; set; }
+    public bool IsConfirmedByClinic { get; set; }
+    public AppointmentStatus Status { get; set; }
+
 }

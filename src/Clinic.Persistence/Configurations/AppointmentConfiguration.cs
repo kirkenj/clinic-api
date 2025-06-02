@@ -8,7 +8,8 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
 {
     public void Configure(EntityTypeBuilder<Appointment> builder)
     {
-        builder.ToTable("Appointments");
+        builder.ToTable("Appointments",
+            b => b.HasCheckConstraint("CK_DateStart_DateEnd", "'DateTimeEnd' > 'DateTimeStart'"));
 
         builder.HasKey(m => m.Id);
 
@@ -31,19 +32,25 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
             .HasForeignKey(m => m.PatientId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(m => m.DateTime)
+        builder.Property(m => m.DateTimeStart)
             .IsRequired();
 
-        builder.Property(m => m.IsBooked)
+        builder.Property(m => m.DateTimeEnd)
+            .IsRequired();
+        
+        builder.Property(m => m.IsApprovedByUser)
             .IsRequired();
 
-        builder.Property(m => m.IsApproved)
+        builder.Property(m => m.IsApprovedByClinic)
             .IsRequired();
 
-        builder.HasIndex(m => new { m.DateTime, m.DoctorId })
+        builder.Property(m => m.Status)
+            .IsRequired();
+
+        builder.HasIndex(m => new { m.DateTimeStart, m.DoctorId })
             .IsUnique();
 
-        builder.HasIndex(m => new { m.DateTime, m.PatientId })
+        builder.HasIndex(m => new { m.DateTimeStart, m.PatientId })
             .IsUnique();
 
         builder.Property(m => m.CreatedOnUtc)

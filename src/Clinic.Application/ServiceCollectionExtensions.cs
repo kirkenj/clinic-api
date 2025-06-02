@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Clinic.Application.Options;
+using Clinic.Application.Services.SlotService;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,8 @@ public static class ServiceCollectionExtensions
 
         ValidatorOptions.Global.LanguageManager.Enabled = false;
         services.AddValidatorsFromAssembly(executingAssembly);
+
+        services.AddSingleton<ISlotService, SlotService>();
 
         return services;
     }

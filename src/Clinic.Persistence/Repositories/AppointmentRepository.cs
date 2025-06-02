@@ -55,20 +55,6 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public Task<bool> ExistsApprovedWithPatientAndDatetimeAsync(uint patientId, DateTime dateTime,
-        CancellationToken cancellationToken)
-    {
-        return _dbSet.AnyAsync(a => a.PatientId == patientId && a.DateTime == dateTime && a.IsApproved && a.IsBooked,
-            cancellationToken);
-    }
-
-    public Task<bool> ExistsApprovedWithDoctorAndDatetimeAsync(uint doctorId, DateTime dateTime,
-        CancellationToken cancellationToken)
-    {
-        return _dbSet.AnyAsync(a => a.PatientId == doctorId && a.DateTime == dateTime && a.IsApproved && a.IsBooked,
-            cancellationToken);
-    }
-
     public async Task<PaginatedCollection<Appointment>> GetPatientsAppointments(uint patientId, int page, int pageSize,
         CancellationToken cancellationToken)
     {
@@ -76,7 +62,7 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
 
         var totalCount = await patientsRequests.CountAsync(cancellationToken);
 
-        var collection = await patientsRequests.OrderByDescending(o => o.DateTime)
+        var collection = await patientsRequests.OrderByDescending(o => o.DateTimeStart)
             .AsNoTracking()
             .OrderBy(o => o.Id)
             .Skip((page - 1) * pageSize)
@@ -93,7 +79,7 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
 
         var totalCount = await patientsRequests.CountAsync(cancellationToken);
 
-        var collection = await patientsRequests.OrderByDescending(o => o.DateTime)
+        var collection = await patientsRequests.OrderByDescending(o => o.DateTimeStart)
             .AsNoTracking()
             .OrderBy(o => o.Id)
             .Skip((page - 1) * pageSize)
@@ -106,7 +92,40 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
     public async Task<IEnumerable<Appointment>> GetDoctorsAppointmentsOnDate(uint doctorId, DateTime date,
         CancellationToken cancellationToken)
     {
-        return await _dbSet.Where(a => a.DoctorId == doctorId && a.DateTime.Date == date.Date)
+        return await _dbSet.Where(a => a.DoctorId == doctorId && a.DateTimeStart.Date == date.Date)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<ICollection<Appointment>> GetAppointmentsForSpecializationOnDate(DateTime date,
+        uint specializationId, CancellationToken cancellationToken)
+    {
+        return await _dbSet.Include(a => a.Doctor)
+            .Where(a => a.Doctor.SpecializationId == specializationId &&
+                        a.IsApprovedByClinic)
+            .ToListAsync(cancellationToken);
+    }
+
+    public Task<bool> ExistsApprovedWithPatientAndDatetimeAsync(uint patientId, DateTime dateTimeStart,
+        DateTime dateTimeEnd,
+        CancellationToken cancellationToken)
+    {
+        return _dbSet.AnyAsync(a => a.PatientId == patientId &&
+                                    ((dateTimeStart <= a.DateTimeEnd && a.DateTimeStart <= dateTimeEnd) ||
+                                     (dateTimeStart >= a.DateTimeStart && dateTimeEnd <= a.DateTimeEnd) ||
+                                     (a.DateTimeStart >= dateTimeStart && a.DateTimeEnd <= dateTimeEnd)) && 
+                                    a.IsApprovedByClinic,
+            cancellationToken);
+    }
+
+    public Task<bool> ExistsApprovedWithDoctorAndDatetimeAsync(uint doctorId, DateTime dateTimeStart,
+        DateTime dateTimeEnd,
+        CancellationToken cancellationToken)
+    {
+        return _dbSet.AnyAsync(a => a.PatientId == doctorId &&
+                                    ((dateTimeStart <= a.DateTimeEnd && a.DateTimeStart <= dateTimeEnd) ||
+                                     (dateTimeStart >= a.DateTimeStart && dateTimeEnd <= a.DateTimeEnd) ||
+                                     (a.DateTimeStart >= dateTimeStart && a.DateTimeEnd <= dateTimeEnd)) &&
+                                    a.IsApprovedByClinic,
+            cancellationToken);
     }
 }

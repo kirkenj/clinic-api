@@ -16,7 +16,7 @@ public sealed class DeleteAppointmentCommandHandler(IAppointmentRepository appoi
             return AppointmentErrors.NotFound(request.Id);
         }
 
-        if (appointment.IsBooked && appointment.IsApproved)
+        if (appointment.IsApprovedByUser && appointment.IsApprovedByClinic)
         {
             return AppointmentErrors.AppointmentIsApproved(request.Id);
         }

@@ -8,13 +8,19 @@ public class Appointment : BaseEntity, IAuditableEntity
     {
     }
 
-    private Appointment(uint doctorId, uint patientId, 
-        uint serviceId, DateTime dateTime)
+    private Appointment(uint doctorId, uint patientId,
+        uint serviceId, DateTime dateTimeStart, DateTime dateTimeEnd,
+        bool isApprovedByUser, bool isApprovedByClinic,
+        AppointmentStatus status)
     {
         DoctorId = doctorId;
         PatientId = patientId;
         ServiceId = serviceId;
-        DateTime = dateTime;
+        DateTimeStart = dateTimeStart;
+        DateTimeEnd = dateTimeEnd;
+        IsApprovedByClinic = isApprovedByClinic;
+        IsApprovedByUser = isApprovedByUser;
+        Status = status;
     }
 
     public uint DoctorId { get; private set; }
@@ -23,35 +29,47 @@ public class Appointment : BaseEntity, IAuditableEntity
     public Patient Patient { get; private set; } = default!;
     public uint ServiceId { get; private set; }
     public Service Service { get; private set; } = default!;
-    public DateTime DateTime { get; private set; }
-    public bool IsApproved { get; private set; }
-    public bool IsBooked { get; private set; }
+    public DateTime DateTimeStart { get; private set; }
+    public DateTime DateTimeEnd { get; private set; }
+    public bool IsApprovedByClinic { get; private set; }
+    public bool IsApprovedByUser { get; private set; }
+    public AppointmentStatus Status { get; private set; }
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? UpdatedOnUtc { get; set; }
 
-    public void Update(uint doctorId, uint patientId, 
-        uint serviceId, DateTime dateTime)
+    public void Update(uint doctorId, uint patientId,
+        uint serviceId, DateTime dateTimeStart, DateTime dateTimeEnd,
+        bool isApprovedByUser, bool isApprovedByClinic,
+        AppointmentStatus status)
     {
+        if (dateTimeStart >= dateTimeEnd)
+        {
+            throw new ArgumentException("dateTimeStart is bigger or equal to dateTimeEnd");
+        }
+
         DoctorId = doctorId;
         PatientId = patientId;
         ServiceId = serviceId;
-        DateTime = dateTime;
-    }
-
-    public void SetBooked(bool isBooked = true)
-    {
-        IsBooked = isBooked;
-    }
-
-    public void SetApproved(bool isApproved = true)
-    {
-        IsApproved = isApproved;
+        DateTimeStart = dateTimeStart;
+        DateTimeEnd = dateTimeEnd;
+        Status = status;
+        IsApprovedByClinic = isApprovedByClinic;
+        IsApprovedByUser = isApprovedByUser;
     }
 
     public static Appointment Create(uint doctorId, uint patientId,
-        uint serviceId, DateTime dateTime)
+        uint serviceId, DateTime dateTimeStart, DateTime dateTimeEnd,
+        bool isApprovedByUser, bool isApprovedByClinic,
+        AppointmentStatus status)
     {
+        if (dateTimeStart >= dateTimeEnd)
+        {
+            throw new ArgumentException("dateTimeStart is bigger or equal to dateTimeEnd");
+        }
+
         return new Appointment(doctorId, patientId,
-            serviceId, dateTime);
+            serviceId, dateTimeStart, dateTimeEnd,
+            isApprovedByUser, isApprovedByClinic,
+            status);
     }
 }

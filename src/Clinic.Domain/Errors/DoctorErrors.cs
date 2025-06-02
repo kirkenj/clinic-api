@@ -23,4 +23,9 @@ public static class DoctorErrors
     {
         return new Error("Doctor.EmailAlreadyTaken", $"Email '{email}' is already taken by other doctor");
     }
+
+    public static Error NoDoctorsForGivenSpecialization(uint specializationId)
+    {
+        return new Error("Doctor.NoDoctorsForGivenSpecialization", $"Doctors with specialization id '{specializationId}' were not found");
+    }
 }
