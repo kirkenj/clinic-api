@@ -2,9 +2,9 @@
 
 public sealed class AppointmentsOptions
 {
-    public TimeSpan WorkTimeStart { get; set; }
-    public TimeSpan WorkTimeEnd { get; set; }
-    public DayOfWeek WorkWeekDayStart { get; set; }
-    public DayOfWeek WorkWeekDayEnd { get; set; }
-    public int TimeSlotSizeMinutes { get; set; }
+    public TimeSpan WorkTimeStart { get; init; }
+    public TimeSpan WorkTimeEnd { get; init; }
+    public DayOfWeek WorkWeekDayStart { get; init; }
+    public DayOfWeek WorkWeekDayEnd { get; init; }
+    public int TimeSlotSizeMinutes { get; init; }
 }

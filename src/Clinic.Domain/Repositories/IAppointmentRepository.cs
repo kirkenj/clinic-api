@@ -23,6 +23,9 @@ public interface IAppointmentRepository
     public Task<bool> ExistsApprovedWithDoctorAndDatetimeAsync(uint doctorId, DateTime dateTimeStart,
         DateTime dateTimeEnd, CancellationToken cancellationToken);
 
+    public Task<Appointment?> GetAsync(uint patientId, uint doctorId, uint serviceId, DateTime dateTimeStart,
+        DateTime dateTimeEnd, CancellationToken cancellationToken);
+
     public Task<PaginatedCollection<Appointment>> GetPatientsAppointments(uint patientId, int page, int pageSize,
         CancellationToken cancellationToken);
 

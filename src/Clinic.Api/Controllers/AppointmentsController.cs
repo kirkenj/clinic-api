@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Clinic.Application.Features.Appointments.Commands.Add;
-using Clinic.Application.Features.Appointments.Commands.Delete;
+using Clinic.Application.Features.Appointments.Commands.ApproveByPatient;
+using Clinic.Application.Features.Appointments.Commands.CancelByClinic;
+using Clinic.Application.Features.Appointments.Commands.SendOtpToCreateAppointment;
 using Clinic.Application.Features.Appointments.Commands.SetApprovedByClinic;
-using Clinic.Application.Features.Appointments.Commands.SetApprovedByPatient;
-using Clinic.Application.Features.Appointments.Commands.Update;
 using Clinic.Application.Features.Appointments.Queries.Get;
 using Clinic.Application.Features.Appointments.Queries.GetPaginated;
 using MediatR;
@@ -24,28 +24,28 @@ public sealed class AppointmentsController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetAppointmentAsync([FromRoute][Required] uint id)
+    public async Task<IActionResult> GetAppointmentAsync([FromRoute] [Required] uint id)
     {
         var result = await mediator.Send(new GetAppointmentQuery { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAppointmentAsync([FromRoute][Required] uint id)
+    public async Task<IActionResult> DeleteAppointmentAsync([FromRoute] [Required] uint id)
     {
-        var result = await mediator.Send(new DeleteAppointmentCommand { Id = id }, HttpContext.RequestAborted);
+        var result = await mediator.Send(new CancelAppointmentByClinicCommand { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddAppointmentAsync([FromBody][Required] AddAppointmentCommand request)
+    public async Task<IActionResult> AddAppointmentAsync([FromBody] [Required] AddAppointmentCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
-    [HttpPut]
-    public async Task<IActionResult> UpdateAppointmentAsync([FromBody][Required] UpdateAppointmentCommand request)
+    [HttpPost("CancelAppointmentByClinic")]
+    public async Task<IActionResult> CancelAppointmentByClinic([FromBody] [Required] CancelAppointmentByClinicCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
@@ -59,9 +59,16 @@ public sealed class AppointmentsController(IMediator mediator) : ControllerBase
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
+    [HttpPost("SendOtpToConfirmAppointment")]
+    public async Task<IActionResult> SendOtpToConfirmAppointment(SendOtpToCreateAppointmentRequest request)
+    {
+        var result = await mediator.Send(request, HttpContext.RequestAborted);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
+    }
+
     [HttpPost("ApproveByPatient")]
     public async Task<IActionResult> ApproveRequestByPatient
-        ([FromBody] [Required] SetApprovedAppointmentByPatientCommand request)
+        ([FromBody] [Required] ApproveAppointmentByPatientCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);

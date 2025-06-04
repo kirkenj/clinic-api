@@ -55,6 +55,21 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
         await context.SaveChangesAsync(cancellationToken);
     }
 
+    public Task<Appointment?> GetAsync(uint patientId, 
+        uint doctorId, 
+        uint serviceId, 
+        DateTime dateTimeStart,
+        DateTime dateTimeEnd,
+        CancellationToken cancellationToken)
+    {
+        return _dbSet.FirstOrDefaultAsync(a => a.DoctorId == doctorId &&
+                                    a.PatientId == patientId &&
+                                    a.ServiceId == serviceId &&
+                                    a.DateTimeStart == dateTimeStart &&
+                                    a.DateTimeEnd == dateTimeEnd,
+            cancellationToken);
+    }
+
     public async Task<PaginatedCollection<Appointment>> GetPatientsAppointments(uint patientId, int page, int pageSize,
         CancellationToken cancellationToken)
     {
@@ -101,7 +116,7 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
     {
         return await _dbSet.Include(a => a.Doctor)
             .Where(a => a.Doctor.SpecializationId == specializationId &&
-                        a.IsApprovedByClinic)
+                        a.IsApprovedByClinic && a.Status == AppointmentStatus.Confirmed)
             .ToListAsync(cancellationToken);
     }
 
@@ -112,8 +127,8 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
         return _dbSet.AnyAsync(a => a.PatientId == patientId &&
                                     ((dateTimeStart <= a.DateTimeEnd && a.DateTimeStart <= dateTimeEnd) ||
                                      (dateTimeStart >= a.DateTimeStart && dateTimeEnd <= a.DateTimeEnd) ||
-                                     (a.DateTimeStart >= dateTimeStart && a.DateTimeEnd <= dateTimeEnd)) && 
-                                    a.IsApprovedByClinic,
+                                     (a.DateTimeStart >= dateTimeStart && a.DateTimeEnd <= dateTimeEnd)) &&
+                                    a.Status == AppointmentStatus.Confirmed,
             cancellationToken);
     }
 
@@ -121,11 +136,11 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
         DateTime dateTimeEnd,
         CancellationToken cancellationToken)
     {
-        return _dbSet.AnyAsync(a => a.PatientId == doctorId &&
+        return _dbSet.AnyAsync(a => a.DoctorId == doctorId &&
                                     ((dateTimeStart <= a.DateTimeEnd && a.DateTimeStart <= dateTimeEnd) ||
                                      (dateTimeStart >= a.DateTimeStart && dateTimeEnd <= a.DateTimeEnd) ||
                                      (a.DateTimeStart >= dateTimeStart && a.DateTimeEnd <= dateTimeEnd)) &&
-                                    a.IsApprovedByClinic,
+                                    a.Status == AppointmentStatus.Confirmed,
             cancellationToken);
     }
 }

@@ -54,6 +54,9 @@ namespace Clinic.Persistence.Migrations
                     b.Property<long>("ServiceId")
                         .HasColumnType("bigint");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
                     b.Property<DateTimeOffset?>("UpdatedOnUtc")
                         .HasColumnType("timestamp with time zone");
 
@@ -65,16 +68,7 @@ namespace Clinic.Persistence.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.HasIndex("DateTimeStart", "DoctorId")
-                        .IsUnique();
-
-                    b.HasIndex("DateTimeStart", "PatientId")
-                        .IsUnique();
-
-                    b.ToTable("Appointments", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_DateStart_DateEnd", "'DateTimeEnd' > 'DateTimeStart'");
-                        });
+                    b.ToTable("Appointments", (string)null);
                 });
 
             modelBuilder.Entity("Clinic.Domain.Entities.Doctor", b =>
@@ -172,6 +166,38 @@ namespace Clinic.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Offices", (string)null);
+                });
+
+            modelBuilder.Entity("Clinic.Domain.Entities.OtpRecord", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("ExpiresOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("MaxTriesCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("OtpHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TriesCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("UpdatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Key", "CreatedOnUtc");
+
+                    b.ToTable("OtpRecords", (string)null);
                 });
 
             modelBuilder.Entity("Clinic.Domain.Entities.Patient", b =>

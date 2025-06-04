@@ -21,7 +21,7 @@ public class
             return AppointmentErrors.NotFound(request.AppointmentId);
         }
 
-        if (appointment.IsApprovedByClinic == request.IsApproved)
+        if (appointment.IsApprovedByClinic == request.IsApprovedByClinic)
         {
             return Result.Success();
         }
@@ -31,7 +31,7 @@ public class
             return AppointmentErrors.AppointmentIsNotApprovedByUser(appointment.PatientId);
         }
 
-        if (request.IsApproved)
+        if (request.IsApprovedByClinic)
         {
             var dateTimeEnd = appointment.DateTimeStart.AddMinutes(options.Value.TimeSlotSizeMinutes);
 

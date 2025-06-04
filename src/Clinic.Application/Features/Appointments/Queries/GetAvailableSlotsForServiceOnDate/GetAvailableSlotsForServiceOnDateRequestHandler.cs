@@ -1,6 +1,6 @@
-﻿using Clinic.Application.Extensions;
+﻿using Clinic.Application.Abstractions;
+using Clinic.Application.Extensions;
 using Clinic.Application.Responses.Appointments;
-using Clinic.Application.Services.SlotService;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;

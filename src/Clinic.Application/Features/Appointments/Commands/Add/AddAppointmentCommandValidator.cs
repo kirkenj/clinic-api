@@ -7,7 +7,8 @@ public sealed class AddAppointmentCommandValidator : AbstractValidator<AddAppoin
     public AddAppointmentCommandValidator()
     {
         RuleFor(a => a.DateTime)
-            .NotEmpty();
+            .NotEmpty()
+            .GreaterThan(DateTime.UtcNow);
         RuleFor(a => a.DoctorId)
             .NotEmpty();
         RuleFor(a => a.PatientId)

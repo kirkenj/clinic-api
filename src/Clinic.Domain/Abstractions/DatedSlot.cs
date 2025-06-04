@@ -1,3 +1,3 @@
-﻿namespace Clinic.Application.Services.SlotService;
+﻿namespace Clinic.Domain.Abstractions;
 
 public record DatedSlot(DateTime SlotStart, DateTime SlotEnd);

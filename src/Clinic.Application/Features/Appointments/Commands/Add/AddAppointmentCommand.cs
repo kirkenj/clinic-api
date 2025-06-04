@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Clinic.Application.Features.Appointments.Commands.Add;
 
-public sealed class AddAppointmentCommand : IRequest<Result>
+public sealed class AddAppointmentCommand : IRequest<Result<string>>
 {
     public uint PatientId { get; set; }
     public uint DoctorId { get; set; }

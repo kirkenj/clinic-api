@@ -4,6 +4,11 @@ namespace Clinic.Domain.Errors;
 
 public static class AppointmentErrors
 {
+    public static Error InvalidDate(DateTime date)
+    {
+        return new Error("Appointment.InvalidDate", $"Date {date} is not valid");
+    }
+
     public static Error NotFound(uint id)
     {
         return new Error("Appointment.NotFound", $"Appointment with id {id} was not found");
@@ -15,6 +20,12 @@ public static class AppointmentErrors
             $"Doctor with id '{doctorId}' is already has got an appointment at {dateTime}");
     }
 
+    public static Error AlreadyExists(uint appointmentId)
+    {
+        return new Error("Appointment.AlreadyExists",
+            $"Appointment already exists with id '{appointmentId}'");
+    }
+
     public static Error DateTimePatientTaken(uint patientId, DateTime dateTime)
     {
         return new Error("Appointment.DateTimePatientTaken",
@@ -23,25 +34,31 @@ public static class AppointmentErrors
 
     public static Error AppointmentIsApproved(uint appointmentId)
     {
-        return new Error("Appointment.AppointmentIsApproved",
-            $"Appoint with id '{appointmentId}' is approved");
+        return new Error("Appointment.AppointmentIsApprovedByClinic",
+            $"Appointment with id '{appointmentId}' is approved");
     }
 
     public static Error AppointmentIsNotApprovedByClinic(uint appointmentId)
     {
         return new Error("Appointment.AppointmentIsNotApprovedByClinic",
-            $"Appoint with id '{appointmentId}' is not approved by clinic");
+            $"Appointment with id '{appointmentId}' is not approved by clinic");
     }
 
     public static Error AppointmentIsNotApprovedByUser(uint appointmentId)
     {
         return new Error("Appointment.AppointmentIsNotApprovedByUser",
-            $"Appoint with id '{appointmentId}' is not approved by user");
+            $"Appointment with id '{appointmentId}' is not approved by user");
     }
 
     public static Error NoSlotsFound(DateTime dateTime)
     {
         return new Error("Appointment.InvalidDayOfWeek",
             $"No slots found at '{dateTime}'");
+    }
+
+    public static Error InvalidStatus(AppointmentStatus expectedStatus, AppointmentStatus currentStatus)
+    {
+        return new Error("Appointment.InvalidStatus",
+            $"Unexpected appointment status '{currentStatus}'. Expected: '{expectedStatus}'");
     }
 }

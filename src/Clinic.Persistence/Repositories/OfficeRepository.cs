@@ -9,21 +9,21 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
 {
     private readonly DbSet<Office> _dbSet = context.Set<Office>();
 
-    public async Task AddAsync(Office office, CancellationToken cancellationToken)
+    public Task AddAsync(Office office, CancellationToken cancellationToken)
     {
-        await context.AddAsync(office, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
+        context.Add(office);
+        return context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteAsync(Office office, CancellationToken cancellationToken)
+    public Task DeleteAsync(Office office, CancellationToken cancellationToken)
     {
         context.Remove(office);
-        await context.SaveChangesAsync(cancellationToken);
+        return context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
+    public Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(o => o.PhoneNumber == phoneNumber, cancellationToken);
+        return _dbSet.AnyAsync(o => o.PhoneNumber == phoneNumber, cancellationToken);
     }
 
     public async Task<ICollection<Office>> GetAllAsync(CancellationToken cancellationToken,

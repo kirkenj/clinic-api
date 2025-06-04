@@ -1,4 +1,4 @@
-﻿using Clinic.Application.Services.SlotService;
+﻿using Clinic.Domain.Abstractions;
 
 namespace Clinic.Application.Responses.Appointments;
 

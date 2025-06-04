@@ -12,10 +12,7 @@ public sealed class AuditableEntitiesInterceptor(ILogger<AuditableEntitiesInterc
         InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("Interceptor Executed");
-
         var dbContext = eventData.Context;
-
         if (dbContext is null)
         {
             return base.SavingChangesAsync(
@@ -28,7 +25,6 @@ public sealed class AuditableEntitiesInterceptor(ILogger<AuditableEntitiesInterc
             dbContext
                 .ChangeTracker
                 .Entries<IAuditableEntity>();
-
         foreach (var entityEntry in entries)
         {
             if (entityEntry.State == EntityState.Added)

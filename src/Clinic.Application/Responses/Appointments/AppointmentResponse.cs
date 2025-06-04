@@ -7,9 +7,9 @@ public sealed record AppointmentResponse(
     uint PatientId,
     uint DoctorId,
     uint ServiceId,
-    bool IsBooked,
-    bool IsApproved
-)
+    DateTime DateTime,
+    string Status
+    )
 {
     public static AppointmentResponse FromAppointment(Appointment appointment)
     {
@@ -18,8 +18,8 @@ public sealed record AppointmentResponse(
             appointment.PatientId,
             appointment.DoctorId,
             appointment.ServiceId,
-            appointment.IsApprovedByUser,
-            appointment.IsApprovedByClinic
+            appointment.DateTimeStart, 
+            appointment.Status.ToString()
         );
     }
 
