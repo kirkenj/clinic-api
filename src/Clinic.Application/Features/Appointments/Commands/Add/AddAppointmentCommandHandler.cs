@@ -1,6 +1,7 @@
-﻿using System.Text.Json;
-using Clinic.Application.Abstractions;
-using Clinic.Application.Responses.Appointments;
+﻿using Clinic.Application.Abstractions;
+using Clinic.Application.Emails;
+using Clinic.Application.Otp;
+using Clinic.Application.Responses;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Entities;
 using Clinic.Domain.Errors;
@@ -10,14 +11,14 @@ using MediatR;
 namespace Clinic.Application.Features.Appointments.Commands.Add;
 
 public sealed class AddAppointmentCommandHandler(
+    AddAppointmentCommandValidator validator,
+    ISlotService slotService,
     IDoctorRepository doctorRepository,
     IPatientRepository patientRepository,
     IServiceRepository serviceRepository,
     IAppointmentRepository appointmentRepository,
-    AddAppointmentCommandValidator validator,
     IOtpService otpService,
-    INotificationService notificationService,
-    ISlotService slotService)
+    IEmailService emailService)
     : IRequestHandler<AddAppointmentCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(AddAppointmentCommand request, CancellationToken cancellationToken)
@@ -103,7 +104,7 @@ public sealed class AddAppointmentCommandHandler(
             slot.SlotStart, slot.SlotEnd, false, false,
             AppointmentStatus.WaitingUserConfirm);
         await appointmentRepository.AddAsync(appointment, cancellationToken);
-        var otpKey = string.Format(ApplicationResources.ConfirmAppointmentCreationByPatientOtpKeyFormat,
+        var otpKey = OtpKeys.ConfirmAppointmentCreationByPatient(
             appointment.PatientId, appointment.Id);
         var otpResult = await otpService.GenerateOtpAsync(otpKey, cancellationToken);
         if (otpResult.IsFailure)
@@ -111,13 +112,9 @@ public sealed class AddAppointmentCommandHandler(
             return Result.Failure<string>(otpResult.Error);
         }
 
-        var emailResponse = new EmailAppointmentResponse(doctor.FirstName + " " + doctor.LastName,
-            service.Name, service.Price, appointment.DateTimeStart);
-        var body = string.Format(ApplicationResources.ConfirmAppointmentCreationByPatientNotificationSubjectBody, 
-            JsonSerializer.Serialize(emailResponse), otpResult.Value);
-        await notificationService.NotifyAsync(patient, 
-            ApplicationResources.ConfirmAppointmentCreationByPatientNotificationSubject,
-            body, cancellationToken);
-        return Result.Success(ApplicationResources.CheckEmailForFurtherDetailsResponse);
+        await emailService.SendAsync(patient.Email, EmailSubjects.ConfirmAppointment,
+            EmailBodies.ConfirmAppointment(service.Name, doctor.FirstName, doctor.LastName, service.Price,
+                appointment.DateTimeStart, otpResult.Value), cancellationToken);
+        return Result.Success(StringResponses.CheckEmailForFurtherDetails);
     }
 }

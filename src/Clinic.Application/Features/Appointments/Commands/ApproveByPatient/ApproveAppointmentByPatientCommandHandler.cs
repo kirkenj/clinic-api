@@ -1,4 +1,5 @@
 ﻿using Clinic.Application.Abstractions;
+using Clinic.Application.Otp;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
@@ -6,21 +7,29 @@ using MediatR;
 
 namespace Clinic.Application.Features.Appointments.Commands.ApproveByPatient;
 
-public class
-    ApproveAppointmentByPatientCommandHandler(
-        IAppointmentRepository appointmentRepository,
-        IOtpService otpService,
-        ApproveAppointmentByPatientCommandValidator validator)
+public sealed class ApproveAppointmentByPatientCommandHandler(
+    IAppointmentRepository appointmentRepository,
+    IOtpService otpService,
+    ApproveAppointmentByPatientCommandValidator validator)
     : IRequestHandler<ApproveAppointmentByPatientCommand, Result>
 {
     public async Task<Result> Handle(ApproveAppointmentByPatientCommand request,
         CancellationToken cancellationToken)
     {
+        request.TrimStringProperties();
+
         var validationResult = validator.Validate(request);
         if (!validationResult.IsValid)
         {
             return Error.ValidationError
                 (validationResult.Errors.Select(e => e.ErrorMessage));
+        }
+
+        var otpKey = OtpKeys.ConfirmAppointmentCreationByPatient(request.PatientId, request.AppointmentId);
+        var otpValidationResul = await otpService.ValidateOtpAsync(otpKey, request.Otp, cancellationToken);
+        if (otpValidationResul.IsFailure)
+        {
+            return otpValidationResul.Error;
         }
 
         var appointment = await appointmentRepository.GetByIdAsync
@@ -37,7 +46,7 @@ public class
 
         if (appointment.Status != AppointmentStatus.WaitingUserConfirm)
         {
-            return AppointmentErrors.InvalidStatus(AppointmentStatus.WaitingUserConfirm, appointment.Status);
+            return AppointmentErrors.InvalidStatus(appointment.Status, AppointmentStatus.WaitingUserConfirm);
         }
 
         var isDoctorSlotTaken = await appointmentRepository.ExistsApprovedWithDoctorAndDatetimeAsync
@@ -54,14 +63,6 @@ public class
         {
             return AppointmentErrors.DateTimePatientTaken
                 (appointment.PatientId, appointment.DateTimeStart);
-        }
-
-        var otpKey = string.Format(ApplicationResources.ConfirmAppointmentCreationByPatientOtpKeyFormat,
-            appointment.PatientId, appointment.Id);
-        var otpValidationResul = await otpService.ValidateOtpAsync(otpKey, request.Otp, cancellationToken);
-        if (otpValidationResul.IsFailure)
-        {
-            return otpValidationResul.Error;
         }
 
         appointment.Update(appointment.DoctorId, appointment.PatientId, appointment.ServiceId,

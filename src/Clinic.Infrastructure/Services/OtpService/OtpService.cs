@@ -20,6 +20,13 @@ public class OtpService(
             return Result.Failure<string>(BasicErrors.NullOrEmpty(nameof(otpKey)));
         }
 
+        var oldOtp = await otpRecordRepository.GetRecordAsync(otpKey, cancellationToken);
+        if (oldOtp is not null)
+        {
+            oldOtp.Disable();
+            await otpRecordRepository.UpdateAsync(oldOtp, cancellationToken);
+        }
+
         var otp = Random.Shared.Next(options.Value.OtpRangeStart, options.Value.OtpRangeEnd)
             .ToString();
         var otpHash = hashService.GetHash(otp);
@@ -48,11 +55,17 @@ public class OtpService(
         }
 
         otpRecord.IncrementTries();
-        if (otpRecord.OtpHash == hashService.GetHash(otp))
+        var givenOtpHash = hashService.GetHash(otp);
+        if (otpRecord.OtpHash == givenOtpHash)
         {
             otpRecord.Disable();
             await otpRecordRepository.UpdateAsync(otpRecord, cancellationToken);
             return Result.Success();
+        }
+
+        if (otpRecord.MaxTriesCount == otpRecord.TriesCount)
+        {
+            otpRecord.Disable();
         }
 
         await otpRecordRepository.UpdateAsync(otpRecord, cancellationToken);

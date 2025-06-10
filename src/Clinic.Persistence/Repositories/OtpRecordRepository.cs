@@ -6,14 +6,18 @@ namespace Clinic.Persistence.Repositories;
 
 public class OtpRecordRepository(ClinnicContext context) : IOtpRecordRepository
 {
+    private readonly IQueryable<OtpRecord> _dbSet = context.Set<OtpRecord>();
+
     public Task<OtpRecord?> GetRecordAsync(string key, CancellationToken cancellationToken)
     {
-        return context.Set<OtpRecord>().FirstOrDefaultAsync(
-            o => o.IsActive &&
-                 o.MaxTriesCount > o.TriesCount &&
-                 o.Key == key &&
-                 o.ExpiresOnUtc > DateTime.UtcNow,
-            cancellationToken);
+        return _dbSet
+            .OrderByDescending(o => o.CreatedOnUtc)
+            .FirstOrDefaultAsync(o =>
+                    o.IsActive &&
+                    o.MaxTriesCount > o.TriesCount &&
+                    o.Key == key &&
+                    o.ExpiresOnUtc > DateTime.UtcNow,
+                cancellationToken);
     }
 
     public Task AddAsync(OtpRecord otpRecord, CancellationToken cancellationToken)

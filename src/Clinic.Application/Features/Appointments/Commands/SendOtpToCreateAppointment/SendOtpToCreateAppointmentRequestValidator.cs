@@ -2,7 +2,8 @@
 
 namespace Clinic.Application.Features.Appointments.Commands.SendOtpToCreateAppointment;
 
-public sealed class SendOtpToCreateAppointmentRequestValidator : AbstractValidator<SendOtpToCreateAppointmentRequest>
+public sealed class SendOtpToCreateAppointmentRequestValidator
+    : AbstractValidator<SendOtpToCreateAppointmentRequest>
 {
     public SendOtpToCreateAppointmentRequestValidator()
     {

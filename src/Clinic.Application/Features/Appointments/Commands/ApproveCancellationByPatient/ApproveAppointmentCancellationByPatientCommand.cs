@@ -5,6 +5,12 @@ namespace Clinic.Application.Features.Appointments.Commands.ApproveCancellationB
 
 public sealed class ApproveAppointmentCancellationByPatientCommand : IRequest<Result>
 {
-    public uint AppointmentId { get; set; }
+    public uint AppointmentId { get; init; }
+    public uint PatientId { get; init; }
     public string Otp { get; set; } = default!;
+
+    public void TrimStringProperties()
+    {
+        Otp = Otp.Trim();
+    }
 }

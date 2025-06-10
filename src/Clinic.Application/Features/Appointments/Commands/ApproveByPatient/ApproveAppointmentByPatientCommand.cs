@@ -5,6 +5,12 @@ namespace Clinic.Application.Features.Appointments.Commands.ApproveByPatient;
 
 public sealed class ApproveAppointmentByPatientCommand : IRequest<Result>
 {
-    public uint AppointmentId { get; set; }
+    public uint PatientId { get; init; }
+    public uint AppointmentId { get; init; }
     public string Otp { get; set; } = default!;
+
+    public void TrimStringProperties()
+    {
+        Otp = Otp.Trim();
+    }
 }

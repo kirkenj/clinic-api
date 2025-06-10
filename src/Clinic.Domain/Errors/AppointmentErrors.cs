@@ -17,7 +17,7 @@ public static class AppointmentErrors
     public static Error DateTimeDoctorTaken(uint doctorId, DateTime dateTime)
     {
         return new Error("Appointment.DateTimeDoctorTaken",
-            $"Doctor with id '{doctorId}' is already has got an appointment at {dateTime}");
+            $"Doctor with id '{doctorId}' has already got an appointment at {dateTime}");
     }
 
     public static Error AlreadyExists(uint appointmentId)
@@ -29,19 +29,13 @@ public static class AppointmentErrors
     public static Error DateTimePatientTaken(uint patientId, DateTime dateTime)
     {
         return new Error("Appointment.DateTimePatientTaken",
-            $"Doctor with id '{patientId}' is already has got an appointment at {dateTime}");
+            $"Patient with id '{patientId}' has already got an appointment at {dateTime}");
     }
 
     public static Error AppointmentIsApproved(uint appointmentId)
     {
         return new Error("Appointment.AppointmentIsApprovedByClinic",
             $"Appointment with id '{appointmentId}' is approved");
-    }
-
-    public static Error AppointmentIsNotApprovedByClinic(uint appointmentId)
-    {
-        return new Error("Appointment.AppointmentIsNotApprovedByClinic",
-            $"Appointment with id '{appointmentId}' is not approved by clinic");
     }
 
     public static Error AppointmentIsNotApprovedByUser(uint appointmentId)
@@ -56,9 +50,9 @@ public static class AppointmentErrors
             $"No slots found at '{dateTime}'");
     }
 
-    public static Error InvalidStatus(AppointmentStatus expectedStatus, AppointmentStatus currentStatus)
+    public static Error InvalidStatus(AppointmentStatus currentStatus, params AppointmentStatus[] expectedStatuses)
     {
         return new Error("Appointment.InvalidStatus",
-            $"Unexpected appointment status '{currentStatus}'. Expected: '{expectedStatus}'");
+            $"Unexpected appointment status '{currentStatus}'. Expected: one of [{string.Join(", ", expectedStatuses.Select(s => $"'{s}'"))}]");
     }
 }

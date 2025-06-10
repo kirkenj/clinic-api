@@ -3,11 +3,14 @@ using FluentValidation;
 
 namespace Clinic.Application.Features.Appointments.Commands.ApproveByPatient;
 
-public sealed class
-    ApproveAppointmentByPatientCommandValidator : AbstractValidator<ApproveAppointmentByPatientCommand>
+public sealed class ApproveAppointmentByPatientCommandValidator
+    : AbstractValidator<ApproveAppointmentByPatientCommand>
 {
     public ApproveAppointmentByPatientCommandValidator()
     {
+        RuleFor(a => a.PatientId)
+            .NotEmpty();
+
         RuleFor(a => a.AppointmentId)
             .NotEmpty();
 

@@ -2,7 +2,8 @@
 
 namespace Clinic.Application.Features.Appointments.Commands.Add;
 
-public sealed class AddAppointmentCommandValidator : AbstractValidator<AddAppointmentCommand>
+public sealed class AddAppointmentCommandValidator 
+    : AbstractValidator<AddAppointmentCommand>
 {
     public AddAppointmentCommandValidator()
     {

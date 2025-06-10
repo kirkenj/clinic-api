@@ -1,11 +1,10 @@
 ﻿using Clinic.Domain.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Logging;
 
 namespace Clinic.Persistence.Interceptors;
 
-public sealed class AuditableEntitiesInterceptor(ILogger<AuditableEntitiesInterceptor> logger) : SaveChangesInterceptor
+public sealed class AuditableEntitiesInterceptor : SaveChangesInterceptor
 {
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,

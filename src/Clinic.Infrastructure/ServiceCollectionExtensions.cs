@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<IHashService, HashService>();
         services.AddTransient<ISlotService, SlotService>();
-        services.AddTransient<INotificationService, LoggerNotificationService>();
+        services.AddTransient<IEmailService, LoggerEmailService>();
 
         services.Configure<OtpServiceOptions>(configuration.GetSection("OtpServiceOptions"));
         services.AddScoped<IOtpService, OtpService>();

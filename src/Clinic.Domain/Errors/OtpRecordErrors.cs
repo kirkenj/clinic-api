@@ -14,7 +14,7 @@ public static class OtpRecordErrors
         var remainingAttempts = maxTriesCount - triesCount;
         return new Error(
             "Invalid otp. " + (remainingAttempts == 0
-                ? "No more attempts left. Create a new registration request"
+                ? "No more attempts left. Request a new one-time password"
                 : $"Attempts left: {remainingAttempts}."));
     }
 }

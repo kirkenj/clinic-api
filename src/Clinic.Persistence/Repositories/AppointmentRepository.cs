@@ -63,10 +63,13 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
         CancellationToken cancellationToken)
     {
         return _dbSet.FirstOrDefaultAsync(a => a.DoctorId == doctorId &&
-                                    a.PatientId == patientId &&
-                                    a.ServiceId == serviceId &&
-                                    a.DateTimeStart == dateTimeStart &&
-                                    a.DateTimeEnd == dateTimeEnd,
+                                               a.PatientId == patientId &&
+                                               a.ServiceId == serviceId &&
+                                               a.DateTimeStart == dateTimeStart &&
+                                               a.DateTimeEnd == dateTimeEnd &&
+                                               (a.Status == AppointmentStatus.Confirmed ||
+                                                a.Status == AppointmentStatus.WaitingUserConfirm ||
+                                                a.Status == AppointmentStatus.WaitingClinicConfirm),
             cancellationToken);
     }
 

@@ -6,7 +6,6 @@ public enum AppointmentStatus
     WaitingClinicConfirm,
     Rescheduled,
     Confirmed,
-    Completed,
     CancelledByUser,
     CancelledByClinic
 }

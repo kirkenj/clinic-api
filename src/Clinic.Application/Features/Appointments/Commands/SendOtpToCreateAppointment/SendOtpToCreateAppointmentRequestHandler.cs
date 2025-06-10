@@ -1,6 +1,6 @@
-﻿using System.Text.Json;
-using Clinic.Application.Abstractions;
-using Clinic.Application.Responses.Appointments;
+﻿using Clinic.Application.Abstractions;
+using Clinic.Application.Emails;
+using Clinic.Application.Otp;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
@@ -8,14 +8,14 @@ using MediatR;
 
 namespace Clinic.Application.Features.Appointments.Commands.SendOtpToCreateAppointment;
 
-internal class SendOtpToCreateAppointmentRequestHandler(
+public sealed class SendOtpToCreateAppointmentRequestHandler(
     SendOtpToCreateAppointmentRequestValidator validator,
     IAppointmentRepository appointmentRepository,
     IOtpService otpService,
     IDoctorRepository doctorRepository,
     IServiceRepository serviceRepository,
     IPatientRepository patientRepository,
-    INotificationService notificationService) : IRequestHandler<SendOtpToCreateAppointmentRequest, Result>
+    IEmailService emailService) : IRequestHandler<SendOtpToCreateAppointmentRequest, Result>
 {
     public async Task<Result> Handle(SendOtpToCreateAppointmentRequest request, CancellationToken cancellationToken)
     {
@@ -34,7 +34,7 @@ internal class SendOtpToCreateAppointmentRequestHandler(
 
         if (appointment.Status != AppointmentStatus.WaitingUserConfirm)
         {
-            return AppointmentErrors.InvalidStatus(AppointmentStatus.WaitingUserConfirm, appointment.Status);
+            return AppointmentErrors.InvalidStatus(appointment.Status, AppointmentStatus.WaitingUserConfirm);
         }
 
         if (appointment.DateTimeStart <= DateTime.UtcNow)
@@ -42,8 +42,7 @@ internal class SendOtpToCreateAppointmentRequestHandler(
             return AppointmentErrors.InvalidDate(appointment.DateTimeStart);
         }
 
-        var otpKey = string.Format(ApplicationResources.ConfirmAppointmentCreationByPatientOtpKeyFormat,
-            appointment.PatientId, appointment.Id);
+        var otpKey = OtpKeys.ConfirmAppointmentCreationByPatient(appointment.PatientId, appointment.Id);
         var otpResult = await otpService.GenerateOtpAsync(otpKey, cancellationToken);
         if (otpResult.IsFailure)
         {
@@ -68,15 +67,10 @@ internal class SendOtpToCreateAppointmentRequestHandler(
             return PatientErrors.NotFound(appointment.PatientId);
         }
 
-        var emailResponse = new EmailAppointmentResponse(doctor.FirstName + " " + doctor.LastName,
-            service.Name, service.Price, appointment.DateTimeStart);
-
-        var body = string.Format(ApplicationResources.ConfirmAppointmentCreationByPatientNotificationSubjectBody,
-            JsonSerializer.Serialize(emailResponse), otpResult.Value);
-
-        await notificationService.NotifyAsync(patient,
-            ApplicationResources.ConfirmAppointmentCreationByPatientNotificationSubject,
-            body, cancellationToken);
+        await emailService.SendAsync(patient.Email, EmailSubjects.ConfirmAppointment,
+            EmailBodies.ConfirmAppointment(service.Name, doctor.FirstName, doctor.LastName,
+                service.Price, appointment.DateTimeStart, otpResult.Value),
+            cancellationToken);
         return Result.Success();
     }
 }

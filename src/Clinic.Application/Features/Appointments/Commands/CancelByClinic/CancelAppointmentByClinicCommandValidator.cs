@@ -2,7 +2,8 @@
 
 namespace Clinic.Application.Features.Appointments.Commands.CancelByClinic;
 
-public sealed class CancelAppointmentByClinicCommandValidator : AbstractValidator<CancelAppointmentByClinicCommand>
+public sealed class CancelAppointmentByClinicCommandValidator
+    : AbstractValidator<CancelAppointmentByClinicCommand>
 {
     public CancelAppointmentByClinicCommandValidator()
     {
