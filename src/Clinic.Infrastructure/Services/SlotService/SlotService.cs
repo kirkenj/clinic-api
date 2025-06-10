@@ -41,9 +41,9 @@ public sealed class SlotService(IOptions<AppointmentsOptions> options) : ISlotSe
         var periodStart = options.Value.WorkTimeStart +
                           TimeSpan.FromMinutes(slotNumber * options.Value.TimeSlotSizeMinutes);
         return new DatedSlot(
-            dateTime.Date + periodStart,
-            dateTime.Date + periodStart + 
-                TimeSpan.FromMinutes(options.Value.TimeSlotSizeMinutes));
+            (dateTime.Date + periodStart).ToUniversalTime(),
+            (dateTime.Date + periodStart +
+             TimeSpan.FromMinutes(options.Value.TimeSlotSizeMinutes)).ToUniversalTime());
     }
 
     private bool CheckForValidWorkingDay(DateTime dateTime)

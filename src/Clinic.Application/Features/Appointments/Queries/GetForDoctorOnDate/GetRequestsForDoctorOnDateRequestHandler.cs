@@ -22,7 +22,7 @@ public sealed class
         }
 
         var appointments = await appointmentRepository
-            .GetDoctorsAppointmentsOnDate(request.DoctorId, request.Date, cancellationToken);
+            .GetDoctorsAppointmentsOnDate(request.DoctorId, request.Date.ToUniversalTime(), cancellationToken, request.AppointmentStatus);
         var appointmentResponse = appointments
             .Select(AppointmentResponse.FromAppointment);
         return Result.Success(appointmentResponse);

@@ -33,8 +33,5 @@ public interface IAppointmentRepository
         CancellationToken cancellationToken);
 
     public Task<IEnumerable<Appointment>> GetDoctorsAppointmentsOnDate(uint doctorId, DateTime date,
-        CancellationToken cancellationToken);
-
-    public Task<ICollection<Appointment>> GetAppointmentsForSpecializationOnDate(DateTime date, uint specializationId,
-        CancellationToken cancellationToken);   
+        CancellationToken cancellationToken, AppointmentStatus? appointmentStatus = null);
 }

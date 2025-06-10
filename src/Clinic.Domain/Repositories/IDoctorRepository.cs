@@ -14,8 +14,6 @@ public interface IDoctorRepository
     public Task AddAsync(Doctor doctor, CancellationToken cancellationToken);
     public Task UpdateAsync(Doctor doctor, CancellationToken cancellationToken);
     public Task DeleteAsync(Doctor doctor, CancellationToken cancellationToken);
-    public Task<IEnumerable<Doctor>> GetBySpecializationAsync(uint specializationId,
-        CancellationToken cancellationToken);
     public Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken);
     public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken);
 }

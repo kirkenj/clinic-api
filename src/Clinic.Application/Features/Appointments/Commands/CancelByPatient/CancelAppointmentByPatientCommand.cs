@@ -5,5 +5,5 @@ namespace Clinic.Application.Features.Appointments.Commands.CancelByPatient;
 
 public sealed class CancelAppointmentByPatientCommand : IRequest<Result<string>>
 {
-    public uint AppointmentId { get; init; }
+    public uint AppointmentId { get; set; }
 }

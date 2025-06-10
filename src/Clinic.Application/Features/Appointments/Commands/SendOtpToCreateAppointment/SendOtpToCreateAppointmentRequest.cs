@@ -5,5 +5,5 @@ namespace Clinic.Application.Features.Appointments.Commands.SendOtpToCreateAppoi
 
 public sealed class SendOtpToCreateAppointmentRequest : IRequest<Result>
 {
-    public uint AppointmentId { get; init; }
+    public uint AppointmentId { get; set; }
 }

@@ -8,7 +8,10 @@ using Clinic.Application.Features.Appointments.Commands.CancelByPatient;
 using Clinic.Application.Features.Appointments.Commands.RescheduleByClinic;
 using Clinic.Application.Features.Appointments.Commands.SendOtpToCreateAppointment;
 using Clinic.Application.Features.Appointments.Queries.Get;
+using Clinic.Application.Features.Appointments.Queries.GetForDoctorOnDate;
 using Clinic.Application.Features.Appointments.Queries.GetPaginated;
+using Clinic.Application.Features.Appointments.Queries.GetPaginatedForDoctor;
+using Clinic.Application.Features.Appointments.Queries.GetPaginatedForPatient;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +26,27 @@ public sealed class AppointmentsController(IMediator mediator) : ControllerBase
     {
         var result = await mediator.Send(new GetPaginatedAppointmentsRequest { Page = page, PageSize = pageSize },
             HttpContext.RequestAborted);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+    }
+
+    [HttpGet("patientPaged")]
+    public async Task<IActionResult> GetPaginatedAppointmentsForPatentAsync([FromQuery][Required] GetPaginatedAppointmentsForPatientRequest request)
+    {
+        var result = await mediator.Send(request, HttpContext.RequestAborted);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+    }
+
+    [HttpGet("doctorPaged")]
+    public async Task<IActionResult> GetPaginatedAppointmentsForDoctorAsync([FromQuery][Required] GetPaginatedAppointmentsForDoctorRequest request)
+    {
+        var result = await mediator.Send(request, HttpContext.RequestAborted);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+    }
+
+    [HttpGet("datedDoctorRequests")]
+    public async Task<IActionResult> GetPaginatedAppointmentsForDoctorAsync([FromQuery][Required] GetRequestsForDoctorOnDateRequest request)
+    {
+        var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
@@ -49,7 +73,7 @@ public sealed class AppointmentsController(IMediator mediator) : ControllerBase
 
     [HttpPost("ApproveByPatient")]
     public async Task<IActionResult> ApproveRequestByPatient
-        ([FromBody][Required] ApproveAppointmentByPatientCommand request)
+        ([FromBody] [Required] ApproveAppointmentByPatientCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
@@ -57,7 +81,7 @@ public sealed class AppointmentsController(IMediator mediator) : ControllerBase
 
     [HttpPost("ApproveByClinic")]
     public async Task<IActionResult> ApproveRequestByClinic
-        ([FromBody][Required] ApproveAppointmentByClinicCommand request)
+        ([FromBody] [Required] ApproveAppointmentByClinicCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
@@ -65,7 +89,7 @@ public sealed class AppointmentsController(IMediator mediator) : ControllerBase
 
     [HttpPost("CancelByPatient")]
     public async Task<IActionResult> CancelRequestByPatient
-        ([FromBody][Required] CancelAppointmentByPatientCommand request)
+        ([FromBody] [Required] CancelAppointmentByPatientCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
@@ -73,7 +97,7 @@ public sealed class AppointmentsController(IMediator mediator) : ControllerBase
 
     [HttpPost("ApproveCancellationByPatient")]
     public async Task<IActionResult> CancelRequestByPatient
-        ([FromBody][Required] ApproveAppointmentCancellationByPatientCommand request)
+        ([FromBody] [Required] ApproveAppointmentCancellationByPatientCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);

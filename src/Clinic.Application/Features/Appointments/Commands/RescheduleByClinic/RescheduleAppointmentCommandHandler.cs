@@ -27,7 +27,7 @@ public sealed class RescheduleAppointmentCommandHandler(
                 (validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        var slot = slotService.GetSlot(request.NewDateTime);
+        var slot = slotService.GetSlot(request.NewDateTime.ToUniversalTime());
         if (slot == null)
         {
             return AppointmentErrors.NoSlotsFound(request.NewDateTime);

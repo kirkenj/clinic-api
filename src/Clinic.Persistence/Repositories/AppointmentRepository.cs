@@ -55,9 +55,9 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public Task<Appointment?> GetAsync(uint patientId, 
-        uint doctorId, 
-        uint serviceId, 
+    public Task<Appointment?> GetAsync(uint patientId,
+        uint doctorId,
+        uint serviceId,
         DateTime dateTimeStart,
         DateTime dateTimeEnd,
         CancellationToken cancellationToken)
@@ -107,13 +107,6 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
         return new PaginatedCollection<Appointment>(collection, page, pageSize, totalCount);
     }
 
-    public async Task<IEnumerable<Appointment>> GetDoctorsAppointmentsOnDate(uint doctorId, DateTime date,
-        CancellationToken cancellationToken)
-    {
-        return await _dbSet.Where(a => a.DoctorId == doctorId && a.DateTimeStart.Date == date.Date)
-            .ToListAsync(cancellationToken);
-    }
-
     public async Task<ICollection<Appointment>> GetAppointmentsForSpecializationOnDate(DateTime date,
         uint specializationId, CancellationToken cancellationToken)
     {
@@ -145,5 +138,17 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
                                      (a.DateTimeStart >= dateTimeStart && a.DateTimeEnd <= dateTimeEnd)) &&
                                     a.Status == AppointmentStatus.Confirmed,
             cancellationToken);
+    }
+
+    public async Task<IEnumerable<Appointment>> GetDoctorsAppointmentsOnDate(uint doctorId, DateTime date,
+        CancellationToken cancellationToken, AppointmentStatus? appointmentStatus = null)
+    {
+        var set = _dbSet.Where(a => a.DoctorId == doctorId && a.DateTimeStart.Date == date.Date);
+        if (appointmentStatus != null)
+        {
+            set = set.Where(a => a.Status == appointmentStatus);
+        }
+
+        return await set.ToListAsync(cancellationToken);
     }
 }

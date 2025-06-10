@@ -30,7 +30,7 @@ public sealed class AddAppointmentCommandHandler(
                 (validationResult.Errors.Select(e => e.ErrorMessage)));
         }
 
-        var slot = slotService.GetSlot(request.DateTime);
+        var slot = slotService.GetSlot(request.DateTime.ToUniversalTime());
         if (slot == null)
         {
             return Result.Failure<string>(AppointmentErrors.NoSlotsFound(request.DateTime));

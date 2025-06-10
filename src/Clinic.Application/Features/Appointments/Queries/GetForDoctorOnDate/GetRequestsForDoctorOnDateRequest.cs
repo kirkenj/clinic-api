@@ -8,4 +8,5 @@ public sealed class GetRequestsForDoctorOnDateRequest : IRequest<Result<IEnumera
 {
     public uint DoctorId { get; set; }
     public DateTime Date { get; set; }
+    public AppointmentStatus? AppointmentStatus { get; set; }
 }
