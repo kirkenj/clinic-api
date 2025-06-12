@@ -1,4 +1,4 @@
-﻿namespace Clinic.Application.Emails;
+﻿namespace Clinic.Application.Email;
 
 public static class EmailBodies
 {
@@ -44,5 +44,10 @@ public static class EmailBodies
     {
         return $"New appointment: '{serviceName}' {servicePrice} ({doctorFirstName} {doctorLastName}) at {appointmentStartDateTime} "
             + $"with one-time password '{otp}'.";
+    }
+
+    public static string SignIn(string otp)
+    {
+        return $"To sign in use one-time password '{otp}'";
     }
 }

@@ -9,26 +9,31 @@ public sealed class PatientRepository(ClinnicContext context) : IPatientReposito
 {
     private readonly DbSet<Patient> _dbSet = context.Set<Patient>();
 
-    public async Task AddAsync(Patient patient, CancellationToken cancellationToken)
+    public Task AddAsync(Patient patient, CancellationToken cancellationToken)
     {
-        await context.AddAsync(patient, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
+        context.Add(patient);
+        return context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteAsync(Patient patient, CancellationToken cancellationToken)
+    public Task DeleteAsync(Patient patient, CancellationToken cancellationToken)
     {
         context.Remove(patient);
-        await context.SaveChangesAsync(cancellationToken);
+        return context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
+    public Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(p => p.PhoneNumber == phoneNumber, cancellationToken);
+        return _dbSet.AnyAsync(p => p.PhoneNumber == phoneNumber, cancellationToken);
     }
 
-    public async Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)
+    public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(p => p.Email == email, cancellationToken);
+        return _dbSet.AnyAsync(p => p.Email == email, cancellationToken);
+    }
+
+    public Task<Patient?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        return _dbSet.FirstOrDefaultAsync(p => p.Email == email, cancellationToken);
     }
 
     public async Task<ICollection<Patient>> GetAllAsync(CancellationToken cancellationToken,

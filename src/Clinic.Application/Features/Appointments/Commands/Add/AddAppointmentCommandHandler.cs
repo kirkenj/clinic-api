@@ -1,5 +1,5 @@
 ﻿using Clinic.Application.Abstractions;
-using Clinic.Application.Emails;
+using Clinic.Application.Email;
 using Clinic.Application.Otp;
 using Clinic.Application.Responses;
 using Clinic.Domain.Abstractions;

@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Clinic.Application.Features.Patients.Commands.Add;
 
-public sealed class AddPatientCommand : IRequest<Result>
+public sealed class AddPatientCommand : IRequest<Result<string>>
 {
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;

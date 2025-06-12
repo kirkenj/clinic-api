@@ -1,5 +1,5 @@
 ﻿using Clinic.Application.Abstractions;
-using Clinic.Application.Emails;
+using Clinic.Application.Email;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;

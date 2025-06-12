@@ -1,4 +1,4 @@
-﻿namespace Clinic.Application.Emails;
+﻿namespace Clinic.Application.Email;
 
 public static class EmailSubjects
 {
@@ -11,4 +11,6 @@ public static class EmailSubjects
     public static string ConfirmAppointmentCancellationByUser => "Confirm appointment cancellation";
 
     public static string NewAppointment => "New appointment";
+
+    public static string SignIn => "Sign in";
 }

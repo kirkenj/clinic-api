@@ -10,9 +10,9 @@ public class Patient : BaseEntity, IAuditableEntity
 
     private Patient(string firstName, string lastName,
         string middleName, string email,
-        string phoneNumber)
+        string phoneNumber, bool isActive)
     {
-        IsActive = true;
+        IsActive = isActive;
         FirstName = firstName;
         LastName = lastName;
         MiddleName = middleName;
@@ -32,21 +32,22 @@ public class Patient : BaseEntity, IAuditableEntity
 
     public void Update(string firstName, string lastName,
         string middleName, string email,
-        string phoneNumber)
+        string phoneNumber, bool isActive)
     {
         FirstName = firstName;
         LastName = lastName;
         MiddleName = middleName;
         Email = email;
         PhoneNumber = phoneNumber;
+        IsActive = isActive;
     }
 
     public static Patient Create(string firstName, string lastName,
         string middleName, string email,
-        string phoneNumber)
+        string phoneNumber, bool isActive)
     {
         return new Patient(firstName, lastName,
             middleName, email,
-            phoneNumber);
+            phoneNumber, isActive);
     }
 }

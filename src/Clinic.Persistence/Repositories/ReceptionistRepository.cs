@@ -9,14 +9,19 @@ public class ReceptionistRepository(ClinnicContext context) : IReceptionistRepos
 {
     private readonly DbSet<Receptionist> _dbSet = context.Set<Receptionist>();
 
-    public async Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
+    public Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(r => r.PhoneNumber == phoneNumber, cancellationToken);
+        return _dbSet.AnyAsync(r => r.PhoneNumber == phoneNumber, cancellationToken);
     }
 
-    public async Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)
+    public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(r => r.Email == email, cancellationToken);
+        return _dbSet.AnyAsync(r => r.Email == email, cancellationToken);
+    }
+
+    public Task<Receptionist?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        return _dbSet.FirstOrDefaultAsync(r => r.Email == email, cancellationToken);
     }
 
     public async Task<ICollection<Receptionist>> GetAllAsync(CancellationToken cancellationToken,
@@ -47,9 +52,9 @@ public class ReceptionistRepository(ClinnicContext context) : IReceptionistRepos
         return new PaginatedCollection<Receptionist>(collection, page, pageSize, totalCount);
     }
 
-    public async Task UpdateAsync(Receptionist receptionist, CancellationToken cancellationToken)
+    public Task UpdateAsync(Receptionist receptionist, CancellationToken cancellationToken)
     {
         context.Update(receptionist);
-        await context.SaveChangesAsync(cancellationToken);
+        return context.SaveChangesAsync(cancellationToken);
     }
 }

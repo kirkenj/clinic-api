@@ -9,6 +9,11 @@ public static class DoctorErrors
         return new Error("Doctor.NotFound", $"Doctor with id {id} was not found");
     }
 
+    public static Error NotFound(string email)
+    {
+        return new Error("Doctor.NotFound", $"Doctor with email '{email}' was not found");
+    }
+
     public static Error NotActive(uint id)
     {
         return new Error("Doctor.NotActive", $"Doctor with id {id} is not active");

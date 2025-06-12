@@ -1,0 +1,14 @@
+﻿using Clinic.Domain.Abstractions;
+using MediatR;
+
+namespace Clinic.Application.Features.Receptionists.Commands.SignIn;
+
+public class ReceptionistSignInRequest : IRequest<Result<string>>
+{
+    public string Email { get; private set; } = default!;
+
+    public void TrimStringProperties()
+    {
+        Email = Email.Trim();
+    }
+}

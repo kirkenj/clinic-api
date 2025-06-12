@@ -52,8 +52,8 @@ public sealed class UpdatePatientCommandHandler(
             }
         }
 
-        patient.Update(request.FirstName, request.LastName,
-            request.MiddleName, request.Email, request.PhoneNumber);
+        patient.Update(request.FirstName, request.LastName, request.MiddleName, 
+            request.Email, request.PhoneNumber, false);
         await patientRepository.UpdateAsync(patient, cancellationToken);
         return Result.Success();
     }
