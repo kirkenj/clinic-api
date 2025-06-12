@@ -1,4 +1,5 @@
 using Clinic.Application;
+using Clinic.Infrastructure;
 using Clinic.Persistence;
 using Serilog;
 
@@ -11,6 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.RegisterApplicationServices(configuration);
 builder.Services.RegisterPersistenceServices(configuration);
+builder.Services.RegisterInfrastructureServices(configuration);
 
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {

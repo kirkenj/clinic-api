@@ -7,7 +7,6 @@ public sealed record ServiceResponse(
     string Name, 
     decimal Price,
     uint SpecializationId, 
-    uint ServiceCategoryId,
     bool IsActive
 )
 {
@@ -18,7 +17,6 @@ public sealed record ServiceResponse(
             service.Name,
             service.Price,
             service.SpecializationId,
-            service.ServiceCategoryId,
             service.IsActive
         );
     }

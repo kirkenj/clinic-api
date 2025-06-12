@@ -2,6 +2,6 @@
 
 public class ServiceOptions
 {
-    public decimal MinimalCost { get; set; }
-    public decimal MaximalCost { get; set; }
+    public decimal MinimalCost { get; init; }
+    public decimal MaximalCost { get; init; }
 }

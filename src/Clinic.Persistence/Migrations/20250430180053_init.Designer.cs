@@ -13,7 +13,7 @@ namespace Clinic.Persistence.Migrations
 {
     [DbContext(typeof(ClinnicContext))]
     [Migration("20250430180053_init")]
-    partial class init
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

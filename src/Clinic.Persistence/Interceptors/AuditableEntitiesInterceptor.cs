@@ -1,21 +1,17 @@
 ﻿using Clinic.Domain.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Logging;
 
 namespace Clinic.Persistence.Interceptors;
 
-public sealed class AuditableEntitiesInterceptor(ILogger<AuditableEntitiesInterceptor> logger) : SaveChangesInterceptor
+public sealed class AuditableEntitiesInterceptor : SaveChangesInterceptor
 {
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("Interceptor Executed");
-
         var dbContext = eventData.Context;
-
         if (dbContext is null)
         {
             return base.SavingChangesAsync(
@@ -28,7 +24,6 @@ public sealed class AuditableEntitiesInterceptor(ILogger<AuditableEntitiesInterc
             dbContext
                 .ChangeTracker
                 .Entries<IAuditableEntity>();
-
         foreach (var entityEntry in entries)
         {
             if (entityEntry.State == EntityState.Added)

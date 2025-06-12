@@ -36,14 +36,6 @@ public sealed class ServiceConfiguration : IEntityTypeConfiguration<Service>
             .HasForeignKey(m => m.SpecializationId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(m => m.ServiceCategoryId)
-            .IsRequired();
-
-        builder.HasOne(m => m.ServiceCategory)
-            .WithMany(s => s.Services)
-            .HasForeignKey(m => m.ServiceCategoryId)
-            .OnDelete(DeleteBehavior.Restrict);
-
         builder.Property(m => m.CreatedOnUtc)
             .IsRequired();
 

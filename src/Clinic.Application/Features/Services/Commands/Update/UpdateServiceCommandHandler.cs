@@ -11,7 +11,6 @@ namespace Clinic.Application.Features.Services.Commands.Update;
 public sealed class UpdateServiceCommandHandler
     (IServiceRepository serviceRepository,
     ISpecializationRepository specializationRepository,
-    IServiceCategoryRepository serviceCategoryRepository,
     UpdateServiceCommandValidator validator,
     IOptions<ServiceOptions> serviceOptions)
     : IRequestHandler<UpdateServiceCommand, Result>
@@ -68,21 +67,6 @@ public sealed class UpdateServiceCommandHandler
             if (!specialization.IsActive)
             {
                 return SpecializationErrors.NotActive(request.SpecializationId);
-            }
-        }
-
-        if (request.ServiceCategoryId != service.ServiceCategoryId)
-        {
-            var serviceCategory =
-                await serviceCategoryRepository.GetByIdAsync(request.ServiceCategoryId, cancellationToken);
-            if (serviceCategory is null)
-            {
-                return ServiceCategoryErrors.NotFound(request.ServiceCategoryId);
-            }
-
-            if (!serviceCategory.IsActive)
-            {
-                return ServiceCategoryErrors.NotActive(request.ServiceCategoryId);
             }
         }
 

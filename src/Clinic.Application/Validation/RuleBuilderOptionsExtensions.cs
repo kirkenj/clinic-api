@@ -36,4 +36,10 @@ public static class RuleBuilderOptionsExtensions
     {
         return ruleBuilder.GreaterThanOrEqualTo(minimalValue);
     }
+
+    public static IRuleBuilderOptions<T, string> Otp<T>(this IRuleBuilder<T, string> ruleBuilder,
+        int otpLength = 6)
+    {
+        return ruleBuilder.Length(otpLength);
+    }
 }

@@ -15,7 +15,6 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<ClinnicContext>((sp, options) =>
         {
             var auditableEntitiesInterceptor = sp.GetRequiredService<AuditableEntitiesInterceptor>();
-
             options.UseNpgsql(configuration.GetConnectionString("ClinicConnection"));
             options.AddInterceptors(auditableEntitiesInterceptor);
         });
@@ -27,8 +26,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDoctorRepository, DoctorRepository>();
         services.AddScoped<IReceptionistRepository, ReceptionistRepository>();
         services.AddScoped<IPatientRepository, PatientRepository>();
-        services.AddScoped<IServiceCategoryRepository, ServiceCategoryRepository>();
         services.AddScoped<IServiceRepository, ServiceRepository>();
+        services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+        services.AddScoped<IOtpRecordRepository, OtpRecordRepository>();
 
         return services;
     }
