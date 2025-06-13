@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Clinic.Application.Features.Patients.Commands.ConfirmSignIn;
 using Clinic.Application.Features.Patients.Commands.ConfirmSignUp;
+using Clinic.Application.Features.Patients.Commands.ResendSignUpOtp;
 using Clinic.Application.Features.Patients.Commands.SignIn;
 using Clinic.Application.Features.Patients.Commands.SignUp;
 using MediatR;
@@ -29,12 +30,20 @@ public sealed class PatientAuthController(IMediator mediator) : ControllerBase
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
-    [HttpPost("send-sign-up-code")]
+    [HttpPost("sign-up")]
     public async Task<ActionResult<string>> SendSignUpOtpAsync(
         [Required] [FromBody] SendPatientSignUpOtpCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+    }
+
+    [HttpPost("send-sign-up-code")]
+    public async Task<ActionResult<string>> SendSignUpOtpAsync(
+        [Required] [FromBody] ResendPatientSignUpOtpCommand request)
+    {
+        var result = await mediator.Send(request, HttpContext.RequestAborted);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
     [HttpPost("confirm-sign-up-code")]
