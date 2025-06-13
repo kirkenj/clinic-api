@@ -1,5 +1,5 @@
 ﻿using Clinic.Application.Abstractions;
-using Clinic.Application.Email;
+using Clinic.Application.Tools;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
@@ -106,8 +106,8 @@ public sealed class ApproveAppointmentByClinicCommandHandler(
                 $"Your appointment for '{service.Name}'({service.Price}) at {appointment.DateTimeStart} has been approved",
                 cancellationToken),
             emailService.SendAsync(doctor.Email,
-                EmailSubjects.NewAppointment,
-                EmailBodies.NewAppointmentForDoctor(service.Name, patient.FirstName, patient.LastName,
+                Constants.SubjectNewAppointment,
+                EmailBodyBuilder.BuildNewAppointmentForDoctorContent(service.Name, patient.FirstName, patient.LastName,
                     appointment.DateTimeStart),
                 cancellationToken));
         return Result.Success();

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Clinic.Application.Features.Patients.Commands.Add;
 using Clinic.Application.Features.Patients.Commands.Delete;
 using Clinic.Application.Features.Patients.Commands.Update;
 using Clinic.Application.Features.Patients.Queries.Get;
@@ -32,13 +31,6 @@ public sealed class PatientController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> DeletePatientAsync([FromRoute] [Required] uint id)
     {
         var result = await mediator.Send(new DeletePatientCommand { Id = id }, HttpContext.RequestAborted);
-        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> AddPatientAsync([FromBody] [Required] AddPatientCommand request)
-    {
-        var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 

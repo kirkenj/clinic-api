@@ -1,10 +1,11 @@
-﻿using Clinic.Application.Features.Patients.Commands.Add;
+﻿using System.ComponentModel.DataAnnotations;
+using Clinic.Application.Features.Patients.Commands.ConfirmSignIn;
+using Clinic.Application.Features.Patients.Commands.ConfirmSignUp;
 using Clinic.Application.Features.Patients.Commands.SignIn;
-using Clinic.Application.Features.Patients.Commands.ValidateSignIn;
+using Clinic.Application.Features.Patients.Commands.SignUp;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace Clinic.Api.Controllers;
 
@@ -12,27 +13,36 @@ namespace Clinic.Api.Controllers;
 [ApiController]
 public sealed class PatientAuthController(IMediator mediator) : ControllerBase
 {
-    [HttpPost("SignIn")]
-    public async Task<ActionResult<string>> SignInAsync([Required] [FromBody] PatientSignInRequest request)
+    [HttpPost("send-sign-in-code")]
+    public async Task<ActionResult<string>> SendSignInOtpAsync(
+        [Required] [FromBody] SendPatientSignInOtpCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
-    [HttpPost("ValidateSignInOtpAsync")]
-    public async Task<ActionResult<string>> ValidateSignInOtpAsync(
-        [Required] [FromBody] PatientValidateSignUpRequest request)
+    [HttpPost("confirm-sign-in-code")]
+    public async Task<ActionResult<string>> ConfirmSignInOtpAsync(
+        [Required] [FromBody] ConfirmPatientSignInOtpCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
-    [HttpPost("SignUp")]
-    public async Task<ActionResult<string>> ValidateSignInOtpAsync(
-        [Required] [FromBody] AddPatientCommand request)
+    [HttpPost("send-sign-up-code")]
+    public async Task<ActionResult<string>> SendSignUpOtpAsync(
+        [Required] [FromBody] SendPatientSignUpOtpCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+    }
+
+    [HttpPost("confirm-sign-up-code")]
+    public async Task<ActionResult<string>> ConfirmSignUpOtpAsync(
+        [Required] [FromBody] ConfirmPatientSignUpCommand request)
+    {
+        var result = await mediator.Send(request, HttpContext.RequestAborted);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
     [Authorize(Roles = "Patient")]

@@ -8,17 +8,17 @@ namespace Clinic.Application.Features.Patients.Commands.Update;
 
 public sealed class UpdatePatientCommandHandler(
     IPatientRepository patientRepository,
-    UpdatePatientCommandValidator validator
-) : IRequestHandler<UpdatePatientCommand, Result>
+    UpdatePatientCommandValidator validator) 
+    : IRequestHandler<UpdatePatientCommand, Result>
 {
     public async Task<Result> Handle(UpdatePatientCommand request, CancellationToken cancellationToken)
     {
         request.TrimStringProperties();
-
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
-            return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
+            return Error.ValidationError(validationResult.Errors
+                .Select(e => e.ErrorMessage));
         }
 
         var patient = await patientRepository.GetByIdAsync(request.Id, cancellationToken);
@@ -35,7 +35,8 @@ public sealed class UpdatePatientCommandHandler(
         var hasSamePhone = patient.PhoneNumber.HasSameValue(request.PhoneNumber);
         if (!hasSamePhone)
         {
-            var isPhoneTaken = await patientRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
+            var isPhoneTaken = await patientRepository.ExistsByPhoneNumberAsync(
+                request.PhoneNumber, cancellationToken);
             if (isPhoneTaken)
             {
                 return PatientErrors.PhoneAlreadyTaken(request.PhoneNumber);
@@ -53,7 +54,7 @@ public sealed class UpdatePatientCommandHandler(
         }
 
         patient.Update(request.FirstName, request.LastName, request.MiddleName, 
-            request.Email, request.PhoneNumber, false);
+            request.Email, request.PhoneNumber);
         await patientRepository.UpdateAsync(patient, cancellationToken);
         return Result.Success();
     }

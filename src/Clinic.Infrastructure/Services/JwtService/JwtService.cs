@@ -10,18 +10,16 @@ namespace Clinic.Infrastructure.Services.JwtService;
 
 public sealed class JwtService(IOptions<JwtOptions> jwtOptions) : IJwtService
 {
-    public string GenerateToken(uint memberId, RoleType roleTypes)
+    public string GenerateToken(uint memberId, RoleType roleType)
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.Role, roleTypes.ToString()),
+            new(ClaimTypes.Role, roleType.ToString()),
             new(ClaimTypes.NameIdentifier, memberId.ToString())
         };
 
-
         SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(jwtOptions.Value.Key));
         SigningCredentials signingCredentials = new(key, jwtOptions.Value.SecurityAlgorithm);
-
         var jwtToken = new JwtSecurityToken
         (
             jwtOptions.Value.Issuer,
@@ -30,7 +28,6 @@ public sealed class JwtService(IOptions<JwtOptions> jwtOptions) : IJwtService
             expires: DateTime.UtcNow.AddMinutes(jwtOptions.Value.DurationInMinutes),
             signingCredentials: signingCredentials
         );
-
         return new JwtSecurityTokenHandler().WriteToken(jwtToken);
     }
 }

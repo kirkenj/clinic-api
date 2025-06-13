@@ -8,11 +8,12 @@ public class Patient : BaseEntity, IAuditableEntity
     {
     }
 
-    private Patient(string firstName, string lastName,
+    private Patient(
+        string firstName, string lastName,
         string middleName, string email,
-        string phoneNumber, bool isActive)
+        string phoneNumber)
     {
-        IsActive = isActive;
+        IsActive = true;
         FirstName = firstName;
         LastName = lastName;
         MiddleName = middleName;
@@ -30,24 +31,36 @@ public class Patient : BaseEntity, IAuditableEntity
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? UpdatedOnUtc { get; set; }
 
-    public void Update(string firstName, string lastName,
+    public void Update(
+        string firstName, string lastName,
         string middleName, string email,
-        string phoneNumber, bool isActive)
+        string phoneNumber)
     {
         FirstName = firstName;
         LastName = lastName;
         MiddleName = middleName;
         Email = email;
         PhoneNumber = phoneNumber;
-        IsActive = isActive;
     }
 
-    public static Patient Create(string firstName, string lastName,
+    public static Patient Create(
+        string firstName, string lastName,
         string middleName, string email,
-        string phoneNumber, bool isActive)
+        string phoneNumber)
     {
-        return new Patient(firstName, lastName,
+        return new Patient(
+            firstName, lastName,
             middleName, email,
-            phoneNumber, isActive);
+            phoneNumber);
+    }
+
+    public void Activate()
+    {
+        IsActive = true;
+    }
+
+    public void Deactivate()
+    {
+        IsActive = false;
     }
 }

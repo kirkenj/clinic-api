@@ -16,12 +16,12 @@ public class ReceptionistRepository(ClinnicContext context) : IReceptionistRepos
 
     public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        return _dbSet.AnyAsync(r => r.Email == email, cancellationToken);
+        return _dbSet.AnyAsync(x => EF.Functions.ILike(x.Email, email), cancellationToken);
     }
 
     public Task<Receptionist?> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        return _dbSet.FirstOrDefaultAsync(r => r.Email == email, cancellationToken);
+        return _dbSet.FirstOrDefaultAsync(x => EF.Functions.ILike(x.Email, email), cancellationToken);
     }
 
     public async Task<ICollection<Receptionist>> GetAllAsync(CancellationToken cancellationToken,
