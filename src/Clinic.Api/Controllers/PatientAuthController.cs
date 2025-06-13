@@ -31,7 +31,7 @@ public sealed class PatientAuthController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost("sign-up")]
-    public async Task<ActionResult<string>> SendSignUpOtpAsync(
+    public async Task<ActionResult<string>> SignUpAsync(
         [Required] [FromBody] SendPatientSignUpOtpCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
