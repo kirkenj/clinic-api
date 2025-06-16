@@ -34,6 +34,7 @@ public class Appointment : BaseEntity, IAuditableEntity
     public bool IsApprovedByClinic { get; private set; }
     public bool IsApprovedByUser { get; private set; }
     public AppointmentStatus Status { get; private set; }
+    public AppointmentResult? AppointmentResult { get; private set; }
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? UpdatedOnUtc { get; set; }
 

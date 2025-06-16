@@ -22,9 +22,4 @@ public sealed record AppointmentResponse(
             appointment.Status.ToString()
         );
     }
-
-    public static IEnumerable<AppointmentResponse> FromAppointmentCollection(IEnumerable<Appointment> appointments)
-    {
-        return appointments.Select(FromAppointment);
-    }
 }

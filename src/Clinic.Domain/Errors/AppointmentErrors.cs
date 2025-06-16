@@ -55,4 +55,10 @@ public static class AppointmentErrors
         return new Error("Appointment.InvalidStatus",
             $"Unexpected appointment status '{currentStatus}'. Expected: one of [{string.Join(", ", expectedStatuses.Select(s => $"'{s}'"))}]");
     }
+
+    public static Error HasNotTakenPlace(uint appointmentId)
+    {
+        return new Error("Appointment.HasNotTakenPlace",
+            $"Appointment with id {appointmentId}' hasn't taken place.");
+    }
 }

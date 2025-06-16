@@ -12,21 +12,16 @@ public sealed record ReceptionistResponse(
     bool IsActive
 )
 {
-    public static ReceptionistResponse FromReceptionist(Receptionist Receptionist)
+    public static ReceptionistResponse FromReceptionist(Receptionist receptionist)
     {
         return new ReceptionistResponse(
-            Receptionist.Id,
-            Receptionist.FirstName,
-            Receptionist.MiddleName,
-            Receptionist.LastName,
-            Receptionist.Email,
-            Receptionist.PhoneNumber,
-            Receptionist.IsActive
+            receptionist.Id,
+            receptionist.FirstName,
+            receptionist.MiddleName,
+            receptionist.LastName,
+            receptionist.Email,
+            receptionist.PhoneNumber,
+            receptionist.IsActive
         );
-    }
-
-    public static IEnumerable<ReceptionistResponse> FromReceptionistCollection(IEnumerable<Receptionist> Receptionists)
-    {
-        return Receptionists.Select(FromReceptionist);
     }
 }

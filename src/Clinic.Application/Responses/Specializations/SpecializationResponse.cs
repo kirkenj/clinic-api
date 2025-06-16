@@ -16,10 +16,4 @@ public sealed record SpecializationResponse(
             specialization.IsActive
         );
     }
-
-    public static IEnumerable<SpecializationResponse> FromSpecializationCollection(
-        IEnumerable<Specialization> specializations)
-    {
-        return specializations.Select(FromSpecialization);
-    }
 }
