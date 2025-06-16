@@ -37,6 +37,11 @@ public sealed class AddAppointmentResultCommandHandler(
         {
             return AppointmentErrors.HasNotTakenPlace(appointment.Id);
         }
+
+        if (await appointmentResultRepository.ExistsByAppointmentIdAsync(request.AppointmentId, cancellationToken))
+        {
+            return AppointmentResultErrors.AppointmentHasResult(request.AppointmentId);
+        }
         
         var appointmentResult = AppointmentResult.Create(request.Complaints, request.Conclusion, 
             request.Recommendations, request.AppointmentId);

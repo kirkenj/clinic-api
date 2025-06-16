@@ -8,4 +8,9 @@ public static class AppointmentResultErrors
     {
         return new Error("AppointmentResult.NotFound", $"AppointmentResult with id {id} was not found");
     }
+
+    public static Error AppointmentHasResult(uint appointmentId)
+    {
+        return new Error("AppointmentResult.AppointmentHasResult", $"Appointment with id {appointmentId} has already got a result");
+    }
 }

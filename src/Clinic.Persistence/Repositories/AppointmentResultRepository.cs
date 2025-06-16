@@ -26,6 +26,11 @@ public sealed class AppointmentResultRepository(ClinnicContext context) : IAppoi
         return await _dbSet.FindAsync([id], cancellationToken);
     }
 
+    public Task<bool> ExistsByAppointmentIdAsync(uint appointmentId, CancellationToken cancellationToken)
+    {
+        return _dbSet.AnyAsync(r => r.AppointmentId == appointmentId, cancellationToken);
+    }
+
     public async Task<PaginatedCollection<AppointmentResult>> GetPaginatedAsync(int page, int pageSize,
         CancellationToken cancellationToken)
     {
