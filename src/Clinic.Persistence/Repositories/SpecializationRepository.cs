@@ -1,6 +1,8 @@
-﻿using Clinic.Domain.Abstractions;
+﻿using System.Linq.Expressions;
+using Clinic.Domain.Abstractions;
 using Clinic.Domain.Entities;
 using Clinic.Domain.Filters;
+using Clinic.Domain.Filters.Sorting;
 using Clinic.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,28 +12,37 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
 {
     private readonly DbSet<Specialization> _dbSet = context.Set<Specialization>();
 
-    public Task<PaginatedCollection<Specialization>> GetFilteredAsync(SpecializationFilter? filter, int? page,
-        int? pageSize, CancellationToken cancellationToken)
+    public async Task<PaginatedCollection<Specialization>> GetPaginatedAsync(SpecializationFilter? filter, int page,
+        int pageSize, CancellationToken cancellationToken)
     {
-        var set = _dbSet;
-
+        var set = _dbSet.AsQueryable();
         if (filter is not null)
         {
+            if (!string.IsNullOrEmpty(filter.Name))
+            {
+                set = set.Where(s =>  s.Name.Contains(filter.Name));
+            }
+
+            if (filter.IsActive is not null)
+            {
+                set = set.Where(s => s.IsActive);
+            }
+
+            set = filter.SortOrder == SortOrder.Descending
+                ? set.OrderByDescending(GetSortProperty(filter))
+                : set.OrderBy(GetSortProperty(filter));
         }
 
-        if (page is not null && pageSize is not null)
-        {
-            var totalCount = await _dbSet.CountAsync(cancellationToken);
+        var totalCount = await set.CountAsync(cancellationToken);
 
-            var collection = await _dbSet.OrderBy(o => o.Id)
-                .AsNoTracking()
-                .OrderBy(o => o.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync(cancellationToken);
+        var collection = await set.OrderBy(o => o.Id)
+            .AsNoTracking()
+            .OrderBy(o => o.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
 
-            return new PaginatedCollection<Specialization>(collection, page, pageSize, totalCount);
-        }
+        return new PaginatedCollection<Specialization>(collection, page, pageSize, totalCount);
     }
 
     public async Task AddAsync(Specialization specialization, CancellationToken cancellationToken)
@@ -56,25 +67,21 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
         return await _dbSet.FindAsync([id], cancellationToken);
     }
 
-    public async Task<PaginatedCollection<Specialization>> GetPaginatedAsync(int page, int pageSize,
-        CancellationToken cancellationToken)
-    {
-        var totalCount = await _dbSet.CountAsync(cancellationToken);
-
-        var collection = await _dbSet.OrderBy(o => o.Id)
-            .AsNoTracking()
-            .OrderBy(o => o.Id)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
-
-        return new PaginatedCollection<Specialization>(collection, page, pageSize, totalCount);
-    }
-
     public async Task UpdateAsync(Specialization specialization, CancellationToken cancellationToken)
     {
         context.Update(specialization);
         await context.SaveChangesAsync(cancellationToken);
+    }
+
+    private static Expression<Func<Specialization, object>> GetSortProperty(SpecializationFilter filter)
+    {
+        return filter.SortColumn switch
+        {
+            SpecializationSortColumn.Id => specialization => specialization.Id,
+            SpecializationSortColumn.Name => specialization => specialization.Name,
+            SpecializationSortColumn.IsActive => specialization => specialization.IsActive,
+            _ => specialization => specialization.Id
+        };
     }
 
     public async Task<ICollection<Specialization>> GetAllAsync(CancellationToken cancellationToken,

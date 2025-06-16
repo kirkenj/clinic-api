@@ -26,7 +26,7 @@ public class GetPaginatedSpecializationsRequestHandler(ILogger<GetPaginatedSpeci
         }
 
         var paginatedSpecializations =
-            await specializationRepository.GetPaginatedAsync(request.Page, request.PageSize, cancellationToken);
+            await specializationRepository.GetPaginatedAsync(request.Filter, request.Page, request.PageSize, cancellationToken);
         var specializationResponse = paginatedSpecializations.Select(SpecializationResponse.FromSpecialization);
         logger.LogInformation("PaginatedSpecializationsResponse: {@response}", specializationResponse);
         return Result.Success(specializationResponse);
