@@ -6,12 +6,12 @@ namespace Clinic.Application.Features.Appointments.Commands.RescheduleByClinic;
 public sealed class RescheduleAppointmentCommandValidator
     : AbstractValidator<RescheduleAppointmentCommand>
 {
-    public RescheduleAppointmentCommandValidator(IDateTimeService dateTimeService)
+    public RescheduleAppointmentCommandValidator(IDateTimeProvider dateTimeProvider)
     {
         RuleFor(c => c.AppointmentId)
             .NotEmpty();
         RuleFor(c => c.NewDateTime)
-            .GreaterThanOrEqualTo(dateTimeService.UtcNow());
+            .GreaterThanOrEqualTo(dateTimeProvider.UtcNow());
         RuleFor(c => c.NewDoctorId)
             .NotEmpty();
     }

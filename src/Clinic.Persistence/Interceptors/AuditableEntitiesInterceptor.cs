@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Clinic.Persistence.Interceptors;
 
-public sealed class AuditableEntitiesInterceptor(IDateTimeService dateTimeService) : SaveChangesInterceptor
+public sealed class AuditableEntitiesInterceptor(IDateTimeProvider dateTimeProvider) : SaveChangesInterceptor
 {
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
@@ -28,12 +28,12 @@ public sealed class AuditableEntitiesInterceptor(IDateTimeService dateTimeServic
         {
             if (entityEntry.State == EntityState.Added)
             {
-                entityEntry.Property(a => a.CreatedOnUtc).CurrentValue = dateTimeService.UtcNow();
+                entityEntry.Property(a => a.CreatedOnUtc).CurrentValue = dateTimeProvider.UtcNow();
             }
 
             if (entityEntry.State == EntityState.Modified)
             {
-                entityEntry.Property(a => a.UpdatedOnUtc).CurrentValue = dateTimeService.UtcNow();
+                entityEntry.Property(a => a.UpdatedOnUtc).CurrentValue = dateTimeProvider.UtcNow();
             }
         }
 

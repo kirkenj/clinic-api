@@ -9,7 +9,7 @@ namespace Clinic.Application.Features.AppointmentResults.Commands.Add;
 public sealed class AddAppointmentResultCommandHandler(
     IAppointmentResultRepository appointmentResultRepository,
     IAppointmentRepository appointmentRepository,
-    IDateTimeService dateTimeService,
+    IDateTimeProvider dateTimeProvider,
     AddAppointmentResultCommandValidator validator)
     : IRequestHandler<AddAppointmentResultCommand, Result>
 {
@@ -33,7 +33,7 @@ public sealed class AddAppointmentResultCommandHandler(
             return AppointmentErrors.InvalidStatus(appointment.Status, AppointmentStatus.Confirmed);
         }
 
-        if (appointment.DateTimeStart.ToUniversalTime() > dateTimeService.UtcNow())
+        if (appointment.DateTimeStart.ToUniversalTime() > dateTimeProvider.UtcNow())
         {
             return AppointmentErrors.HasNotTakenPlace(appointment.Id);
         }

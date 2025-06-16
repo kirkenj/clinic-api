@@ -1,6 +1,6 @@
 ﻿using Clinic.Application.Abstractions;
 using Clinic.Domain.Abstractions;
-using Clinic.Infrastructure.Services.DateTimeService;
+using Clinic.Infrastructure.Services.DateTimeProvider;
 using Clinic.Infrastructure.Services.HashService;
 using Clinic.Infrastructure.Services.NotificationService;
 using Clinic.Infrastructure.Services.OtpService;
@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IHashService, HashService>();
         services.AddTransient<ISlotService, SlotService>();
         services.AddTransient<IEmailService, LoggerEmailService>();
-        services.AddTransient<IDateTimeService, DateTimeService>();
+        services.AddTransient<IDateTimeProvider, DateTimeProvider>();
 
         services.Configure<OtpServiceOptions>(configuration.GetSection("OtpServiceOptions"));
         services.AddScoped<IOtpService, OtpService>();

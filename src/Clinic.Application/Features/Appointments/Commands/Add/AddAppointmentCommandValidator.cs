@@ -6,11 +6,11 @@ namespace Clinic.Application.Features.Appointments.Commands.Add;
 public sealed class AddAppointmentCommandValidator 
     : AbstractValidator<AddAppointmentCommand>
 {
-    public AddAppointmentCommandValidator(IDateTimeService dateTimeService)
+    public AddAppointmentCommandValidator(IDateTimeProvider dateTimeProvider)
     {
         RuleFor(a => a.DateTime)
             .NotEmpty()
-            .GreaterThan(dateTimeService.UtcNow());
+            .GreaterThan(dateTimeProvider.UtcNow());
         RuleFor(a => a.DoctorId)
             .NotEmpty();
         RuleFor(a => a.PatientId)

@@ -1,6 +1,6 @@
 ﻿namespace Clinic.Domain.Abstractions;
 
-public interface IDateTimeService
+public interface IDateTimeProvider
 {
     public DateTime UtcNow();
 }
