@@ -12,15 +12,17 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
 {
     private readonly DbSet<Specialization> _dbSet = context.Set<Specialization>();
 
-    public async Task<PaginatedCollection<Specialization>> GetPaginatedAsync(SpecializationFilter? filter, int page,
-        int pageSize, CancellationToken cancellationToken)
+    public async Task<PaginatedCollection<Specialization>> GetPaginatedAsync(
+        SpecializationFilter? filter,
+        int page, int pageSize, 
+        CancellationToken cancellationToken)
     {
         var set = _dbSet.AsQueryable();
         if (filter is not null)
         {
             if (!string.IsNullOrEmpty(filter.Name))
             {
-                set = set.Where(s =>  s.Name.Contains(filter.Name));
+                set = set.Where(s => s.Name.Contains(filter.Name));
             }
 
             if (filter.IsActive is not null)
@@ -73,7 +75,8 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    private static Expression<Func<Specialization, object>> GetSortProperty(SpecializationFilter filter)
+    private static Expression<Func<Specialization, object>> GetSortProperty
+        (SpecializationFilter filter)
     {
         return filter.SortColumn switch
         {
