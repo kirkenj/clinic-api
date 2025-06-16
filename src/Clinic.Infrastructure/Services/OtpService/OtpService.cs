@@ -37,7 +37,7 @@ public class OtpService(
         return Result.Success(otp);
     }
 
-    public async Task<Result> ValidateOtpAsync(string otpKey, string otp, CancellationToken cancellationToken)
+    public async Task<Result> CheckOtpAsync(string otpKey, string otp, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(otpKey))
         {

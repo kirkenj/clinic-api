@@ -1,6 +1,5 @@
 ﻿using Clinic.Application.Abstractions;
-using Clinic.Application.Emails;
-using Clinic.Application.Otp;
+using Clinic.Application.Tools;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
@@ -44,7 +43,7 @@ public sealed class SendOtpToCreateAppointmentRequestHandler(
             return AppointmentErrors.InvalidDate(appointment.DateTimeStart);
         }
 
-        var otpKey = OtpKeys.ConfirmAppointmentCreationByPatient(appointment.PatientId, appointment.Id);
+        var otpKey = $"ConfirmAppointmentCreationByPatient{appointment.PatientId}:{appointment.Id}";
         var otpResult = await otpService.GenerateOtpAsync(otpKey, cancellationToken);
         if (otpResult.IsFailure)
         {
@@ -69,9 +68,9 @@ public sealed class SendOtpToCreateAppointmentRequestHandler(
             return PatientErrors.NotFound(appointment.PatientId);
         }
 
-        await emailService.SendAsync(patient.Email, EmailSubjects.ConfirmAppointment,
-            EmailBodies.ConfirmAppointment(service.Name, doctor.FirstName, doctor.LastName,
-                service.Price, appointment.DateTimeStart, otpResult.Value),
+        await emailService.SendAsync(patient.Email, Constants.SubjectConfirmAppointment,
+            EmailBodyBuilder.BuildConfirmAppointmentContent(service.Name, doctor.FirstName, 
+                doctor.LastName, service.Price, appointment.DateTimeStart, otpResult.Value),
             cancellationToken);
         return Result.Success();
     }

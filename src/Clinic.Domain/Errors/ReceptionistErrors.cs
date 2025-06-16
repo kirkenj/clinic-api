@@ -9,6 +9,11 @@ public static class ReceptionistErrors
         return new Error("Receptionist.NotFound", $"Receptionist with id {id} was not found");
     }
 
+    public static Error NotFound(string email)
+    {
+        return new Error("Receptionist.NotFound", $"Receptionist with email '{email}' was not found");
+    }
+
     public static Error NotActive(uint id)
     {
         return new Error("Receptionist.NotActive", $"Receptionist with id {id} is not active");
