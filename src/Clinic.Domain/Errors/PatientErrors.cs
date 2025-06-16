@@ -9,9 +9,19 @@ public static class PatientErrors
         return new Error("Patient.NotFound", $"Patient with id {id} was not found");
     }
 
+    public static Error NotFound(string email)
+    {
+        return new Error("Patient.NotFound", $"Patient with email '{email}' was not found");
+    }
+
     public static Error NotActive(uint id)
     {
         return new Error("Patient.NotActive", $"Patient with id {id} is not active");
+    }
+
+    public static Error Active(uint id)
+    {
+        return new Error("Patient.Active", $"Patient with id {id} is active");
     }
 
     public static Error PhoneAlreadyTaken(string phoneNumber)

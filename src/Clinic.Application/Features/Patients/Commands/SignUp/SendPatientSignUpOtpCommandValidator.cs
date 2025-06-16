@@ -1,11 +1,11 @@
 ﻿using Clinic.Application.Validation;
 using FluentValidation;
 
-namespace Clinic.Application.Features.Patients.Commands.Add;
+namespace Clinic.Application.Features.Patients.Commands.SignUp;
 
-public sealed class AddPatientCommandValidator : AbstractValidator<AddPatientCommand>
+public sealed class SendPatientSignUpOtpCommandValidator : AbstractValidator<SendPatientSignUpOtpCommand>
 {
-    public AddPatientCommandValidator()
+    public SendPatientSignUpOtpCommandValidator()
     {
         RuleFor(c => c.FirstName)
             .TitleField();

@@ -1,5 +1,5 @@
 ﻿using Clinic.Application.Abstractions;
-using Clinic.Application.Emails;
+using Clinic.Application.Tools;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Entities;
 using Clinic.Domain.Errors;
@@ -124,16 +124,16 @@ public sealed class RescheduleAppointmentCommandHandler(
         await appointmentRepository.AddAsync(newAppointment, cancellationToken);
 
         await Task.WhenAll(
-            emailService.SendAsync(oldDoctor.Email, EmailSubjects.AppointmentCancelled,
-                EmailBodies.AppointmentCancelledForDoctor(service.Name,
+            emailService.SendAsync(oldDoctor.Email, Constants.SubjectAppointmentCancelled,
+                EmailBodyBuilder.BuildCancelledAppointmentContent(service.Name,
                     patient.FirstName, patient.LastName, oldAppointment.DateTimeStart),
                 cancellationToken),
-            emailService.SendAsync(newDoctor.Email, EmailSubjects.NewAppointment,
-                EmailBodies.NewAppointmentForDoctor(service.Name,
+            emailService.SendAsync(newDoctor.Email, Constants.SubjectNewAppointment,
+                EmailBodyBuilder.BuildNewAppointmentForDoctorContent(service.Name,
                     patient.FirstName, patient.LastName, newAppointment.DateTimeStart),
                 cancellationToken),
-            emailService.SendAsync(patient.Email, EmailSubjects.AppointmentRescheduled,
-                EmailBodies.AppointmentRescheduled(service.Name,
+            emailService.SendAsync(patient.Email, Constants.SubjectAppointmentRescheduled,
+                EmailBodyBuilder.BuildAppointmentRescheduledContent(service.Name,
                     oldDoctor.FirstName, oldDoctor.LastName, oldAppointment.DateTimeStart,
                     newDoctor.FirstName, newDoctor.LastName, newAppointment.DateTimeStart),
                 cancellationToken));

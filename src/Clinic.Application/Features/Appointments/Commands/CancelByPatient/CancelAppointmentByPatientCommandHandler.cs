@@ -1,7 +1,5 @@
 ﻿using Clinic.Application.Abstractions;
-using Clinic.Application.Emails;
-using Clinic.Application.Otp;
-using Clinic.Application.Responses;
+using Clinic.Application.Tools;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
@@ -41,7 +39,7 @@ public sealed class CancelAppointmentByPatientCommandHandler(
                 appointment.DateTimeStart, appointment.DateTimeEnd, false,
                 appointment.IsApprovedByClinic, AppointmentStatus.CancelledByUser);
             await appointmentRepository.UpdateAsync(appointment, cancellationToken);
-            return Result.Success(StringResponses.AppointmentCancelled);
+            return Result.Success("Appointment cancelled. No further actions needed");
         }
 
         if (appointment.Status != AppointmentStatus.Confirmed)
@@ -51,7 +49,7 @@ public sealed class CancelAppointmentByPatientCommandHandler(
                 AppointmentStatus.Confirmed));
         }
 
-        var otpKey = OtpKeys.ConfirmAppointmentCancellationByUser(appointment.PatientId, appointment.Id);
+        var otpKey = $"ConfirmAppointmentCancellationByPatient{appointment.PatientId}:{appointment.Id}";
         var otpGenerationResult = await otpService.GenerateOtpAsync(otpKey, cancellationToken);
         if (otpGenerationResult.IsFailure)
         {
@@ -77,9 +75,9 @@ public sealed class CancelAppointmentByPatientCommandHandler(
         }
 
         await emailService.SendAsync(patient.Email,
-            EmailSubjects.ConfirmAppointmentCancellationByUser,
-            EmailBodies.ConfirmAppointmentCancellation(service.Name, doctor.FirstName, doctor.LastName,
+            Constants.SubjectConfirmAppointmentCancellationByUser,
+            EmailBodyBuilder.BuildConfirmAppointmentCancellationContent(service.Name, doctor.FirstName, doctor.LastName,
                 appointment.DateTimeStart, otpGenerationResult.Value), cancellationToken);
-        return Result.Success(StringResponses.CheckEmailForFurtherDetails);
+        return Result.Success(Constants.ResponseCheckEmailForFurtherDetails);
     }
 }
