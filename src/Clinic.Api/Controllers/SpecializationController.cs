@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Clinic.Application.Features.Specializations.Commands.Add;
+﻿using Clinic.Application.Features.Specializations.Commands.Add;
 using Clinic.Application.Features.Specializations.Commands.Delete;
 using Clinic.Application.Features.Specializations.Commands.Update;
 using Clinic.Application.Features.Specializations.Queries.Get;
+using Clinic.Application.Features.Specializations.Queries.GetFiltered;
 using Clinic.Application.Features.Specializations.Queries.GetPaginated;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Clinic.Api.Controllers;
 
@@ -13,6 +14,13 @@ namespace Clinic.Api.Controllers;
 [ApiController]
 public sealed class SpecializationController(IMediator mediator) : ControllerBase
 {
+    [HttpGet]
+    public async Task<IActionResult> GetPaginatedSpecializationsAsync([FromQuery] GetFilteredSpecializationsQuery request)
+    {
+        var result = await mediator.Send(request, HttpContext.RequestAborted);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+    }
+
     [HttpGet("paged")]
     public async Task<IActionResult> GetPaginatedSpecializationsAsync(int page, int pageSize)
     {
