@@ -11,7 +11,7 @@ public class ReceptionistRepository(ClinnicContext context) : IReceptionistRepos
 
     public Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
     {
-        return _dbSet.AnyAsync(r => r.PhoneNumber == phoneNumber, cancellationToken);
+        return _dbSet.AnyAsync(r => EF.Functions.ILike(r.PhoneNumber, phoneNumber), cancellationToken);
     }
 
     public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)

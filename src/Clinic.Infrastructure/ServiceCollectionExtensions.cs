@@ -1,8 +1,7 @@
+using System.Text;
 using Clinic.Application.Abstractions;
 using Clinic.Domain.Abstractions;
 using Clinic.Infrastructure.Services.DateTimeProvider;
-using System.Text;
-using Clinic.Application.Abstractions;
 using Clinic.Infrastructure.Services.EmailService;
 using Clinic.Infrastructure.Services.HashService;
 using Clinic.Infrastructure.Services.JwtService;
@@ -54,7 +53,7 @@ public static class ServiceCollectionExtensions
                     ValidAlgorithms = [settings.SecurityAlgorithm]
                 };
             });
-        
+
         return services;
     }
 }

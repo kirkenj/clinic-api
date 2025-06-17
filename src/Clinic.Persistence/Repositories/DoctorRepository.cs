@@ -23,7 +23,7 @@ public sealed class DoctorRepository(ClinnicContext context) : IDoctorRepository
 
     public Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
     {
-        return _dbSet.AnyAsync(d => d.PhoneNumber == phoneNumber, cancellationToken);
+        return _dbSet.AnyAsync(d => EF.Functions.ILike(d.PhoneNumber, phoneNumber), cancellationToken);
     }
 
     public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)
@@ -56,7 +56,6 @@ public sealed class DoctorRepository(ClinnicContext context) : IDoctorRepository
 
         var collection = await _dbSet.OrderBy(o => o.Id)
             .AsNoTracking()
-            .OrderBy(o => o.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

@@ -13,7 +13,7 @@ public sealed class PatientRepository(ClinnicContext context) : IPatientReposito
     {
         context.Add(patient);
         return context.SaveChangesAsync(cancellationToken);
-    }
+    } 
 
     public Task DeleteAsync(Patient patient, CancellationToken cancellationToken)
     {
@@ -23,12 +23,12 @@ public sealed class PatientRepository(ClinnicContext context) : IPatientReposito
 
     public Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
     {
-        return _dbSet.AnyAsync(p => p.PhoneNumber == phoneNumber, cancellationToken);
+        return _dbSet.AnyAsync(p => EF.Functions.ILike(p.PhoneNumber, phoneNumber), cancellationToken);
     }
 
     public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        return _dbSet.AnyAsync(x => EF.Functions.ILike(x.Email, email), cancellationToken);
+        return _dbSet.AnyAsync(p => EF.Functions.ILike(p.Email, email), cancellationToken);
     }
 
     public Task<Patient?> GetByEmailAsync(string email, CancellationToken cancellationToken)
@@ -56,7 +56,6 @@ public sealed class PatientRepository(ClinnicContext context) : IPatientReposito
 
         var collection = await _dbSet.OrderBy(o => o.Id)
             .AsNoTracking()
-            .OrderBy(o => o.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -64,9 +63,9 @@ public sealed class PatientRepository(ClinnicContext context) : IPatientReposito
         return new PaginatedCollection<Patient>(collection, page, pageSize, totalCount);
     }
 
-    public async Task UpdateAsync(Patient patient, CancellationToken cancellationToken)
+    public Task UpdateAsync(Patient patient, CancellationToken cancellationToken)
     {
         context.Update(patient);
-        await context.SaveChangesAsync(cancellationToken);
+        return context.SaveChangesAsync(cancellationToken);
     }
 }
