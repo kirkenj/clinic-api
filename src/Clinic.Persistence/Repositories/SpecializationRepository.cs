@@ -27,7 +27,7 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
 
             if (filter.IsActive is not null)
             {
-                set = set.Where(s => s.IsActive);
+                set = set.Where(s => s.IsActive == filter.IsActive.Value);
             }
 
             set = filter.SortOrder == SortOrder.Descending
