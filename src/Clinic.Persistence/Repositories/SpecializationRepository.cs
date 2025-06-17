@@ -47,21 +47,21 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
         return new PaginatedCollection<Specialization>(collection, page, pageSize, totalCount);
     }
 
-    public async Task AddAsync(Specialization specialization, CancellationToken cancellationToken)
+    public Task AddAsync(Specialization specialization, CancellationToken cancellationToken)
     {
         _dbSet.Add(specialization);
-        await context.SaveChangesAsync(cancellationToken);
+        return context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteAsync(Specialization specialization, CancellationToken cancellationToken)
+    public Task DeleteAsync(Specialization specialization, CancellationToken cancellationToken)
     {
         context.Remove(specialization);
-        await context.SaveChangesAsync(cancellationToken);
+        return context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken)
+    public Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(s => s.Name == name, cancellationToken);
+        return _dbSet.AnyAsync(s => s.Name == name, cancellationToken);
     }
 
     public async Task<Specialization?> GetByIdAsync(uint id, CancellationToken cancellationToken)
@@ -69,10 +69,10 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
         return await _dbSet.FindAsync([id], cancellationToken);
     }
 
-    public async Task UpdateAsync(Specialization specialization, CancellationToken cancellationToken)
+    public Task UpdateAsync(Specialization specialization, CancellationToken cancellationToken)
     {
         context.Update(specialization);
-        await context.SaveChangesAsync(cancellationToken);
+        return context.SaveChangesAsync(cancellationToken);
     }
 
     private static Expression<Func<Specialization, object>> GetSortProperty
@@ -85,13 +85,5 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
             SpecializationSortColumn.IsActive => specialization => specialization.IsActive,
             _ => specialization => specialization.Id
         };
-    }
-
-    public async Task<ICollection<Specialization>> GetAllAsync(CancellationToken cancellationToken,
-        bool includeTracking = false)
-    {
-        return includeTracking
-            ? await _dbSet.AsNoTracking().ToListAsync(cancellationToken)
-            : await _dbSet.ToListAsync(cancellationToken);
     }
 }
