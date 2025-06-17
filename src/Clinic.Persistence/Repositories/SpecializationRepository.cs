@@ -25,7 +25,7 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
                 set = set.Where(s => s.Name.Contains(filter.Name));
             }
 
-            if (filter.IsActive is not null)
+            if (filter.IsActive.HasValue)
             {
                 set = set.Where(s => s.IsActive == filter.IsActive.Value);
             }

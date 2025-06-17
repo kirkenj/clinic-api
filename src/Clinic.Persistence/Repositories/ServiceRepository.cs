@@ -9,21 +9,21 @@ public sealed class ServiceRepository(ClinnicContext context) : IServiceReposito
 {
     private readonly DbSet<Service> _dbSet = context.Set<Service>();
 
-    public async Task AddAsync(Service service, CancellationToken cancellationToken)
+    public Task AddAsync(Service service, CancellationToken cancellationToken)
     {
-        await context.AddAsync(service, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
+        context.Add(service);
+        return context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteAsync(Service service, CancellationToken cancellationToken)
+    public Task DeleteAsync(Service service, CancellationToken cancellationToken)
     {
         context.Remove(service);
-        await context.SaveChangesAsync(cancellationToken);
+        return context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken)
+    public Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken)
     {
-        return await _dbSet.AnyAsync(o => o.Name == name, cancellationToken);
+        return _dbSet.AnyAsync(d => EF.Functions.ILike(d.Name, name), cancellationToken);
     }
 
     public async Task<ICollection<Service>> GetAllAsync(CancellationToken cancellationToken,
@@ -54,9 +54,9 @@ public sealed class ServiceRepository(ClinnicContext context) : IServiceReposito
         return new PaginatedCollection<Service>(collection, page, pageSize, totalCount);
     }
 
-    public async Task UpdateAsync(Service service, CancellationToken cancellationToken)
+    public Task UpdateAsync(Service service, CancellationToken cancellationToken)
     {
         context.Update(service);
-        await context.SaveChangesAsync(cancellationToken);
+        return context.SaveChangesAsync(cancellationToken);
     }
 }

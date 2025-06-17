@@ -23,7 +23,7 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
 
     public Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken)
     {
-        return _dbSet.AnyAsync(o => o.PhoneNumber == phoneNumber, cancellationToken);
+        return _dbSet.AnyAsync(d => EF.Functions.ILike(d.PhoneNumber, phoneNumber), cancellationToken);
     }
 
     public async Task<ICollection<Office>> GetAllAsync(CancellationToken cancellationToken,
@@ -46,7 +46,6 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
 
         var collection = await _dbSet.OrderBy(o => o.Id)
             .AsNoTracking()
-            .OrderBy(o => o.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -54,9 +53,9 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
         return new PaginatedCollection<Office>(collection, page, pageSize, totalCount);
     }
 
-    public async Task UpdateAsync(Office office, CancellationToken cancellationToken)
+    public Task UpdateAsync(Office office, CancellationToken cancellationToken)
     {
         context.Update(office);
-        await context.SaveChangesAsync(cancellationToken);
+        return context.SaveChangesAsync(cancellationToken);
     }
 }

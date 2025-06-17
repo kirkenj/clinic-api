@@ -29,7 +29,6 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
 
         var collection = await _dbSet.OrderBy(o => o.Id)
             .AsNoTracking()
-            .OrderBy(o => o.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -37,22 +36,22 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
         return new PaginatedCollection<Appointment>(collection, page, pageSize, totalCount);
     }
 
-    public async Task AddAsync(Appointment appointment, CancellationToken cancellationToken)
+    public Task AddAsync(Appointment appointment, CancellationToken cancellationToken)
     {
         context.Add(appointment);
-        await context.SaveChangesAsync(cancellationToken);
+        return context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task UpdateAsync(Appointment appointment, CancellationToken cancellationToken)
+    public Task UpdateAsync(Appointment appointment, CancellationToken cancellationToken)
     {
         context.Update(appointment);
-        await context.SaveChangesAsync(cancellationToken);
+        return context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteAsync(Appointment appointment, CancellationToken cancellationToken)
+    public Task DeleteAsync(Appointment appointment, CancellationToken cancellationToken)
     {
         context.Remove(appointment);
-        await context.SaveChangesAsync(cancellationToken);
+        return context.SaveChangesAsync(cancellationToken);
     }
 
     public Task<Appointment?> GetAsync(uint patientId,
