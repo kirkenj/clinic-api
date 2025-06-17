@@ -1,7 +1,5 @@
 ﻿using Clinic.Application.Abstractions;
-using Clinic.Application.Emails;
-using Clinic.Application.Otp;
-using Clinic.Application.Responses;
+using Clinic.Application.Tools;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Entities;
 using Clinic.Domain.Errors;
@@ -18,7 +16,8 @@ public sealed class AddAppointmentCommandHandler(
     IServiceRepository serviceRepository,
     IAppointmentRepository appointmentRepository,
     IOtpService otpService,
-    IEmailService emailService)
+    IEmailService emailService,
+    IDateTimeProvider dateTimeProvider)
     : IRequestHandler<AddAppointmentCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(AddAppointmentCommand request, CancellationToken cancellationToken)
@@ -36,7 +35,7 @@ public sealed class AddAppointmentCommandHandler(
             return Result.Failure<string>(AppointmentErrors.NoSlotsFound(request.DateTime));
         }
 
-        if (slot.SlotStart <= DateTime.UtcNow)
+        if (slot.SlotStart <= dateTimeProvider.UtcNow())
         {
             return Result.Failure<string>(AppointmentErrors.InvalidDate(request.DateTime));
         }
@@ -104,17 +103,18 @@ public sealed class AddAppointmentCommandHandler(
             slot.SlotStart, slot.SlotEnd, false, false,
             AppointmentStatus.WaitingUserConfirm);
         await appointmentRepository.AddAsync(appointment, cancellationToken);
-        var otpKey = OtpKeys.ConfirmAppointmentCreationByPatient(
-            appointment.PatientId, appointment.Id);
+        var otpKey = $"ConfirmAppointmentCreationByPatient{appointment.PatientId}:{appointment.Id}";
         var otpResult = await otpService.GenerateOtpAsync(otpKey, cancellationToken);
         if (otpResult.IsFailure)
         {
             return Result.Failure<string>(otpResult.Error);
         }
 
-        await emailService.SendAsync(patient.Email, EmailSubjects.ConfirmAppointment,
-            EmailBodies.ConfirmAppointment(service.Name, doctor.FirstName, doctor.LastName, service.Price,
+
+        await emailService.SendAsync(patient.Email, Constants.SubjectConfirmAppointment,
+            EmailBodyBuilder.BuildConfirmAppointmentContent(service.Name, doctor.FirstName, doctor.LastName,
+                service.Price,
                 appointment.DateTimeStart, otpResult.Value), cancellationToken);
-        return Result.Success(StringResponses.CheckEmailForFurtherDetails);
+        return Result.Success(Constants.ResponseCheckEmailForFurtherDetails);
     }
 }

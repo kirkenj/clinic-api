@@ -31,6 +31,11 @@ public sealed class PatientRepository(ClinnicContext context) : IPatientReposito
         return _dbSet.AnyAsync(p => EF.Functions.ILike(p.Email, email), cancellationToken);
     }
 
+    public Task<Patient?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        return _dbSet.FirstOrDefaultAsync(x => EF.Functions.ILike(x.Email, email), cancellationToken);
+    }
+
     public async Task<ICollection<Patient>> GetAllAsync(CancellationToken cancellationToken,
         bool includeTracking = false)
     {

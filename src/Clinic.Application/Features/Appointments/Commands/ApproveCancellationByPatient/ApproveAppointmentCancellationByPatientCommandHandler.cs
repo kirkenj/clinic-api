@@ -1,6 +1,5 @@
 ﻿using Clinic.Application.Abstractions;
-using Clinic.Application.Emails;
-using Clinic.Application.Otp;
+using Clinic.Application.Tools;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
@@ -30,8 +29,8 @@ public sealed class ApproveAppointmentCancellationByPatientCommandHandler(
                 (validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        var otpKey = OtpKeys.ConfirmAppointmentCancellationByUser(request.PatientId, request.AppointmentId);
-        var otpValidationResul = await otpService.ValidateOtpAsync(otpKey, request.Otp, cancellationToken);
+        var otpKey = $"ConfirmAppointmentCancellationByPatient{request.PatientId}:{request.AppointmentId}";
+        var otpValidationResul = await otpService.CheckOtpAsync(otpKey, request.Otp, cancellationToken);
         if (otpValidationResul.IsFailure)
         {
             return otpValidationResul.Error;
@@ -72,8 +71,8 @@ public sealed class ApproveAppointmentCancellationByPatientCommandHandler(
             appointment.IsApprovedByClinic, AppointmentStatus.CancelledByUser);
         await appointmentRepository.UpdateAsync(appointment, cancellationToken);
 
-        await emailService.SendAsync(doctor.Email, EmailSubjects.AppointmentCancelled,
-            EmailBodies.AppointmentCancelledForDoctor(service.Name,
+        await emailService.SendAsync(doctor.Email, Constants.SubjectAppointmentCancelled,
+            EmailBodyBuilder.BuildCancelledAppointmentContent(service.Name,
                 patient.FirstName,
                 patient.LastName, appointment.DateTimeStart),
             cancellationToken);

@@ -29,6 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IServiceRepository, ServiceRepository>();
         services.AddScoped<IAppointmentRepository, AppointmentRepository>();
         services.AddScoped<IOtpRecordRepository, OtpRecordRepository>();
+        services.AddScoped<IAppointmentResultRepository, AppointmentResultRepository>();
 
         return services;
     }

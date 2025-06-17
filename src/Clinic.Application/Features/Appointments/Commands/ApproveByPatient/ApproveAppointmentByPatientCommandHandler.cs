@@ -1,5 +1,4 @@
 ﻿using Clinic.Application.Abstractions;
-using Clinic.Application.Otp;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
@@ -25,8 +24,8 @@ public sealed class ApproveAppointmentByPatientCommandHandler(
                 (validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        var otpKey = OtpKeys.ConfirmAppointmentCreationByPatient(request.PatientId, request.AppointmentId);
-        var otpValidationResul = await otpService.ValidateOtpAsync(otpKey, request.Otp, cancellationToken);
+        var otpKey = $"ConfirmAppointmentCreationByPatient{request.PatientId}:{request.AppointmentId}";
+        var otpValidationResul = await otpService.CheckOtpAsync(otpKey, request.Otp, cancellationToken);
         if (otpValidationResul.IsFailure)
         {
             return otpValidationResul.Error;

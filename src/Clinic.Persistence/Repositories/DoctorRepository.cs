@@ -28,7 +28,12 @@ public sealed class DoctorRepository(ClinnicContext context) : IDoctorRepository
 
     public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        return _dbSet.AnyAsync(d => EF.Functions.ILike(d.Email, email), cancellationToken);
+        return _dbSet.AnyAsync(x => EF.Functions.ILike(x.Email, email), cancellationToken);
+    }
+
+    public Task<Doctor?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        return _dbSet.FirstOrDefaultAsync(x => EF.Functions.ILike(x.Email, email), cancellationToken);
     }
 
     public async Task<ICollection<Doctor>> GetAllAsync(CancellationToken cancellationToken,

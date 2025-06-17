@@ -10,6 +10,7 @@ namespace Clinic.Infrastructure.Services.OtpService;
 public class OtpService(
     IOtpRecordRepository otpRecordRepository,
     IOptions<OtpServiceOptions> options,
+    IDateTimeProvider dateTimeProvider,
     IHashService hashService)
     : IOtpService
 {
@@ -31,12 +32,12 @@ public class OtpService(
             .ToString();
         var otpHash = hashService.GetHash(otp);
         var otpRecord = OtpRecord.Create(otpKey, otpHash, 0, options.Value.MaxTriesCount, true,
-            DateTime.UtcNow + options.Value.OtpTtl);
+            dateTimeProvider.UtcNow() + options.Value.OtpTtl);
         await otpRecordRepository.AddAsync(otpRecord, cancellationToken);
         return Result.Success(otp);
     }
 
-    public async Task<Result> ValidateOtpAsync(string otpKey, string otp, CancellationToken cancellationToken)
+    public async Task<Result> CheckOtpAsync(string otpKey, string otp, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(otpKey))
         {

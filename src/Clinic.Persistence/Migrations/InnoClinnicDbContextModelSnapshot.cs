@@ -71,6 +71,43 @@ namespace Clinic.Persistence.Migrations
                     b.ToTable("Appointments", (string)null);
                 });
 
+            modelBuilder.Entity("Clinic.Domain.Entities.AppointmentResult", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AppointmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Complaints")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Conclusion")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Recommendations")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("UpdatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId")
+                        .IsUnique();
+
+                    b.ToTable("AppointmentResults", (string)null);
+                });
+
             modelBuilder.Entity("Clinic.Domain.Entities.Doctor", b =>
                 {
                     b.Property<long>("Id")
@@ -397,6 +434,17 @@ namespace Clinic.Persistence.Migrations
                     b.Navigation("Service");
                 });
 
+            modelBuilder.Entity("Clinic.Domain.Entities.AppointmentResult", b =>
+                {
+                    b.HasOne("Clinic.Domain.Entities.Appointment", "Appointment")
+                        .WithOne("AppointmentResult")
+                        .HasForeignKey("Clinic.Domain.Entities.AppointmentResult", "AppointmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Appointment");
+                });
+
             modelBuilder.Entity("Clinic.Domain.Entities.Doctor", b =>
                 {
                     b.HasOne("Clinic.Domain.Entities.Office", "Office")
@@ -425,6 +473,11 @@ namespace Clinic.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Specialization");
+                });
+
+            modelBuilder.Entity("Clinic.Domain.Entities.Appointment", b =>
+                {
+                    b.Navigation("AppointmentResult");
                 });
 
             modelBuilder.Entity("Clinic.Domain.Entities.Doctor", b =>

@@ -1,5 +1,5 @@
 ﻿using Clinic.Application.Abstractions;
-using Clinic.Application.Emails;
+using Clinic.Application.Tools;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
@@ -57,12 +57,12 @@ public sealed class CancelAppointmentByClinicCommandHandler(
         }
 
         await Task.WhenAll(
-            emailService.SendAsync(patient.Email, EmailSubjects.AppointmentCancelled,
-                EmailBodies.AppointmentCancelledForPatient(service.Name, doctor.FirstName, doctor.LastName,
+            emailService.SendAsync(patient.Email, Constants.SubjectAppointmentCancelled,
+                EmailBodyBuilder.BuildCancelledAppointmentContent(service.Name, doctor.FirstName, doctor.LastName,
                     appointment.DateTimeStart),
                 cancellationToken),
-            emailService.SendAsync(doctor.Email, EmailSubjects.AppointmentCancelled,
-                EmailBodies.AppointmentCancelledForDoctor(service.Name, patient.FirstName, patient.LastName,
+            emailService.SendAsync(doctor.Email, Constants.SubjectAppointmentCancelled,
+                EmailBodyBuilder.BuildCancelledAppointmentContent(service.Name, patient.FirstName, patient.LastName,
                     appointment.DateTimeStart),
                 cancellationToken));
         return Result.Success();
