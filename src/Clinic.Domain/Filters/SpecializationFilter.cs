@@ -6,6 +6,6 @@ public sealed class SpecializationFilter
 {
     public string? Name { get; set; }
     public bool? IsActive { get; set; }
-    public SortOrder SortOrder { get; set; } = SortOrder.Ascending;
+    public bool OrderDescending { get; set; } = true;
     public SpecializationSortColumn SortColumn { get; set; } = SpecializationSortColumn.Id;
 }

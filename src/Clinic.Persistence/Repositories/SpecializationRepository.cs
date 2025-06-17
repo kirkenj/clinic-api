@@ -30,16 +30,18 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
                 set = set.Where(s => s.IsActive == filter.IsActive.Value);
             }
 
-            set = filter.SortOrder == SortOrder.Descending
+            set = filter.OrderDescending
                 ? set.OrderByDescending(GetSortProperty(filter))
                 : set.OrderBy(GetSortProperty(filter));
+        }
+        else
+        {
+            set = set.OrderBy(s => s.Id);
         }
 
         var totalCount = await set.CountAsync(cancellationToken);
 
-        var collection = await set.OrderBy(o => o.Id)
-            .AsNoTracking()
-            .OrderBy(o => o.Id)
+        var collection = await set.AsNoTracking()
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -61,7 +63,7 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
 
     public Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken)
     {
-        return _dbSet.AnyAsync(s => s.Name == name, cancellationToken);
+        return _dbSet.AnyAsync(s => EF.Functions.ILike(s.Name, name), cancellationToken);
     }
 
     public async Task<Specialization?> GetByIdAsync(uint id, CancellationToken cancellationToken)
