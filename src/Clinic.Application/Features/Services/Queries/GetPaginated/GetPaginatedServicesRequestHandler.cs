@@ -1,6 +1,7 @@
 ﻿using Clinic.Application.Extensions;
 using Clinic.Application.Responses.Services;
 using Clinic.Domain.Abstractions;
+using Clinic.Domain.Filters;
 using Clinic.Domain.Repositories;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -25,8 +26,15 @@ public class GetPaginatedServicesRequestHandler
                 Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage)));
         }
 
+        if (request.ServiceFilter is { PriceStart: not null, PriceEnd: not null }
+            && request.ServiceFilter.PriceStart.Value > request.ServiceFilter.PriceEnd.Value)
+        {
+            (request.ServiceFilter.PriceStart, request.ServiceFilter.PriceEnd) =
+                (request.ServiceFilter.PriceEnd, request.ServiceFilter.PriceStart);
+        }
+
         var paginatedServices =
-            await serviceRepository.GetPaginatedAsync(request.Page, request.PageSize, cancellationToken);
+            await serviceRepository.GetPaginatedAsync(request.ServiceFilter, request.Page, request.PageSize, cancellationToken);
         var serviceResponse = paginatedServices.Select(ServiceResponse.FromService);
         logger.LogInformation("PaginatedServicesResponse: {@response}", serviceResponse);
         return Result.Success(serviceResponse);

@@ -4,6 +4,7 @@ using Clinic.Application.Features.Offices.Commands.Delete;
 using Clinic.Application.Features.Offices.Commands.Update;
 using Clinic.Application.Features.Offices.Queries.Get;
 using Clinic.Application.Features.Offices.Queries.GetPaginated;
+using Clinic.Domain.Filters;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,9 +15,11 @@ namespace Clinic.Api.Controllers;
 public sealed class OfficeController(IMediator mediator) : ControllerBase
 {
     [HttpGet("paged")]
-    public async Task<IActionResult> GetPaginatedOfficesAsync(int page, int pageSize)
+    public async Task<IActionResult> GetPaginatedOfficesAsync([FromQuery] OfficeFilter? officeFilter,
+        [FromQuery] [Required] int page, [FromQuery] [Required] int pageSize)
     {
-        var result = await mediator.Send(new GetPaginatedOfficesRequest { Page = page, PageSize = pageSize },
+        var result = await mediator.Send(new GetPaginatedOfficesRequest
+                { OfficeFilter = officeFilter, Page = page, PageSize = pageSize },
             HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
