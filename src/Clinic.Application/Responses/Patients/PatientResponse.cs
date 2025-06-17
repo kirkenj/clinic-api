@@ -12,21 +12,16 @@ public sealed record PatientResponse(
     bool IsActive
 )
 {
-    public static PatientResponse FromPatient(Patient Patient)
+    public static PatientResponse FromPatient(Patient patient)
     {
         return new PatientResponse(
-            Patient.Id,
-            Patient.FirstName,
-            Patient.MiddleName,
-            Patient.LastName,
-            Patient.Email,
-            Patient.PhoneNumber,
-            Patient.IsActive
+            patient.Id,
+            patient.FirstName,
+            patient.MiddleName,
+            patient.LastName,
+            patient.Email,
+            patient.PhoneNumber,
+            patient.IsActive
         );
-    }
-
-    public static IEnumerable<PatientResponse> FromPatientCollection(IEnumerable<Patient> Patients)
-    {
-        return Patients.Select(FromPatient);
     }
 }

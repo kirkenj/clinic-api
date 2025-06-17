@@ -18,9 +18,4 @@ public sealed record OfficeResponse(
             office.IsActive
         );
     }
-
-    public static IEnumerable<OfficeResponse> FromOfficeCollection(IEnumerable<Office> offices)
-    {
-        return offices.Select(FromOffice);
-    }
 }

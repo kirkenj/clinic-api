@@ -20,9 +20,4 @@ public sealed record ServiceResponse(
             service.IsActive
         );
     }
-
-    public static IEnumerable<ServiceResponse> FromServiceCollection(IEnumerable<Service> services)
-    {
-        return services.Select(FromService);
-    }
 }

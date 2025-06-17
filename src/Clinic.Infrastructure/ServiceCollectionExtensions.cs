@@ -1,4 +1,7 @@
-﻿using System.Text;
+using Clinic.Application.Abstractions;
+using Clinic.Domain.Abstractions;
+using Clinic.Infrastructure.Services.DateTimeProvider;
+using System.Text;
 using Clinic.Application.Abstractions;
 using Clinic.Infrastructure.Services.EmailService;
 using Clinic.Infrastructure.Services.HashService;
@@ -19,6 +22,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<IHashService, HashService>();
         services.AddTransient<ISlotService, SlotService>();
+        services.AddTransient<IDateTimeProvider, DateTimeProvider>();
         services.Configure<SmtpEmailServiceOptions>(configuration.GetSection("SmtpEmailServiceOptions"));
         services.AddTransient<IEmailService, SmtpEmailService>();
         services.Configure<OtpServiceOptions>(configuration.GetSection("OtpServiceOptions"));

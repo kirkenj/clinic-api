@@ -14,7 +14,9 @@ public sealed class SendOtpToCreateAppointmentRequestHandler(
     IDoctorRepository doctorRepository,
     IServiceRepository serviceRepository,
     IPatientRepository patientRepository,
-    IEmailService emailService) : IRequestHandler<SendOtpToCreateAppointmentRequest, Result>
+    IDateTimeProvider dateTimeProvider,
+    IEmailService emailService) 
+    : IRequestHandler<SendOtpToCreateAppointmentRequest, Result>
 {
     public async Task<Result> Handle(SendOtpToCreateAppointmentRequest request, CancellationToken cancellationToken)
     {
@@ -36,7 +38,7 @@ public sealed class SendOtpToCreateAppointmentRequestHandler(
             return AppointmentErrors.InvalidStatus(appointment.Status, AppointmentStatus.WaitingUserConfirm);
         }
 
-        if (appointment.DateTimeStart <= DateTime.UtcNow)
+        if (appointment.DateTimeStart <= dateTimeProvider.UtcNow())
         {
             return AppointmentErrors.InvalidDate(appointment.DateTimeStart);
         }

@@ -28,9 +28,4 @@ public sealed record DoctorResponse(
             doctor.IsActive
         );
     }
-
-    public static IEnumerable<DoctorResponse> FromDoctorCollection(IEnumerable<Doctor> doctors)
-    {
-        return doctors.Select(FromDoctor);
-    }
 }

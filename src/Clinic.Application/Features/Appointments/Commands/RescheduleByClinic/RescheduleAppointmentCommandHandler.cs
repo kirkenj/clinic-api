@@ -15,6 +15,7 @@ public sealed class RescheduleAppointmentCommandHandler(
     ISlotService slotService,
     IPatientRepository patientRepository,
     IEmailService emailService,
+    IDateTimeProvider dateTimeProvider,
     RescheduleAppointmentCommandValidator validator)
     : IRequestHandler<RescheduleAppointmentCommand, Result>
 {
@@ -33,7 +34,7 @@ public sealed class RescheduleAppointmentCommandHandler(
             return AppointmentErrors.NoSlotsFound(request.NewDateTime);
         }
 
-        if (slot.SlotStart <= DateTime.UtcNow)
+        if (slot.SlotStart <= dateTimeProvider.UtcNow())
         {
             return AppointmentErrors.InvalidDate(request.NewDateTime);
         }

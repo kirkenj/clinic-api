@@ -16,7 +16,8 @@ public sealed class AddAppointmentCommandHandler(
     IServiceRepository serviceRepository,
     IAppointmentRepository appointmentRepository,
     IOtpService otpService,
-    IEmailService emailService)
+    IEmailService emailService,
+    IDateTimeProvider dateTimeProvider)
     : IRequestHandler<AddAppointmentCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(AddAppointmentCommand request, CancellationToken cancellationToken)
@@ -34,7 +35,7 @@ public sealed class AddAppointmentCommandHandler(
             return Result.Failure<string>(AppointmentErrors.NoSlotsFound(request.DateTime));
         }
 
-        if (slot.SlotStart <= DateTime.UtcNow)
+        if (slot.SlotStart <= dateTimeProvider.UtcNow())
         {
             return Result.Failure<string>(AppointmentErrors.InvalidDate(request.DateTime));
         }
