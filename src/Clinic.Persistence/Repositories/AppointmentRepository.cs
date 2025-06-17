@@ -106,15 +106,6 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
         return new PaginatedCollection<Appointment>(collection, page, pageSize, totalCount);
     }
 
-    public async Task<ICollection<Appointment>> GetAppointmentsForSpecializationOnDate(DateTime date,
-        uint specializationId, CancellationToken cancellationToken)
-    {
-        return await _dbSet.Include(a => a.Doctor)
-            .Where(a => a.Doctor.SpecializationId == specializationId &&
-                        a.IsApprovedByClinic && a.Status == AppointmentStatus.Confirmed)
-            .ToListAsync(cancellationToken);
-    }
-
     public Task<bool> ExistsApprovedWithPatientAndDatetimeAsync(uint patientId, DateTime dateTimeStart,
         DateTime dateTimeEnd,
         CancellationToken cancellationToken)
