@@ -15,5 +15,6 @@ public interface IOfficeRepository
     public Task AddAsync(Office office, CancellationToken cancellationToken);
     public Task UpdateAsync(Office office, CancellationToken cancellationToken);
     public Task DeleteAsync(Office office, CancellationToken cancellationToken);
+    public Task<bool> ExistsByAddressAsync(string address, CancellationToken cancellationToken);
     public Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken);
 }

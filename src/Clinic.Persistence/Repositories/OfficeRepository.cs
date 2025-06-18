@@ -29,6 +29,11 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
         return _dbSet.AnyAsync(d => EF.Functions.ILike(d.PhoneNumber, phoneNumber), cancellationToken);
     }
 
+    public Task<bool> ExistsByAddressAsync(string address, CancellationToken cancellationToken)
+    {
+        return _dbSet.AnyAsync(d => EF.Functions.ILike(d.Address, address), cancellationToken);
+    }
+
     public async Task<Office?> GetByIdAsync(uint id, CancellationToken cancellationToken)
     {
         return await _dbSet.FindAsync([id], cancellationToken);

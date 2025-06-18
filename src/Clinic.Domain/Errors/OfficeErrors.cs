@@ -18,4 +18,9 @@ public static class OfficeErrors
     {
         return new Error("Office.PhoneAlreadyTaken", $"Phone number '{phoneNumber}' is already taken by other office");
     }
+
+    public static Result AddressAlreadyTaken(string address)
+    {
+        return new Error("Office.AddressAlreadyTaken", $"Address '{address}' is already taken by other office");
+    }
 }
