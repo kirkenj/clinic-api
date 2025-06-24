@@ -5,7 +5,7 @@ namespace Clinic.Application.Features.Doctors.Commands.SignIn;
 
 public class SendDoctorSignInOtpCommand : IRequest<Result<string>>
 {
-    public string Email { get; private set; } = default!;
+    public string Email { get; set; } = default!;
 
     public void TrimStringProperties()
     {
