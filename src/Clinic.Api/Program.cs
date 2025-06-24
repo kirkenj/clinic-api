@@ -1,3 +1,4 @@
+using Clinic.Api;
 using Clinic.Application;
 using Clinic.Infrastructure;
 using Clinic.Persistence;
@@ -5,6 +6,11 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+
+builder.Services.AddCors(a => a.AddDefaultPolicy(d => 
+    d.AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowAnyOrigin()));
 
 builder.Services.AddLogging();
 builder.Services.AddControllers();
@@ -26,6 +32,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors();
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseAuthentication();

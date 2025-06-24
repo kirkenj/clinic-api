@@ -18,6 +18,11 @@ public sealed class ServiceRepository(ClinnicContext context) : IServiceReposito
         var set = _dbSet.AsQueryable();
         if (serviceFilter is not null)
         {
+            if (serviceFilter.Ids is not null && serviceFilter.Ids.Count != 0)
+            {
+                set = set.Where(o => serviceFilter.Ids.Contains(o.Id));
+            }
+
             if (!string.IsNullOrEmpty(serviceFilter.Name))
             {
                 set = set.Where(s => s.Name.Contains(serviceFilter.Name));

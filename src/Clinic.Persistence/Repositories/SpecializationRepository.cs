@@ -20,6 +20,11 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
         var set = _dbSet.AsQueryable();
         if (filter is not null)
         {
+            if (filter.Ids is not null && filter.Ids.Count != 0)
+            {
+                set = set.Where(o => filter.Ids.Contains(o.Id));
+            }
+
             if (!string.IsNullOrEmpty(filter.Name))
             {
                 set = set.Where(s => s.Name.Contains(filter.Name));

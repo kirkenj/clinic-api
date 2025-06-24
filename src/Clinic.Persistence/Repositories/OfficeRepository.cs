@@ -45,6 +45,11 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
         var set = _dbSet.AsQueryable();
         if (officeFilter is not null)
         {
+            if (officeFilter.Ids is not null && officeFilter.Ids.Count != 0)
+            {
+                set = set.Where(o => officeFilter.Ids.Contains(o.Id));
+            }
+
             if (!string.IsNullOrEmpty(officeFilter.Address))
             {
                 set = set.Where(s => s.Address.Contains(officeFilter.Address));
