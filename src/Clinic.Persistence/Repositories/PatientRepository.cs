@@ -50,6 +50,11 @@ public sealed class PatientRepository(ClinnicContext context) : IPatientReposito
         var set = _dbSet.AsQueryable();
         if (patientFilter is not null)
         {
+            if (patientFilter.Ids is not null && patientFilter.Ids.Count != 0)
+            {
+                set = set.Where(o => patientFilter.Ids.Contains(o.Id));
+            }
+
             if (!string.IsNullOrEmpty(patientFilter.Email))
             {
                 set = set.Where(s => s.Email.Contains(patientFilter.Email));

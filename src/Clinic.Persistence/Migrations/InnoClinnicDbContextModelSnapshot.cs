@@ -222,7 +222,7 @@ namespace Clinic.Persistence.Migrations
                     b.Property<int>("MaxTriesCount")
                         .HasColumnType("integer");
 
-                    b.Property<string>("OtpHash")
+                    b.Property<string>("Otp")
                         .IsRequired()
                         .HasColumnType("text");
 

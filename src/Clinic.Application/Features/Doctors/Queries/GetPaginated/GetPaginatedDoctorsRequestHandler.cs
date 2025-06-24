@@ -25,7 +25,7 @@ public class GetPaginatedDoctorsRequestHandler(ILogger<GetPaginatedDoctorsReques
         }
 
         var paginatedDoctors =
-            await doctorRepository.GetPaginatedAsync(request.Page, request.PageSize, cancellationToken);
+            await doctorRepository.GetPaginatedAsync(request.DoctorFilter, request.Page, request.PageSize, cancellationToken);
         var doctorResponse = paginatedDoctors.Select(DoctorResponse.FromDoctor);
         logger.LogInformation("PaginatedDoctorsResponse: {@response}", doctorResponse);
         return Result.Success(doctorResponse);

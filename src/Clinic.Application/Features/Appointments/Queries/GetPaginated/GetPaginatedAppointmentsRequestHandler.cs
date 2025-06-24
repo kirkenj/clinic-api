@@ -25,8 +25,15 @@ public class GetPaginatedAppointmentsRequestHandler(
                 (Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage)));
         }
 
-        var paginatedAppointments =
-            await appointmentRepository.GetPaginatedAsync(request.Page, request.PageSize, cancellationToken);
+        if (request.AppointmentFilter is { DateTimeStart: not null, DateTimeEnd: not null } && 
+            request.AppointmentFilter.DateTimeStart.Value > request.AppointmentFilter.DateTimeEnd.Value)
+        {
+            (request.AppointmentFilter.DateTimeStart, request.AppointmentFilter.DateTimeEnd) =
+                (request.AppointmentFilter.DateTimeEnd, request.AppointmentFilter.DateTimeStart);
+        }
+
+        var paginatedAppointments =await appointmentRepository.GetPaginatedAsync(request.AppointmentFilter, 
+            request.Page, request.PageSize, cancellationToken);
         var appointmentResponse = paginatedAppointments
             .Select(AppointmentResponse.FromAppointment);
         logger.LogInformation("PaginatedAppointmentsResponse: {@response}", appointmentResponse);

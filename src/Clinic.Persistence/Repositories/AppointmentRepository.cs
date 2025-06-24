@@ -1,7 +1,10 @@
 ﻿using Clinic.Domain.Abstractions;
 using Clinic.Domain.Entities;
+using Clinic.Domain.Filters;
+using Clinic.Domain.Filters.Sorting;
 using Clinic.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Clinic.Persistence.Repositories;
 
@@ -22,18 +25,90 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
             : await _dbSet.ToListAsync(cancellationToken);
     }
 
-    public async Task<PaginatedCollection<Appointment>> GetPaginatedAsync(int page, int pageSize,
-        CancellationToken cancellationToken)
+    public async Task<PaginatedCollection<Appointment>> GetPaginatedAsync(AppointmentFilter? appointmentFilter,
+        int page, int pageSize, CancellationToken cancellationToken)
     {
-        var totalCount = await _dbSet.CountAsync(cancellationToken);
+        var set = _dbSet.AsQueryable();
+        if (appointmentFilter is not null)
+        {
+            if (appointmentFilter.Ids is not null && appointmentFilter.Ids.Count != 0)
+            {
+                set = set.Where(o => appointmentFilter.Ids.Contains(o.Id));
+            }
 
-        var collection = await _dbSet.OrderBy(o => o.Id)
-            .AsNoTracking()
+            if (appointmentFilter.DoctorIds is not null && appointmentFilter.DoctorIds.Count != 0)
+            {
+                set = set.Where(o => appointmentFilter.DoctorIds.Contains(o.DoctorId));
+            }
+
+            if (appointmentFilter.PatientIds is not null && appointmentFilter.PatientIds.Count != 0)
+            {
+                set = set.Where(o => appointmentFilter.PatientIds.Contains(o.PatientId));
+            }
+
+            if (appointmentFilter.ServiceIds is not null && appointmentFilter.ServiceIds.Count != 0)
+            {
+                set = set.Where(o => appointmentFilter.ServiceIds.Contains(o.ServiceId));
+            }
+
+            if (appointmentFilter.DateTimeStart is not null)
+            {
+                set = set.Where(o => o.DateTimeStart >= appointmentFilter.DateTimeStart);
+            }
+
+            if (appointmentFilter.DateTimeEnd is not null)
+            {
+                set = set.Where(o => o.DateTimeStart <= appointmentFilter.DateTimeEnd);
+            }
+
+            if (appointmentFilter.IsApprovedByClinic is not null)
+            {
+                set = set.Where(o => appointmentFilter.IsApprovedByClinic == o.IsApprovedByClinic);
+            }
+
+            if (appointmentFilter.IsApprovedByUser is not null)
+            {
+                set = set.Where(o => appointmentFilter.IsApprovedByUser == o.IsApprovedByUser);
+            }
+
+            if (appointmentFilter.Statuses is not null && appointmentFilter.Statuses.Count > 0)
+            {
+                set = set.Where(o => appointmentFilter.Statuses.Contains(o.Status));
+            }
+
+            set = appointmentFilter.OrderDescending
+                ? set.OrderByDescending(GetSortProperty(appointmentFilter))
+                : set.OrderBy(GetSortProperty(appointmentFilter));
+        }
+        else
+        {
+            set = set.OrderBy(s => s.Id);
+        }
+
+        var totalCount = await set.CountAsync(cancellationToken);
+
+        var collection = await set.AsNoTracking()
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
         return new PaginatedCollection<Appointment>(collection, page, pageSize, totalCount);
+    }
+
+    private Expression<Func<Appointment, object>> GetSortProperty(AppointmentFilter appointmentFilter)
+    {
+        return appointmentFilter.SortColumn switch
+        {
+            AppointmentSortColumn.Id => service => service.Id,
+            AppointmentSortColumn.DotorId => service => service.DoctorId,
+            AppointmentSortColumn.PatientId => service => service.PatientId,
+            AppointmentSortColumn.ServiceId => service => service.ServiceId,
+            AppointmentSortColumn.DateTimeStart => service => service.DateTimeStart,
+            AppointmentSortColumn.IsApprovedByUser => service => service.IsApprovedByUser,
+            AppointmentSortColumn.IsApprovedByClinic => service => service.IsApprovedByClinic,
+            AppointmentSortColumn.Status => service => service.Status,
+            _ => service => service.Id
+        };
     }
 
     public Task AddAsync(Appointment appointment, CancellationToken cancellationToken)

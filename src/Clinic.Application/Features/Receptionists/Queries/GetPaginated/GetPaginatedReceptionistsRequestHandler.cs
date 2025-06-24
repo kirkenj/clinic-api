@@ -26,7 +26,7 @@ public class GetPaginatedReceptionistsRequestHandler(ILogger<GetPaginatedRecepti
         }
 
         var paginatedReceptionists =
-            await receptionistRepository.GetPaginatedAsync(request.Page, request.PageSize, cancellationToken);
+            await receptionistRepository.GetPaginatedAsync(request.ReceptionistFilter, request.Page, request.PageSize, cancellationToken);
         var receptionistResponse = paginatedReceptionists.Select(ReceptionistResponse.FromReceptionist);
         logger.LogInformation("PaginatedReceptionistsResponse: {@response}", receptionistResponse);
         return Result.Success(receptionistResponse);

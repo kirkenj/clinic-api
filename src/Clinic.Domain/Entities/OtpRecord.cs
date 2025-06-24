@@ -8,11 +8,11 @@ public sealed class OtpRecord : IAuditableEntity
     {
     }
 
-    private OtpRecord(string key, string otpHash, int triesCount,
+    private OtpRecord(string key, string otp, int triesCount,
         int maxTriesCount, bool isActive, DateTime expiresOnUtc)
     {
         Key = key;
-        OtpHash = otpHash;
+        Otp = otp;
         TriesCount = triesCount;
         MaxTriesCount = maxTriesCount;
         IsActive = isActive;
@@ -20,7 +20,7 @@ public sealed class OtpRecord : IAuditableEntity
     }
 
     public string Key { get; private set; } = default!;
-    public string OtpHash { get; private set; } = default!;
+    public string Otp { get; private set; } = default!;
     public int TriesCount { get; private set; }
     public int MaxTriesCount { get; private set; }
     public bool IsActive { get; private set; }
@@ -29,10 +29,10 @@ public sealed class OtpRecord : IAuditableEntity
     public DateTimeOffset? UpdatedOnUtc { get; set; }
 
 
-    public static OtpRecord Create(string key, string otpHash, int triesCount,
+    public static OtpRecord Create(string key, string otp, int triesCount,
         int maxTriesCount, bool isActive, DateTime expiresOnUtc)
     {
-        return new OtpRecord(key, otpHash, triesCount, maxTriesCount, isActive, expiresOnUtc);
+        return new OtpRecord(key, otp, triesCount, maxTriesCount, isActive, expiresOnUtc);
     }
 
     public void IncrementTries()

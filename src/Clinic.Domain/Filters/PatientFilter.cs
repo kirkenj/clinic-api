@@ -4,6 +4,7 @@ namespace Clinic.Domain.Filters;
 
 public sealed class PatientFilter
 {
+    public ICollection<uint>? Ids { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? MiddleName { get; set; }
