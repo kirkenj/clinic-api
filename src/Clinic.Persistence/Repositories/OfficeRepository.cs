@@ -42,7 +42,7 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
     public async Task<PaginatedCollection<Office>> GetPaginatedAsync(OfficeFilter? officeFilter, int page, int pageSize,
         CancellationToken cancellationToken)
     {
-        var set = _dbSet.AsQueryable();
+        var set = _dbSet.AsQueryable().Where(d => d.IsActive);
         if (officeFilter is not null)
         {
             if (officeFilter.Ids is not null && officeFilter.Ids.Count != 0)
@@ -58,11 +58,6 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
             if (!string.IsNullOrEmpty(officeFilter.PhoneNumber))
             {
                 set = set.Where(s => s.PhoneNumber.Contains(officeFilter.PhoneNumber));
-            }
-
-            if (officeFilter.IsActive.HasValue)
-            {
-                set = set.Where(s => s.IsActive == officeFilter.IsActive.Value);
             }
 
             set = officeFilter.OrderDescending
@@ -92,7 +87,6 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
             OfficeSortColumn.Id => specialization => specialization.Id,
             OfficeSortColumn.Address => specialization => specialization.Address,
             OfficeSortColumn.PhoneNumber => specialization => specialization.PhoneNumber,
-            OfficeSortColumn.IsActive => specialization => specialization.IsActive,
             _ => specialization => specialization.Id
         };
     }

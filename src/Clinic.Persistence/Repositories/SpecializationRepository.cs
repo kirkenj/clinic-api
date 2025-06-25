@@ -17,7 +17,7 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
         int page, int pageSize,
         CancellationToken cancellationToken)
     {
-        var set = _dbSet.AsQueryable();
+        var set = _dbSet.AsQueryable().Where(d => d.IsActive);
         if (filter is not null)
         {
             if (filter.Ids is not null && filter.Ids.Count != 0)
@@ -28,11 +28,6 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
             if (!string.IsNullOrEmpty(filter.Name))
             {
                 set = set.Where(s => s.Name.Contains(filter.Name));
-            }
-
-            if (filter.IsActive.HasValue)
-            {
-                set = set.Where(s => s.IsActive == filter.IsActive.Value);
             }
 
             set = filter.OrderDescending
@@ -89,7 +84,6 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
         {
             SpecializationSortColumn.Id => specialization => specialization.Id,
             SpecializationSortColumn.Name => specialization => specialization.Name,
-            SpecializationSortColumn.IsActive => specialization => specialization.IsActive,
             _ => specialization => specialization.Id
         };
     }

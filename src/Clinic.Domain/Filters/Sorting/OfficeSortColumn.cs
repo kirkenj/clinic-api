@@ -5,5 +5,4 @@ public enum OfficeSortColumn
     Id,
     Address,
     PhoneNumber,
-    IsActive
 }

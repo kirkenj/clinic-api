@@ -8,5 +8,4 @@ public enum ReceptionistSortColumn
     MiddleName,
     Email,
     PhoneNumber,
-    IsActive
 }

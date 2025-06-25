@@ -15,7 +15,7 @@ public sealed class ServiceRepository(ClinnicContext context) : IServiceReposito
     public async Task<PaginatedCollection<Service>> GetPaginatedAsync(ServiceFilter? serviceFilter, 
         int page, int pageSize, CancellationToken cancellationToken)
     {
-        var set = _dbSet.AsQueryable();
+        var set = _dbSet.AsQueryable().Where(d => d.IsActive);
         if (serviceFilter is not null)
         {
             if (serviceFilter.Ids is not null && serviceFilter.Ids.Count != 0)
@@ -26,11 +26,6 @@ public sealed class ServiceRepository(ClinnicContext context) : IServiceReposito
             if (!string.IsNullOrEmpty(serviceFilter.Name))
             {
                 set = set.Where(s => s.Name.Contains(serviceFilter.Name));
-            }
-
-            if (serviceFilter.IsActive.HasValue)
-            {
-                set = set.Where(s => s.IsActive == serviceFilter.IsActive.Value);
             }
 
             if (serviceFilter.PriceStart.HasValue)
@@ -106,7 +101,6 @@ public sealed class ServiceRepository(ClinnicContext context) : IServiceReposito
             ServiceSortColumn.Name => service => service.Name,
             ServiceSortColumn.Price => service => service.Price,
             ServiceSortColumn.SpecializationId => service => service.SpecializationId,
-            ServiceSortColumn.IsActive => service => service.IsActive,
             _ => service => service.Id
         };
     }

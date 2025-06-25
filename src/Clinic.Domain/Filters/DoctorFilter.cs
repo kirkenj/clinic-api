@@ -12,7 +12,6 @@ public sealed class DoctorFilter
     public string? PhoneNumber { get; set; }
     public ICollection<uint>? SpecializationIds { get; set; }
     public ICollection<uint>? OfficeIds { get; set; }
-    public bool? IsActive { get; set; }
     public bool OrderDescending { get; set; } = true;
     public DoctorSortColumn SortColumn { get; set; } = DoctorSortColumn.Id;
 }

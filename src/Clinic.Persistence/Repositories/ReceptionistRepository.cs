@@ -43,7 +43,7 @@ public class ReceptionistRepository(ClinnicContext context) : IReceptionistRepos
     public async Task<PaginatedCollection<Receptionist>> GetPaginatedAsync(ReceptionistFilter? receptionistFilter, 
         int page, int pageSize, CancellationToken cancellationToken)
     {
-        var set = _dbSet.AsQueryable();
+        var set = _dbSet.AsQueryable().Where(d => d.IsActive);
         if (receptionistFilter is not null)
         {
             if (receptionistFilter.Ids is not null && receptionistFilter.Ids.Count != 0)
@@ -76,11 +76,6 @@ public class ReceptionistRepository(ClinnicContext context) : IReceptionistRepos
                 set = set.Where(s => s.PhoneNumber.Contains(receptionistFilter.PhoneNumber));
             }
 
-            if (receptionistFilter.IsActive.HasValue)
-            {
-                set = set.Where(s => s.IsActive == receptionistFilter.IsActive.Value);
-            }
-
             set = receptionistFilter.OrderDescending
                 ? set.OrderByDescending(GetSortProperty(receptionistFilter))
                 : set.OrderBy(GetSortProperty(receptionistFilter));
@@ -111,7 +106,6 @@ public class ReceptionistRepository(ClinnicContext context) : IReceptionistRepos
             ReceptionistSortColumn.MiddleName => Receptionist => Receptionist.MiddleName,
             ReceptionistSortColumn.Email => Receptionist => Receptionist.Email,
             ReceptionistSortColumn.PhoneNumber => Receptionist => Receptionist.PhoneNumber,
-            ReceptionistSortColumn.IsActive => Receptionist => Receptionist.IsActive,
             _ => patient => patient.Id
         };
     }

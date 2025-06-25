@@ -8,5 +8,4 @@ public enum PatientSortColumn
     MiddleName,
     Email,
     PhoneNumber,
-    IsActive
 }

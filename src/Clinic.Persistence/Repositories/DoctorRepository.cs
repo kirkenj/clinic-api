@@ -55,7 +55,7 @@ public sealed class DoctorRepository(ClinnicContext context) : IDoctorRepository
     public async Task<PaginatedCollection<Doctor>> GetPaginatedAsync(DoctorFilter? doctorFilter, 
         int page, int pageSize, CancellationToken cancellationToken)
     {
-        var set = _dbSet.AsQueryable();
+        var set = _dbSet.AsQueryable().Where(d => d.IsActive);
         if (doctorFilter is not null)
         {
             if (doctorFilter.Ids is not null && doctorFilter.Ids.Count != 0)
@@ -86,11 +86,6 @@ public sealed class DoctorRepository(ClinnicContext context) : IDoctorRepository
             if (!string.IsNullOrEmpty(doctorFilter.PhoneNumber))
             {
                 set = set.Where(s => s.PhoneNumber.Contains(doctorFilter.PhoneNumber));
-            }
-
-            if (doctorFilter.IsActive.HasValue)
-            {
-                set = set.Where(s => s.IsActive == doctorFilter.IsActive.Value);
             }
 
             if (doctorFilter.OfficeIds is not null && doctorFilter.OfficeIds.Count != 0)
@@ -132,7 +127,6 @@ public sealed class DoctorRepository(ClinnicContext context) : IDoctorRepository
             DoctorSortColumn.MiddleName => patient => patient.MiddleName,
             DoctorSortColumn.Email => patient => patient.Email,
             DoctorSortColumn.PhoneNumber => patient => patient.PhoneNumber,
-            DoctorSortColumn.IsActive => patient => patient.IsActive,
             DoctorSortColumn.SpecializationId => patient => patient.SpecializationId,
             DoctorSortColumn.OfficeId => patient => patient.OfficeId,
             _ => patient => patient.Id

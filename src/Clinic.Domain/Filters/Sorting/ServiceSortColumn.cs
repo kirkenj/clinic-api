@@ -6,5 +6,4 @@ public enum ServiceSortColumn
     Name,
     Price,
     SpecializationId,
-    IsActive,
 }

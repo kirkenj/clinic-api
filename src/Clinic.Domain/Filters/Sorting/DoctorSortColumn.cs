@@ -8,7 +8,6 @@ public enum DoctorSortColumn
     MiddleName,
     Email,
     PhoneNumber,
-    IsActive,
     SpecializationId,
     OfficeId
 }

@@ -5,7 +5,6 @@ namespace Clinic.Domain.Filters;
 public sealed class ServiceFilter
 {
     public ICollection<uint>? Ids { get; set; }
-    public bool? IsActive { get; set; }
     public string? Name { get; set; }
     public decimal? PriceStart { get; set; }
     public decimal? PriceEnd { get; set; }
