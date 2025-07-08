@@ -1,5 +1,6 @@
 ﻿using Clinic.Domain.Abstractions;
 using Clinic.Domain.Entities;
+using Clinic.Domain.Filters;
 
 namespace Clinic.Domain.Repositories;
 
@@ -7,9 +8,8 @@ public interface IServiceRepository
 {
     public Task<Service?> GetByIdAsync(uint id, CancellationToken cancellationToken);
 
-    public Task<ICollection<Service>> GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false);
-
-    public Task<PaginatedCollection<Service>> GetPaginatedAsync(int page, int pageSize,
+    public Task<PaginatedCollection<Service>> GetPaginatedAsync(ServiceFilter? serviceFilter,
+        int page, int pageSize,
         CancellationToken cancellationToken);
 
     public Task AddAsync(Service service, CancellationToken cancellationToken);

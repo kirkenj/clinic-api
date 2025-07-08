@@ -7,7 +7,7 @@ public record Error(string Code, string? Description = null)
 
     public static Error ValidationError(IEnumerable<string> errorMessages)
     {
-        return new Error(string.Join(";", errorMessages));
+        return new Error("ValidationError", string.Join(";", errorMessages));
     }
 
     public static implicit operator Result(Error error)

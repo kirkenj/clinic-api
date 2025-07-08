@@ -24,8 +24,8 @@ public class GetPaginatedOfficesRequestHandler(ILogger<GetPaginatedOfficesReques
                 Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage)));
         }
 
-        var paginatedOffices =
-            await officeRepository.GetPaginatedAsync(request.Page, request.PageSize, cancellationToken);
+        var paginatedOffices = await officeRepository
+            .GetPaginatedAsync(request.OfficeFilter, request.Page, request.PageSize, cancellationToken);
         var officeResponse = paginatedOffices.Select(OfficeResponse.FromOffice);
         logger.LogInformation("PaginatedOfficesResponse: {@response}", officeResponse);
         return Result.Success(officeResponse);

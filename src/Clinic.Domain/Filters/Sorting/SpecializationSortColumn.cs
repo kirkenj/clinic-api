@@ -4,5 +4,4 @@ public enum SpecializationSortColumn
 {
     Id,
     Name,
-    IsActive
 }

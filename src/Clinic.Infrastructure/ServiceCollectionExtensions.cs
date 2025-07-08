@@ -1,9 +1,7 @@
-using System.Text;
 using Clinic.Application.Abstractions;
 using Clinic.Domain.Abstractions;
 using Clinic.Infrastructure.Services.DateTimeProvider;
 using Clinic.Infrastructure.Services.EmailService;
-using Clinic.Infrastructure.Services.HashService;
 using Clinic.Infrastructure.Services.JwtService;
 using Clinic.Infrastructure.Services.OtpService;
 using Clinic.Infrastructure.Services.SlotService;
@@ -11,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Clinic.Infrastructure;
 
@@ -19,7 +18,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection RegisterInfrastructureServices(this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddTransient<IHashService, HashService>();
         services.AddTransient<ISlotService, SlotService>();
         services.AddTransient<IDateTimeProvider, DateTimeProvider>();
         services.Configure<SmtpEmailServiceOptions>(configuration.GetSection("SmtpEmailServiceOptions"));

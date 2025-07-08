@@ -15,7 +15,7 @@ public sealed class OtpRecordConfiguration : IEntityTypeConfiguration<OtpRecord>
         builder.Property(m => m.Key)
             .IsRequired();
 
-        builder.Property(m => m.OtpHash)
+        builder.Property(m => m.Otp)
             .IsRequired();
         
         builder.Property(m => m.TriesCount)

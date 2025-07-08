@@ -1,5 +1,6 @@
 ﻿using Clinic.Domain.Abstractions;
 using Clinic.Domain.Entities;
+using Clinic.Domain.Filters;
 
 namespace Clinic.Domain.Repositories;
 
@@ -7,11 +8,11 @@ public interface IAppointmentRepository
 {
     public Task<Appointment?> GetByIdAsync(uint id, CancellationToken cancellationToken);
 
-    public Task<ICollection<Appointment>>
-        GetAllAsync(CancellationToken cancellationToken, bool includeTracking = false);
+    public Task<ICollection<Appointment>> GetAllAsync(CancellationToken cancellationToken, 
+        bool includeTracking = false);
 
-    public Task<PaginatedCollection<Appointment>> GetPaginatedAsync(int page, int pageSize,
-        CancellationToken cancellationToken);
+    public Task<PaginatedCollection<Appointment>> GetPaginatedAsync(AppointmentFilter? appointmentFilter, 
+        int page, int pageSize, CancellationToken cancellationToken);
 
     public Task AddAsync(Appointment appointment, CancellationToken cancellationToken);
     public Task UpdateAsync(Appointment appointment, CancellationToken cancellationToken);

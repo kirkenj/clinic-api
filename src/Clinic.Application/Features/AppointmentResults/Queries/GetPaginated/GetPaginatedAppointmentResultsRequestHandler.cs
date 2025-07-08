@@ -25,8 +25,8 @@ public class GetPaginatedAppointmentResultsRequestHandler(
                 Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage)));
         }
 
-        var paginatedAppointmentResults = await appointmentResultRepository
-            .GetPaginatedAsync(request.Page, request.PageSize, cancellationToken);
+        var paginatedAppointmentResults = await appointmentResultRepository.GetPaginatedAsync(
+            request.AppointmentResultFilter, request.Page, request.PageSize, cancellationToken);
         var appointmentResultResponse = paginatedAppointmentResults
             .Select(AppointmentResultResponse.FromAppointmentResult);
         logger.LogInformation("PaginatedAppointmentResultsResponse: {@response}", appointmentResultResponse);

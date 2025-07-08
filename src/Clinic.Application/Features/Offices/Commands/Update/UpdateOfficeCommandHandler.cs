@@ -41,6 +41,16 @@ public sealed class UpdateOfficeCommandHandler
             }
         }
 
+        var hasSameAddress = office.Address.HasSameValue(request.Address);
+        if (!hasSameAddress)
+        {
+            var isAddressTaken = await officeRepository.ExistsByAddressAsync(request.Address, cancellationToken);
+            if (isAddressTaken)
+            {
+                return OfficeErrors.AddressAlreadyTaken(request.Address);
+            }
+        }
+
         office.Update(request.Address, request.PhoneNumber);
         await officeRepository.UpdateAsync(office, cancellationToken);
         return Result.Success();
