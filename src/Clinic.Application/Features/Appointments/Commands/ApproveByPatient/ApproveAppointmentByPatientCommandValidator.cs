@@ -8,9 +8,6 @@ public sealed class ApproveAppointmentByPatientCommandValidator
 {
     public ApproveAppointmentByPatientCommandValidator()
     {
-        RuleFor(a => a.PatientId)
-            .NotEmpty();
-
         RuleFor(a => a.AppointmentId)
             .NotEmpty();
 

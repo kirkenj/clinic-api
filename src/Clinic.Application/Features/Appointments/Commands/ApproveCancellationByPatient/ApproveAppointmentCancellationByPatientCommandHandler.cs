@@ -1,19 +1,13 @@
 ﻿using Clinic.Application.Abstractions;
-using Clinic.Application.Tools;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
-using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Appointments.Commands.ApproveCancellationByPatient;
 
 public sealed class ApproveAppointmentCancellationByPatientCommandHandler(
-    IAppointmentRepository appointmentRepository,
-    IOtpService otpService,
-    IEmailService emailService,
-    IPatientRepository patientRepository,
-    IDoctorRepository doctorRepository,
-    IServiceRepository serviceRepository,
+    IUserAccessService userAccessService,
+    IAppointmentService appointmentService,
     ApproveAppointmentCancellationByPatientCommandValidator validator)
     : IRequestHandler<ApproveAppointmentCancellationByPatientCommand, Result>
 {
@@ -21,7 +15,6 @@ public sealed class ApproveAppointmentCancellationByPatientCommandHandler(
         CancellationToken cancellationToken)
     {
         request.TrimStringProperties();
-
         var validationResult = validator.Validate(request);
         if (!validationResult.IsValid)
         {
@@ -29,53 +22,29 @@ public sealed class ApproveAppointmentCancellationByPatientCommandHandler(
                 (validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        var otpKey = $"ConfirmAppointmentCancellationByPatient{request.PatientId}:{request.AppointmentId}";
-        var otpValidationResul = await otpService.CheckOtpAsync(otpKey, request.Otp, cancellationToken);
-        if (otpValidationResul.IsFailure)
+        var userAccessResult = await userAccessService.ValidateUserAccessAsync(
+            [RoleType.Patient, RoleType.Patient], cancellationToken);
+        if (userAccessResult.IsFailure)
         {
-            return otpValidationResul.Error;
+            return userAccessResult.Error;
         }
 
-        var patient = await patientRepository.GetByIdAsync(request.PatientId, cancellationToken);
-        if (patient is null)
+        if (userAccessResult.Value.Role == RoleType.Patient) 
         {
-            return PatientErrors.NotFound(request.PatientId);
+            var appointmentResult = await appointmentService.GetByIdAsync(
+                request.AppointmentId, cancellationToken);
+            if (appointmentResult.IsFailure)
+            {
+                return appointmentResult.Error;
+            }
+
+            if (appointmentResult.Value.PatientId != userAccessResult.Value.Id)
+            {
+                return BasicErrors.NoAccess();
+            }
         }
 
-        var appointment = await appointmentRepository.GetByIdAsync
-            (request.AppointmentId, cancellationToken);
-        if (appointment is null)
-        {
-            return AppointmentErrors.NotFound(request.AppointmentId);
-        }
-
-        if (appointment.Status != AppointmentStatus.Confirmed)
-        {
-            return AppointmentErrors.InvalidStatus(appointment.Status, AppointmentStatus.Confirmed);
-        }
-
-        var doctor = await doctorRepository.GetByIdAsync(appointment.DoctorId, cancellationToken);
-        if (doctor is null)
-        {
-            return DoctorErrors.NotFound(appointment.DoctorId);
-        }
-
-        var service = await serviceRepository.GetByIdAsync(appointment.ServiceId, cancellationToken);
-        if (service is null)
-        {
-            return ServiceErrors.NotFound(appointment.ServiceId);
-        }
-
-        appointment.Update(appointment.DoctorId, appointment.PatientId, appointment.ServiceId,
-            appointment.DateTimeStart, appointment.DateTimeEnd, false,
-            appointment.IsApprovedByClinic, AppointmentStatus.CancelledByUser);
-        await appointmentRepository.UpdateAsync(appointment, cancellationToken);
-
-        await emailService.SendAsync(doctor.Email, Constants.SubjectAppointmentCancelled,
-            EmailBodyBuilder.BuildCancelledAppointmentContent(service.Name,
-                patient.FirstName,
-                patient.LastName, appointment.DateTimeStart),
-            cancellationToken);
-        return Result.Success();
+        return await appointmentService.ApproveAppointmentCancellationByPatient(
+            request.AppointmentId, request.Otp, cancellationToken);
     }
 }

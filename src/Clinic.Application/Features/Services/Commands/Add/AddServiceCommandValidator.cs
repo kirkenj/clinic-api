@@ -13,7 +13,5 @@ public sealed class AddServiceCommandValidator : AbstractValidator<AddServiceCom
             .Price();
         RuleFor(m => m.SpecializationId)
             .NotEmpty();
-        RuleFor(m => m.ServiceCategoryId)
-            .NotEmpty();
     }
 }

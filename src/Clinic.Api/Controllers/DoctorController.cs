@@ -5,6 +5,7 @@ using Clinic.Application.Features.Doctors.Queries.Get;
 using Clinic.Application.Features.Doctors.Queries.GetPaginated;
 using Clinic.Domain.Filters;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
@@ -35,6 +36,7 @@ public sealed class DoctorController(IMediator mediator) : ControllerBase
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
+    [Authorize(Roles = "Receptionist")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteDoctorAsync([FromRoute][Required] uint id)
     {
@@ -42,6 +44,7 @@ public sealed class DoctorController(IMediator mediator) : ControllerBase
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
+    [Authorize(Roles = "Receptionist")]
     [HttpPost]
     public async Task<IActionResult> AddDoctorAsync([FromBody][Required] AddDoctorCommand request)
     {
@@ -49,6 +52,7 @@ public sealed class DoctorController(IMediator mediator) : ControllerBase
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
+    [Authorize(Roles = "Receptionist")]
     [HttpPut]
     public async Task<IActionResult> UpdateDoctorAsync([FromBody][Required] UpdateDoctorCommand request)
     {

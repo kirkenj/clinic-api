@@ -3,10 +3,10 @@ public enum AppointmentSortColumn
 {
     Id,
     DotorId,
-    PatientId,
     ServiceId,
     DateTimeStart,
     IsApprovedByClinic,
     IsApprovedByUser,
-    Status
+    Status,
+    PatientId,
 }

@@ -5,7 +5,6 @@ namespace Clinic.Application.Features.Appointments.Commands.ApproveByPatient;
 
 public sealed class ApproveAppointmentByPatientCommand : IRequest<Result>
 {
-    public uint PatientId { get; set; }
     public uint AppointmentId { get; set; }
     public string Otp { get; set; } = default!;
 

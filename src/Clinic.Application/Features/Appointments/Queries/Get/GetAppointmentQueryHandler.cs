@@ -1,24 +1,35 @@
-﻿using Clinic.Application.Responses.Appointments;
+﻿using Clinic.Application.Abstractions;
+using Clinic.Application.Responses.Appointments;
+using Clinic.Application.Tools;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
-using Clinic.Domain.Repositories;
 using MediatR;
 
-namespace Clinic.Application.Features.Appointments.Queries.Get;
+namespace Clinic.Application.Features.Appointments.Queries.Get.Staff;
 
-public sealed class GetAppointmentQueryHandler(IAppointmentRepository appointmentRepository)
+public sealed class GetAppointmentQueryHandler
+    (IAppointmentService appointmentService,
+    IUserAccessService userAccessService)
     : IRequestHandler<GetAppointmentQuery, Result<AppointmentResponse>>
 {
     public async Task<Result<AppointmentResponse>> Handle(GetAppointmentQuery request,
         CancellationToken cancellationToken)
     {
-        var appointment = await appointmentRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (appointment is null)
+        var userAccessResult = await userAccessService.ValidateUserAccessAsync(
+            Constants.AllRoles, cancellationToken);
+        if (userAccessResult.IsFailure)
         {
-            return Result.Failure<AppointmentResponse>(
-                AppointmentErrors.NotFound(request.Id));
+            return Result.Failure<AppointmentResponse>(userAccessResult.Error);
         }
 
-        return AppointmentResponse.FromAppointment(appointment);
+        var appointmentResult = await appointmentService.GetByIdAsync(request.Id, cancellationToken);
+        if (appointmentResult.IsFailure)
+        {
+            return Result.Failure<AppointmentResponse>(appointmentResult.Error);
+        }
+
+        return appointmentResult.Value.PatientId == userAccessResult.Value.Id 
+            ? appointmentResult
+            : Result.Failure<AppointmentResponse>(BasicErrors.NoAccess());
     }
 }

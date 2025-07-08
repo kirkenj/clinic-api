@@ -1,8 +1,10 @@
 ﻿using Clinic.Domain.Abstractions;
 using Clinic.Domain.Entities;
 using Clinic.Domain.Filters;
+using Clinic.Domain.Filters.Sorting;
 using Clinic.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Clinic.Persistence.Repositories;
 
@@ -36,6 +38,11 @@ public sealed class AppointmentResultRepository(ClinnicContext context) : IAppoi
         int page, int pageSize,CancellationToken cancellationToken)
     {
         var set = _dbSet.AsQueryable();
+        return await FilterAsync(set, appointmentResultFilter, page, pageSize, cancellationToken);
+    }
+
+    private async Task<PaginatedCollection<AppointmentResult>> FilterAsync(IQueryable<AppointmentResult> set, AppointmentResultFilter? appointmentResultFilter, int page, int pageSize, CancellationToken cancellationToken)
+    {
         if (appointmentResultFilter is not null)
         {
             if (appointmentResultFilter.Ids is not null && appointmentResultFilter.Ids.Count != 0)
@@ -43,9 +50,14 @@ public sealed class AppointmentResultRepository(ClinnicContext context) : IAppoi
                 set = set.Where(o => appointmentResultFilter.Ids.Contains(o.Id));
             }
 
+            if (appointmentResultFilter.AppointmentIds is not null && appointmentResultFilter.AppointmentIds.Count != 0)
+            {
+                set = set.Where(o => appointmentResultFilter.AppointmentIds.Contains(o.AppointmentId));
+            }
+
             set = appointmentResultFilter.OrderDescending
-                ? set.OrderByDescending(a => a.Id)
-                : set.OrderBy(a => a.Id);
+                ? set.OrderByDescending(GetSortProperty(appointmentResultFilter))
+                : set.OrderBy(GetSortProperty(appointmentResultFilter));
         }
         else
         {
@@ -62,9 +74,33 @@ public sealed class AppointmentResultRepository(ClinnicContext context) : IAppoi
         return new PaginatedCollection<AppointmentResult>(collection, page, pageSize, totalCount);
     }
 
+    private static Expression<Func<AppointmentResult, object>> GetSortProperty(AppointmentResultFilter appointmentResultFilter)
+    {
+        return appointmentResultFilter.SortColumn switch
+        {
+            AppointmentResultSortColumn.Id => service => service.Id,
+            AppointmentResultSortColumn.AppointmentId => service => service.AppointmentId,
+            _ => service => service.Id
+        };
+    }
+
     public async Task UpdateAsync(AppointmentResult appointmentResult, CancellationToken cancellationToken)
     {
         context.Update(appointmentResult);
         await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public Task<AppointmentResult?> GetByAppointmentIdAsync(uint appointmentId, CancellationToken cancellationToken)
+    {
+        return _dbSet.FirstOrDefaultAsync(r => r.AppointmentId == appointmentId, cancellationToken);
+    }
+
+    public async Task<PaginatedCollection<AppointmentResult>> GetPaginatedAsync(uint patientId, AppointmentResultFilter? appointmentResultFilter, int page, int pageSize, CancellationToken cancellationToken)
+    {
+        var set = _dbSet.Include(a => a.Appointment)
+            .Where(a => a.Appointment.PatientId == patientId)
+            .AsQueryable();
+
+        return await FilterAsync(set, appointmentResultFilter, page, pageSize, cancellationToken);
     }
 }

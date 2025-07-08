@@ -8,8 +8,7 @@ public sealed record PatientResponse(
     string LastName,
     string MiddleName,
     string Email,
-    string PhoneNumber,
-    bool IsActive
+    string PhoneNumber
 )
 {
     public static PatientResponse FromPatient(Patient patient)
@@ -20,8 +19,7 @@ public sealed record PatientResponse(
             patient.MiddleName,
             patient.LastName,
             patient.Email,
-            patient.PhoneNumber,
-            patient.IsActive
+            patient.PhoneNumber
         );
     }
 }

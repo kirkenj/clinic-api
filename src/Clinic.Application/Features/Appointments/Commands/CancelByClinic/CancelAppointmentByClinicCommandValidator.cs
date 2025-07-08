@@ -7,6 +7,6 @@ public sealed class CancelAppointmentByClinicCommandValidator
 {
     public CancelAppointmentByClinicCommandValidator()
     {
-        RuleFor(a => a.Id).NotEmpty();
+        RuleFor(a => a.AppointmentId).NotEmpty();
     }
 }

@@ -9,8 +9,7 @@ public sealed class SlotService(IOptions<AppointmentsOptions> options) : ISlotSe
 {
     public IReadOnlyCollection<DatedSlot> GetSlots(DateTime dateTime)
     {
-        dateTime = dateTime.ToUniversalTime();
-        if (!CheckForValidWorkingDay(dateTime))
+        if (!IsWorkingDay(dateTime))
         {
             return [];
         }
@@ -32,7 +31,7 @@ public sealed class SlotService(IOptions<AppointmentsOptions> options) : ISlotSe
     public DatedSlot? GetSlot(DateTime dateTime)
     {
         dateTime = dateTime.ToUniversalTime();
-        if (!CheckForValidWorkingDay(dateTime))
+        if (!(IsWorkingDay(dateTime) && IsWorkingHours(dateTime)))
         {
             return null;
         }
@@ -48,11 +47,15 @@ public sealed class SlotService(IOptions<AppointmentsOptions> options) : ISlotSe
              TimeSpan.FromMinutes(options.Value.TimeSlotSizeMinutes)).ToUniversalTime());
     }
 
-    private bool CheckForValidWorkingDay(DateTime dateTime)
+    private bool IsWorkingDay(DateTime dateTime)
     {
         return dateTime.DayOfWeek >= options.Value.WorkWeekDayStart &&
-               dateTime.DayOfWeek <= options.Value.WorkWeekDayEnd &&
-               dateTime.TimeOfDay >= options.Value.WorkTimeStart &&
+               dateTime.DayOfWeek <= options.Value.WorkWeekDayEnd;
+    }
+
+    private bool IsWorkingHours(DateTime dateTime)
+    {
+        return dateTime.TimeOfDay >= options.Value.WorkTimeStart &&
                dateTime.TimeOfDay <= options.Value.WorkTimeEnd;
     }
 }

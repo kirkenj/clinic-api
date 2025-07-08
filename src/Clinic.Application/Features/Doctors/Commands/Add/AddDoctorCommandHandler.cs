@@ -1,17 +1,13 @@
-﻿using Clinic.Domain.Abstractions;
-using Clinic.Domain.Entities;
-using Clinic.Domain.Errors;
-using Clinic.Domain.Repositories;
+﻿using Clinic.Application.Abstractions;
+using Clinic.Domain.Abstractions;
 using MediatR;
 
 namespace Clinic.Application.Features.Doctors.Commands.Add;
 
 public sealed class AddDoctorCommandHandler
-    (IDoctorRepository doctorRepository,
-        IReceptionistRepository receptionistRepository,
-        ISpecializationRepository specializationRepository,
-        IOfficeRepository officeRepository,
-        AddDoctorCommandValidator validator)
+    (IDoctorService doctorService,
+    IUserAccessService userAccessService,
+    AddDoctorCommandValidator validator)
     : IRequestHandler<AddDoctorCommand, Result>
 {
     public async Task<Result> Handle(AddDoctorCommand request, CancellationToken cancellationToken)
@@ -23,57 +19,15 @@ public sealed class AddDoctorCommandHandler
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        var isPhoneTaken =
-            await receptionistRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
-        if (isPhoneTaken)
+        var userAccessResult = await userAccessService.ValidateUserAccessAsync(
+            [RoleType.Receptionist], cancellationToken);
+        if (userAccessResult.IsFailure)
         {
-            return ReceptionistErrors.PhoneAlreadyTaken(request.PhoneNumber);
+            return userAccessResult.Error;
         }
 
-        isPhoneTaken = await doctorRepository.ExistsByPhoneNumberAsync(request.PhoneNumber, cancellationToken);
-        if (isPhoneTaken)
-        {
-            return DoctorErrors.PhoneAlreadyTaken(request.PhoneNumber);
-        }
-
-        var isEmailTaken = await receptionistRepository.ExistsByEmailAsync(request.Email, cancellationToken);
-        if (isEmailTaken)
-        {
-            return ReceptionistErrors.EmailAlreadyTaken(request.Email);
-        }
-
-        isEmailTaken = await doctorRepository.ExistsByEmailAsync(request.Email, cancellationToken);
-        if (isEmailTaken)
-        {
-            return DoctorErrors.EmailAlreadyTaken(request.Email);
-        }
-
-        var office = await officeRepository.GetByIdAsync(request.OfficeId, cancellationToken);
-        if (office is null)
-        {
-            return OfficeErrors.NotFound(request.OfficeId);
-        }
-
-        if (!office.IsActive)
-        {
-            return OfficeErrors.NotActive(request.OfficeId);
-        }
-
-        var specialization = await specializationRepository.GetByIdAsync(request.SpecializationId, cancellationToken);
-        if (specialization is null)
-        {
-            return SpecializationErrors.NotFound(request.SpecializationId);
-        }
-
-        if (!specialization.IsActive)
-        {
-            return SpecializationErrors.NotActive(request.SpecializationId);
-        }
-
-        var doctor = Doctor.Create(request.FirstName, request.LastName,
-            request.MiddleName, request.Email, request.PhoneNumber,
-            request.SpecializationId, request.OfficeId);
-        await doctorRepository.AddAsync(doctor, cancellationToken);
-        return Result.Success();
+        return await doctorService.AddAsync(request.FirstName, request.MiddleName, request.LastName, 
+            request.Email, request.PhoneNumber, request.OfficeId, request.SpecializationId, 
+            cancellationToken);
     }
 }

@@ -5,7 +5,7 @@ namespace Clinic.Application.Features.Patients.Commands.ResendSignUpOtp;
 
 public class ResendPatientSignUpOtpCommand : IRequest<Result>
 {
-    public string Email { get; private set; } = default!;
+    public string Email { get; set; } = default!;
 
     public void TrimStringProperties()
     {

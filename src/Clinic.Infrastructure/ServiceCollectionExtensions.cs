@@ -2,6 +2,7 @@ using Clinic.Application.Abstractions;
 using Clinic.Domain.Abstractions;
 using Clinic.Infrastructure.Services.DateTimeProvider;
 using Clinic.Infrastructure.Services.EmailService;
+using Clinic.Infrastructure.Services.HttpUserContextService;
 using Clinic.Infrastructure.Services.JwtService;
 using Clinic.Infrastructure.Services.OtpService;
 using Clinic.Infrastructure.Services.SlotService;
@@ -24,6 +25,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IEmailService, SmtpEmailService>();
         services.Configure<OtpServiceOptions>(configuration.GetSection("OtpServiceOptions"));
         services.AddScoped<IOtpService, OtpService>();
+        services.AddHttpContextAccessor();
+        services.AddScoped<IUserAccessService, UserAccessService>();
         var jwtOptionsSections = configuration.GetSection("JwtOptions");
         services.Configure<JwtOptions>(jwtOptionsSections);
         services.AddTransient<IJwtService, JwtService>();

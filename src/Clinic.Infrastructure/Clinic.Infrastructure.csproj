@@ -17,4 +17,8 @@
 		<ProjectReference Include="..\Clinic.Application\Clinic.Application.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Services\MemberAccessService\" />
+	</ItemGroup>
+
 </Project>

@@ -14,6 +14,11 @@ public static class AppointmentErrors
         return new Error("Appointment.NotFound", $"Appointment with id {id} was not found");
     }
 
+    public static Error NotExpectedPatientId()
+    {
+        return new Error("Appointment.NotExpectedPatientId", $"Not expected patient id");
+    }
+
     public static Error DateTimeDoctorTaken(uint doctorId, DateTime dateTime)
     {
         return new Error("Appointment.DateTimeDoctorTaken",

@@ -1,14 +1,13 @@
 ﻿using Clinic.Application.Abstractions;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
-using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Appointments.Commands.ApproveByPatient;
 
 public sealed class ApproveAppointmentByPatientCommandHandler(
-    IAppointmentRepository appointmentRepository,
-    IOtpService otpService,
+    IAppointmentService appointmentService,
+    IUserAccessService userAccessService,
     ApproveAppointmentByPatientCommandValidator validator)
     : IRequestHandler<ApproveAppointmentByPatientCommand, Result>
 {
@@ -16,7 +15,6 @@ public sealed class ApproveAppointmentByPatientCommandHandler(
         CancellationToken cancellationToken)
     {
         request.TrimStringProperties();
-
         var validationResult = validator.Validate(request);
         if (!validationResult.IsValid)
         {
@@ -24,50 +22,28 @@ public sealed class ApproveAppointmentByPatientCommandHandler(
                 (validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        var otpKey = $"ConfirmAppointmentCreationByPatient{request.PatientId}:{request.AppointmentId}";
-        var otpValidationResul = await otpService.CheckOtpAsync(otpKey, request.Otp, cancellationToken);
-        if (otpValidationResul.IsFailure)
+        var userAccessResult = await userAccessService.ValidateUserAccessAsync(
+            [RoleType.Receptionist, RoleType.Patient], cancellationToken);
+        if (userAccessResult.IsFailure)
         {
-            return otpValidationResul.Error;
+            return userAccessResult.Error;
         }
 
-        var appointment = await appointmentRepository.GetByIdAsync
-            (request.AppointmentId, cancellationToken);
-        if (appointment is null)
+        if (userAccessResult.Value.Role == RoleType.Patient)
         {
-            return AppointmentErrors.NotFound(request.AppointmentId);
+            var appointmentResult = await appointmentService.GetByIdAsync(
+                request.AppointmentId, cancellationToken);
+            if (appointmentResult.IsFailure)
+            {
+                return appointmentResult.Error;
+            }
+
+            if (appointmentResult.Value.PatientId != userAccessResult.Value.Id)
+            {
+                return BasicErrors.NoAccess();
+            }
         }
 
-        if (appointment.IsApprovedByUser)
-        {
-            return AppointmentErrors.AppointmentIsApproved(appointment.Id);
-        }
-
-        if (appointment.Status != AppointmentStatus.WaitingUserConfirm)
-        {
-            return AppointmentErrors.InvalidStatus(appointment.Status, AppointmentStatus.WaitingUserConfirm);
-        }
-
-        var isDoctorSlotTaken = await appointmentRepository.ExistsApprovedWithDoctorAndDatetimeAsync
-            (appointment.DoctorId, appointment.DateTimeStart, appointment.DateTimeEnd, cancellationToken);
-        if (isDoctorSlotTaken)
-        {
-            return AppointmentErrors.DateTimeDoctorTaken
-                (appointment.DoctorId, appointment.DateTimeStart);
-        }
-
-        var isPatientSlotTaken = await appointmentRepository.ExistsApprovedWithPatientAndDatetimeAsync
-            (appointment.PatientId, appointment.DateTimeStart, appointment.DateTimeEnd, cancellationToken);
-        if (isPatientSlotTaken)
-        {
-            return AppointmentErrors.DateTimePatientTaken
-                (appointment.PatientId, appointment.DateTimeStart);
-        }
-
-        appointment.Update(appointment.DoctorId, appointment.PatientId, appointment.ServiceId,
-            appointment.DateTimeStart, appointment.DateTimeEnd, true,
-            appointment.IsApprovedByClinic, AppointmentStatus.WaitingClinicConfirm);
-        await appointmentRepository.UpdateAsync(appointment, cancellationToken);
-        return Result.Success();
+        return await appointmentService.ApproveByPatientAsync(request.AppointmentId, request.Otp, cancellationToken);
     }
 }

@@ -8,8 +8,7 @@ public sealed record ReceptionistResponse(
     string LastName,
     string MiddleName,
     string Email,
-    string PhoneNumber,
-    bool IsActive
+    string PhoneNumber
 )
 {
     public static ReceptionistResponse FromReceptionist(Receptionist receptionist)
@@ -20,8 +19,7 @@ public sealed record ReceptionistResponse(
             receptionist.MiddleName,
             receptionist.LastName,
             receptionist.Email,
-            receptionist.PhoneNumber,
-            receptionist.IsActive
+            receptionist.PhoneNumber
         );
     }
 }

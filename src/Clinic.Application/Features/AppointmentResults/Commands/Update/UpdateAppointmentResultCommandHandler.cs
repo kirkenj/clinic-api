@@ -1,4 +1,5 @@
-﻿using Clinic.Domain.Abstractions;
+﻿using Clinic.Application.Abstractions;
+using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
 using MediatR;
@@ -8,7 +9,7 @@ namespace Clinic.Application.Features.AppointmentResults.Commands.Update;
 public sealed class UpdateAppointmentResultCommandHandler(
     IAppointmentResultRepository appointmentResultRepository,
     IAppointmentRepository appointmentRepository,
-    IDateTimeProvider dateTimeProvider,
+    IUserAccessService userAccessService,
     UpdateAppointmentResultCommandValidator validator)
     : IRequestHandler<UpdateAppointmentResultCommand, Result>
 {
@@ -21,34 +22,31 @@ public sealed class UpdateAppointmentResultCommandHandler(
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        var appointmentResult = await appointmentResultRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (appointmentResult is null)
+        var userResult = await userAccessService.ValidateUserAccessAsync(
+            [RoleType.Doctor, RoleType.Receptionist], cancellationToken);
+        if (userResult.IsFailure)
         {
-            return AppointmentResultErrors.NotFound(request.Id);
+            return userResult.Error;
         }
 
-        if (appointmentResult.AppointmentId != request.AppointmentId)
+        if (userResult.Value.Role == RoleType.Doctor)
         {
-            var newAppointment = await appointmentRepository.GetByIdAsync(request.AppointmentId, cancellationToken);
-            if (newAppointment is null)
+            var appointment = await appointmentRepository.GetByIdAsync(request.AppointmentId, cancellationToken);
+            if (appointment is null)
             {
                 return AppointmentErrors.NotFound(request.AppointmentId);
             }
 
-            if (newAppointment.Status != AppointmentStatus.Confirmed)
+            if (userResult.Value.Id != appointment.DoctorId)
             {
-                return AppointmentErrors.InvalidStatus(newAppointment.Status, AppointmentStatus.Confirmed);
+                return BasicErrors.NoAccess();
             }
+        }
 
-            if (newAppointment.DateTimeStart.ToUniversalTime() > dateTimeProvider.UtcNow())
-            {
-                return AppointmentErrors.HasNotTakenPlace(newAppointment.Id);
-            }
-
-            if (await appointmentResultRepository.ExistsByAppointmentIdAsync(request.AppointmentId, cancellationToken))
-            {
-                return AppointmentResultErrors.AppointmentHasResult(request.AppointmentId);
-            }
+        var appointmentResult = await appointmentResultRepository.GetByAppointmentIdAsync(request.AppointmentId, cancellationToken);
+        if (appointmentResult is null)
+        {
+            return AppointmentResultErrors.NotFoundWithAppointmentId(request.AppointmentId);
         }
 
         appointmentResult.Update(request.Complaints, request.Conclusion,

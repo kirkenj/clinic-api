@@ -1,4 +1,6 @@
-﻿namespace Clinic.Application.Tools;
+﻿using Clinic.Domain.Abstractions;
+
+namespace Clinic.Application.Tools;
 
 public static class Constants
 {
@@ -17,4 +19,7 @@ public static class Constants
     public const string SubjectSignIn = "Sign in";
 
     public const string SubjectSignUp = "Sign up";
+
+    public static RoleType[] StaffRoles => [RoleType.Receptionist, RoleType.Doctor];
+    public static RoleType[] AllRoles => Enum.GetValues<RoleType>();
 }
