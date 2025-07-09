@@ -1,4 +1,5 @@
-﻿using Clinic.Application.Extensions;
+﻿using Clinic.Application.Abstractions;
+using Clinic.Application.Extensions;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
@@ -8,7 +9,8 @@ namespace Clinic.Application.Features.Offices.Commands.Update;
 
 public sealed class UpdateOfficeCommandHandler
     (IOfficeRepository officeRepository,
-        UpdateOfficeCommandValidator validator)
+    IUserAccessService userAccessService,
+    UpdateOfficeCommandValidator validator)
     : IRequestHandler<UpdateOfficeCommand, Result>
 {
     public async Task<Result> Handle(UpdateOfficeCommand request, CancellationToken cancellationToken)
@@ -18,6 +20,13 @@ public sealed class UpdateOfficeCommandHandler
         if (!validationResult.IsValid)
         {
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
+
+        var userAccessResult = await userAccessService.ValidateUserAccessAsync(
+            [RoleType.Receptionist], cancellationToken);
+        if (userAccessResult.IsFailure)
+        {
+            return userAccessResult.Error;
         }
 
         var office = await officeRepository.GetByIdAsync(request.Id, cancellationToken);

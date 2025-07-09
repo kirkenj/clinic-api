@@ -1,4 +1,5 @@
-﻿using Clinic.Application.Extensions;
+﻿using Clinic.Application.Abstractions;
+using Clinic.Application.Extensions;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
@@ -8,7 +9,8 @@ namespace Clinic.Application.Features.Specializations.Commands.Update;
 
 public sealed class UpdateSpecializationCommandHandler
     (ISpecializationRepository specializationRepository,
-        UpdateSpecializationCommandValidator validator)
+    IUserAccessService userAccessService,
+    UpdateSpecializationCommandValidator validator)
     : IRequestHandler<UpdateSpecializationCommand, Result>
 {
     public async Task<Result> Handle(UpdateSpecializationCommand request, CancellationToken cancellationToken)
@@ -18,6 +20,13 @@ public sealed class UpdateSpecializationCommandHandler
         if (!validationResult.IsValid)
         {
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
+
+        var userAccessResult = await userAccessService.ValidateUserAccessAsync(
+            [RoleType.Receptionist], cancellationToken);
+        if (userAccessResult.IsFailure)
+        {
+            return userAccessResult.Error;
         }
 
         var specialization = await specializationRepository.GetByIdAsync(request.Id, cancellationToken);
