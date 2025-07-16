@@ -57,22 +57,22 @@ public sealed class PatientRepository(ClinnicContext context) : IPatientReposito
 
             if (!string.IsNullOrEmpty(patientFilter.Email))
             {
-                set = set.Where(s => s.Email.Contains(patientFilter.Email));
+                set = set.Where(x => EF.Functions.ILike(x.Email, $"%{patientFilter.Email}%"));
             }
 
             if (!string.IsNullOrEmpty(patientFilter.MiddleName))
             {
-                set = set.Where(s => s.MiddleName.Contains(patientFilter.MiddleName));
+                set = set.Where(x => EF.Functions.ILike(x.MiddleName, $"%{patientFilter.MiddleName}%"));
             }
 
             if (!string.IsNullOrEmpty(patientFilter.LastName))
             {
-                set = set.Where(s => s.LastName.Contains(patientFilter.LastName));
+                set = set.Where(x => EF.Functions.ILike(x.LastName, $"%{patientFilter.LastName}%"));
             }
 
             if (!string.IsNullOrEmpty(patientFilter.FirstName))
             {
-                set = set.Where(s => s.FirstName.Contains(patientFilter.FirstName));
+                set = set.Where(x => EF.Functions.ILike(x.FirstName, $"%{patientFilter.FirstName}%"));
             }
 
             if (!string.IsNullOrEmpty(patientFilter.PhoneNumber))

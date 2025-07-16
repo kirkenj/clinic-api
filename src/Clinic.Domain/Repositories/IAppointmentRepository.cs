@@ -10,10 +10,16 @@ public interface IAppointmentRepository
     public Task<PaginatedCollection<Appointment>> GetPaginatedAsync(AppointmentFilter? appointmentFilter,
         int page, int pageSize, CancellationToken cancellationToken);
 
+    public Task<IEnumerable<Appointment>> GetAppointmentsToOutdate(DateTime dateTime, CancellationToken cancellationToken);
+
     public Task AddAsync(Appointment appointment, CancellationToken cancellationToken);
     public Task UpdateAsync(Appointment appointment, CancellationToken cancellationToken);
     public Task DeleteAsync(Appointment appointment, CancellationToken cancellationToken);
+    public Task UpdateRangeAsync(IEnumerable<Appointment> appointments, CancellationToken cancellationToken);
 
+    public Task<IEnumerable<Appointment>> GetAppointmentsOnTime(DateTime dateTime, uint doctorId, 
+        IEnumerable<AppointmentStatus> statuses, CancellationToken cancellationToken);
+    
     public Task<bool> ExistsApprovedWithPatientAndDatetimeAsync(uint patientId, DateTime dateTimeStart,
         DateTime dateTimeEnd, CancellationToken cancellationToken);
 

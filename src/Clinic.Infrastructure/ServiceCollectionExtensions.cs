@@ -1,5 +1,6 @@
 using Clinic.Application.Abstractions;
 using Clinic.Domain.Abstractions;
+using Clinic.Infrastructure.Jobs;
 using Clinic.Infrastructure.Services.DateTimeProvider;
 using Clinic.Infrastructure.Services.EmailService;
 using Clinic.Infrastructure.Services.HttpUserContextService;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Quartz;
 using System.Text;
 
 namespace Clinic.Infrastructure;
@@ -55,6 +57,22 @@ public static class ServiceCollectionExtensions
                 };
             });
 
+        services.AddQuartz(q =>
+        {
+            var jobKey = new JobKey("CancelUnconfirmedAppointmentsJob");
+            q.AddJob<CancelUnconfirmedAppointmentsJob>(opts => opts.WithIdentity(jobKey));
+
+            q.AddTrigger(opts => opts
+                .ForJob(jobKey)
+                .WithIdentity("CancelUnconfirmedAppointments-Trigger")
+                .WithSimpleSchedule(x => x
+                    .WithIntervalInMinutes(30)
+                    .RepeatForever()) 
+                .StartNow() 
+            );
+        });
+
+        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
         return services;
     }
 }

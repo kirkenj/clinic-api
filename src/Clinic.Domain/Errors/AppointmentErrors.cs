@@ -4,6 +4,11 @@ namespace Clinic.Domain.Errors;
 
 public static class AppointmentErrors
 {
+    public static Error AppointmentOutdated(uint appointmentID)
+    {
+        return new Error("Appointment.AppointmentOutdated", $"Appointment {appointmentID} is outdated");
+    }
+
     public static Error InvalidDate(DateTime date)
     {
         return new Error("Appointment.InvalidDate", $"Date {date} is not valid");

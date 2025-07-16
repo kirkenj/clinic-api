@@ -26,7 +26,7 @@ public sealed class PatientAddAppointmentCommandHandler(
             return Result.Failure<string>(userAccessResult.Error);
         }
 
-        return await appointmentService.AddByPatient(userAccessResult.Value.Id, request.DoctorId, 
+        return await appointmentService.Add(userAccessResult.Value.Id, request.DoctorId, 
             request.ServiceId, request.DateTime, cancellationToken);
     }
 }

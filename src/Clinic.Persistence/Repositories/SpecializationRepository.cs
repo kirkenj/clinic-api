@@ -27,7 +27,7 @@ public class SpecializationRepository(ClinnicContext context) : ISpecializationR
 
             if (!string.IsNullOrEmpty(filter.Name))
             {
-                set = set.Where(s => s.Name.Contains(filter.Name));
+                set = set.Where(x => EF.Functions.ILike(x.Name, $"%{filter.Name}%"));
             }
 
             set = filter.OrderDescending

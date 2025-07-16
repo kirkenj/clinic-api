@@ -16,8 +16,8 @@ public sealed record PatientResponse(
         return new PatientResponse(
             patient.Id,
             patient.FirstName,
-            patient.MiddleName,
             patient.LastName,
+            patient.MiddleName,
             patient.Email,
             patient.PhoneNumber
         );

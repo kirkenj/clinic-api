@@ -5,9 +5,9 @@ using Clinic.Domain.Filters;
 namespace Clinic.Application.Abstractions;
 public interface IAppointmentService
 {
-    public Task<Result<string>> AddByPatient(uint patientId, uint doctorId, uint serviceId,
+    public Task<Result<string>> Add(uint patientId, uint doctorId, uint serviceId,
         DateTime dateTime, CancellationToken cancellationToken);
-    public Task<Result> ApproveAppointmentCancellationByPatient(uint appointmentId, string otp,
+    public Task<Result> ApproveCancellationByPatient(uint appointmentId, string otp,
         CancellationToken cancellationToken);
     public Task<Result> ApproveByClinicAsync(uint appointmentId, CancellationToken cancellationToken);
     public Task<Result> ApproveByPatientAsync(uint appointmentId, string otp, CancellationToken cancellationToken);

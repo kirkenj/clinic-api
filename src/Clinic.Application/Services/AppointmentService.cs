@@ -20,7 +20,7 @@ public class AppointmentService
     IDateTimeProvider dateTimeProvider)
     : IAppointmentService
 {
-    public async Task<Result<string>> AddByPatient(uint patientId, uint doctorId, uint serviceId,
+    public async Task<Result<string>> Add(uint patientId, uint doctorId, uint serviceId,
         DateTime dateTime, CancellationToken cancellationToken)
     {
         var slot = slotService.GetSlot(dateTime.ToUniversalTime());
@@ -65,6 +65,22 @@ public class AppointmentService
             return Result.Failure<string>(PatientErrors.NotActive(doctorId));
         }
 
+        var isDoctorSlotTaken = await appointmentRepository.ExistsApprovedWithDoctorAndDatetimeAsync
+            (doctorId, slot.SlotStart, slot.SlotEnd, cancellationToken);
+        if (isDoctorSlotTaken)
+        {
+            return Result.Failure<string>(AppointmentErrors.DateTimeDoctorTaken
+                (doctorId, slot.SlotStart));
+        }
+
+        var isPatientSlotTaken = await appointmentRepository.ExistsApprovedWithPatientAndDatetimeAsync
+            (patientId, slot.SlotStart, slot.SlotEnd, cancellationToken);
+        if (isPatientSlotTaken)
+        {
+            return Result.Failure<string>(AppointmentErrors.DateTimePatientTaken
+                (patientId, slot.SlotStart));
+        }
+
         var service = await serviceRepository
             .GetByIdAsync(serviceId, cancellationToken);
         if (service is null)
@@ -75,21 +91,6 @@ public class AppointmentService
         if (!service.IsActive)
         {
             return Result.Failure<string>(ServiceErrors.NotActive(serviceId));
-        }
-
-        var isDoctorSlotTaken = await appointmentRepository.ExistsApprovedWithDoctorAndDatetimeAsync
-            (doctorId, slot.SlotStart, slot.SlotEnd, cancellationToken);
-        if (isDoctorSlotTaken)
-        {
-            return Result.Failure<string>(AppointmentErrors.DateTimeDoctorTaken(doctorId, dateTime));
-        }
-
-        var isPatientSlotTaken = await appointmentRepository.ExistsApprovedWithPatientAndDatetimeAsync
-            (patientId, slot.SlotStart, slot.SlotEnd, cancellationToken);
-        if (isPatientSlotTaken)
-        {
-            return Result.Failure<string>(AppointmentErrors
-                .DateTimePatientTaken(patientId, dateTime));
         }
 
         var appointment = Appointment.Create(doctorId, patientId, serviceId,
@@ -111,7 +112,7 @@ public class AppointmentService
 
     }
 
-    public async Task<Result> ApproveAppointmentCancellationByPatient(uint appointmentId, string otp, CancellationToken cancellationToken)
+    public async Task<Result> ApproveCancellationByPatient(uint appointmentId, string otp, CancellationToken cancellationToken)
     {
         otp = otp.Trim();
         ArgumentNullException.ThrowIfNullOrWhiteSpace(otp);
@@ -126,6 +127,11 @@ public class AppointmentService
         if (appointment.Status != AppointmentStatus.Confirmed)
         {
             return AppointmentErrors.InvalidStatus(appointment.Status, AppointmentStatus.Confirmed);
+        }
+
+        if (appointment.DateTimeStart <= dateTimeProvider.UtcNow())
+        {
+            return AppointmentErrors.AppointmentOutdated(appointment.Id);
         }
 
         var otpKey = $"ConfirmAppointmentCancellationByPatient{appointment.PatientId}:{appointment.Id}";
@@ -165,7 +171,6 @@ public class AppointmentService
                 patient.LastName, appointment.DateTimeStart),
             cancellationToken);
         return Result.Success();
-
     }
 
     public async Task<Result> ApproveByClinicAsync(uint appointmentId, CancellationToken cancellationToken)
@@ -174,6 +179,11 @@ public class AppointmentService
         if (appointment is null)
         {
             return AppointmentErrors.NotFound(appointmentId);
+        }
+
+        if (appointment.DateTimeStart <= dateTimeProvider.UtcNow())
+        {
+            return AppointmentErrors.AppointmentOutdated(appointment.Id);
         }
 
         if (appointment.Status != AppointmentStatus.WaitingClinicConfirm)
@@ -250,7 +260,37 @@ public class AppointmentService
         appointment.Update(appointment.DoctorId, appointment.PatientId, appointment.ServiceId,
             appointment.DateTimeStart, appointment.DateTimeEnd, appointment.IsApprovedByUser,
             true, AppointmentStatus.Confirmed);
+        
         await appointmentRepository.UpdateAsync(appointment, cancellationToken);
+
+        var appointmentsOnSlot = await appointmentRepository.GetAppointmentsOnTime(appointment.DateTimeStart, 
+            appointment.DoctorId, [AppointmentStatus.WaitingClinicConfirm, AppointmentStatus.WaitingUserConfirm], 
+            cancellationToken);
+
+        var appointmentsToCancel = appointmentsOnSlot.Where(a => a.Id != appointment.Id);
+        foreach (var appointmentToCancel in appointmentsToCancel)
+        {
+            appointmentToCancel.Update(
+                    appointmentToCancel.DoctorId,
+                    appointmentToCancel.PatientId,
+                    appointmentToCancel.ServiceId,
+                    appointmentToCancel.DateTimeStart,
+                    appointmentToCancel.DateTimeEnd,
+                    appointmentToCancel.IsApprovedByUser,
+                    false,
+                    AppointmentStatus.CancelledByClinic
+                );
+        }
+
+        await appointmentRepository.UpdateRangeAsync(appointmentsToCancel, cancellationToken);
+        
+        var cancelNotificationTask = Task.WhenAll(appointmentsToCancel.Select(a => 
+            emailService.SendAsync(doctor.Email, Constants.SubjectAppointmentCancelled,
+                EmailBodyBuilder.BuildCancelledAppointmentContent(service.Name,
+                    doctor.FirstName,
+                    doctor.LastName, appointment.DateTimeStart),
+                cancellationToken)));
+
         await Task.WhenAll(
             emailService.SendAsync(patient.Email, "Appointment approved",
                 $"Your appointment for '{service.Name}'({service.Price}) at {appointment.DateTimeStart} has been approved",
@@ -259,7 +299,8 @@ public class AppointmentService
                 Constants.SubjectNewAppointment,
                 EmailBodyBuilder.BuildNewAppointmentForDoctorContent(service.Name, patient.FirstName, patient.LastName,
                     appointment.DateTimeStart),
-                cancellationToken));
+                cancellationToken),
+            cancelNotificationTask);
         return Result.Success();
     }
 
@@ -273,6 +314,11 @@ public class AppointmentService
         if (appointment is null)
         {
             return AppointmentErrors.NotFound(appointmentId);
+        }
+
+        if (appointment.DateTimeStart <= dateTimeProvider.UtcNow())
+        {
+            return AppointmentErrors.AppointmentOutdated(appointment.Id);
         }
 
         if (appointment.IsApprovedByUser)
@@ -328,6 +374,11 @@ public class AppointmentService
             return AppointmentErrors.NotFound(appointmentId);
         }
 
+        if (appointment.DateTimeStart <= dateTimeProvider.UtcNow())
+        {
+            return AppointmentErrors.AppointmentOutdated(appointment.Id);
+        }
+
         if (appointment.Status is not (
             AppointmentStatus.Confirmed or
             AppointmentStatus.WaitingClinicConfirm or
@@ -380,6 +431,11 @@ public class AppointmentService
         if (appointment == null)
         {
             return Result.Failure<string>(AppointmentErrors.NotFound(appointmentId));
+        }
+
+        if (appointment.DateTimeStart <= dateTimeProvider.UtcNow())
+        {
+            return Result.Failure<string>(AppointmentErrors.AppointmentOutdated(appointment.Id));
         }
 
         if (appointment.Status is AppointmentStatus.WaitingUserConfirm or AppointmentStatus.WaitingClinicConfirm)
@@ -507,6 +563,11 @@ public class AppointmentService
             return AppointmentErrors.NotFound(appointmentId);
         }
 
+        if (oldAppointment.DateTimeStart <= dateTimeProvider.UtcNow())
+        {
+            return Result.Failure<string>(AppointmentErrors.AppointmentOutdated(oldAppointment.Id));
+        }
+        
         if (!oldAppointment.IsApprovedByUser)
         {
             return AppointmentErrors.AppointmentIsNotApprovedByUser(oldAppointment.Id);
@@ -604,6 +665,11 @@ public class AppointmentService
         if (appointment is null)
         {
             return AppointmentErrors.NotFound(appointmentId);
+        }
+
+        if (appointment.DateTimeStart <= dateTimeProvider.UtcNow())
+        {
+            return Result.Failure<string>(AppointmentErrors.AppointmentOutdated(appointment.Id));
         }
 
         if (appointment.Status != AppointmentStatus.WaitingUserConfirm)

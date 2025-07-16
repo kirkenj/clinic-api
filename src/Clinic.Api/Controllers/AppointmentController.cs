@@ -1,13 +1,16 @@
 ﻿using Clinic.Application.Features.AppointmentResults.Queries.GetPaginated;
+using Clinic.Application.Features.Appointments.Commands.Add.Patient;
 using Clinic.Application.Features.Appointments.Commands.Add.Staff;
 using Clinic.Application.Features.Appointments.Commands.ApproveByClinic;
 using Clinic.Application.Features.Appointments.Commands.ApproveByPatient;
+using Clinic.Application.Features.Appointments.Commands.ApproveCancellationByPatient;
 using Clinic.Application.Features.Appointments.Commands.CancelByClinic;
 using Clinic.Application.Features.Appointments.Commands.CancelByPatient;
 using Clinic.Application.Features.Appointments.Commands.RescheduleByClinic;
 using Clinic.Application.Features.Appointments.Commands.SendOtpToCreateAppointment;
 using Clinic.Application.Features.Appointments.Queries.Get.Staff;
 using Clinic.Application.Features.Appointments.Queries.GetAvailableSlots.cs;
+using Clinic.Application.Features.Appointments.Queries.GetPaginated.Patient;
 using Clinic.Application.Features.Appointments.Queries.GetPaginated.Staff;
 using Clinic.Application.Options;
 using Clinic.Domain.Filters;
@@ -56,7 +59,7 @@ public sealed class AppointmentController
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
-    [Authorize(Roles = "Receptionist,Doctor")]
+    [Authorize(Roles = "Receptionist")]
     [HttpPost]
     public async Task<IActionResult> AddAppointmentAsync([FromBody][Required] StaffAddAppointmentCommand request)
     {
@@ -64,8 +67,39 @@ public sealed class AppointmentController
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
+    [Authorize(Roles ="Patient")]
+    [HttpPost("as-patient")]
+    public async Task<IActionResult>AddAppointment(PatientAddAppointmentCommand request)
+    {
+        var result = await mediator.Send(request, HttpContext.RequestAborted);
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
+    }
+
+    [Authorize(Roles = "Patient")]
+    [HttpGet("as-patient")]
+    public async Task<IActionResult> GetPaginatedAppointmentsAsPatientAsync([FromQuery] PatientAppointmentFilter? filter,
+        [FromQuery][Required] int page, [FromQuery][Required] int pageSize)
+    {
+        var result = await mediator.Send(new PatientGetPaginatedAppointmentsRequest
+        {
+            AppointmentFilter = filter,
+            Page = page,
+            PageSize = pageSize
+        },
+            HttpContext.RequestAborted);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+    }
+
+    [Authorize(Roles = "Patient")]
+    [HttpGet("as-patient/{id}")]
+    public async Task<IActionResult> GetAppointmentAsPatientAsync([FromRoute][Required] uint id)
+    {
+        var result = await mediator.Send(new GetAppointmentQuery { Id = id }, HttpContext.RequestAborted);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+    }
+
     [Authorize(Roles = "Receptionist,Patient")]
-    [HttpPost("send-otp-to-confirm-appointment")]
+    [HttpPost("send-otp-to-confirm-appointment-by-patient")]
     public async Task<IActionResult> SendOtpToConfirmAppointment(SendOtpToCreateAppointmentRequest request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
@@ -102,7 +136,7 @@ public sealed class AppointmentController
     [Authorize(Roles = "Receptionist,Patient")]
     [HttpPost("approve-cancellation-by-patient")]
     public async Task<IActionResult> ApproveCancelationByPatient
-        ([FromBody][Required] CancelAppointmentByPatientCommand request)
+        ([FromBody][Required] ApproveAppointmentCancellationByPatientCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);

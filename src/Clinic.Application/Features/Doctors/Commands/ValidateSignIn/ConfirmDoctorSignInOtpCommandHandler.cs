@@ -19,6 +19,6 @@ public sealed class ConfirmDoctorSignInOtpCommandHandler
                 validationResult.Errors.Select(e => e.ErrorMessage)));
         }
 
-        return await doctorService.ValidateSignInAsync(request.Email, request.Email, cancellationToken);
+        return await doctorService.ValidateSignInAsync(request.Email, request.Otp, cancellationToken);
     }
 }

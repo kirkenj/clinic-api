@@ -28,8 +28,12 @@ public sealed class GetAppointmentQueryHandler
             return Result.Failure<AppointmentResponse>(appointmentResult.Error);
         }
 
-        return appointmentResult.Value.PatientId == userAccessResult.Value.Id 
-            ? appointmentResult
-            : Result.Failure<AppointmentResponse>(BasicErrors.NoAccess());
+        if (userAccessResult.Value.Role == RoleType.Patient &&
+            userAccessResult.Value.Id != appointmentResult.Value.PatientId)
+        {
+            return Result.Failure<AppointmentResponse>(BasicErrors.NoAccess());
+        }
+
+        return appointmentResult;
     }
 }

@@ -15,7 +15,7 @@ namespace Clinic.Api.Controllers;
 [ApiController]
 public sealed class AppointmentResultController(IMediator mediator) : ControllerBase
 {
-    [Authorize(Roles = "Receptionist,Doctor")]
+    [Authorize(Roles = "Receptionist,Doctor,Patient")]
     [HttpGet("paged")]
     public async Task<IActionResult> GetPaginatedAppointmentResultsAsync([FromQuery] AppointmentResultFilter? appointmentResultFilter,
     [FromQuery][Required] int page, [FromQuery][Required] int pageSize)
@@ -30,7 +30,7 @@ public sealed class AppointmentResultController(IMediator mediator) : Controller
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
-    [Authorize(Roles = "Receptionist,Doctor")]
+    [Authorize(Roles = "Receptionist,Doctor,Patient")]
     [HttpGet("{appointmentId}")]
     public async Task<IActionResult> GetAppointmentResultAsync([FromRoute][Required] uint appointmentId)
     {
@@ -38,7 +38,7 @@ public sealed class AppointmentResultController(IMediator mediator) : Controller
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
-    [Authorize(Roles = "Receptionist")]
+    [Authorize(Roles = "Receptionist,Doctor")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAppointmentResultAsync([FromRoute][Required] uint id)
     {
@@ -46,7 +46,7 @@ public sealed class AppointmentResultController(IMediator mediator) : Controller
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
-    [Authorize(Roles = "Receptionist")]
+    [Authorize(Roles = "Receptionist,Doctor")]
     [HttpPost]
     public async Task<IActionResult> AddAppointmentResultAsync([FromBody][Required] AddAppointmentResultCommand request)
     {
@@ -54,7 +54,7 @@ public sealed class AppointmentResultController(IMediator mediator) : Controller
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
-    [Authorize(Roles = "Receptionist")]
+    [Authorize(Roles = "Receptionist,Doctor")]
     [HttpPut]
     public async Task<IActionResult> UpdateAppointmentResultAsync([FromBody][Required] UpdateAppointmentResultCommand request)
     {

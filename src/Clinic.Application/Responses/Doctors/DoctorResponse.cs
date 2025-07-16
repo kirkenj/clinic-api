@@ -18,12 +18,12 @@ public sealed record DoctorResponse(
         return new DoctorResponse(
             doctor.Id,
             doctor.FirstName,
-            doctor.MiddleName,
             doctor.LastName,
+            doctor.MiddleName,
             doctor.Email,
             doctor.PhoneNumber,
-            doctor.OfficeId,
-            doctor.SpecializationId
+            doctor.SpecializationId,
+            doctor.OfficeId
         );
     }
 }

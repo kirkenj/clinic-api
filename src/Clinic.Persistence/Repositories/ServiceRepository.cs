@@ -25,7 +25,7 @@ public sealed class ServiceRepository(ClinnicContext context) : IServiceReposito
 
             if (!string.IsNullOrEmpty(serviceFilter.Name))
             {
-                set = set.Where(s => s.Name.Contains(serviceFilter.Name));
+                set = set.Where(x => EF.Functions.ILike(x.Name, $"%{serviceFilter.Name}%"));
             }
 
             if (serviceFilter.PriceStart.HasValue)

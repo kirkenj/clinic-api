@@ -66,29 +66,6 @@ public sealed class PatientAuthController(IMediator mediator) : ControllerBase
     }
 
     [Authorize(Roles = "Patient")]
-    [HttpGet("Appointments")]
-    public async Task<IActionResult> GetPaginatedAppointmentsAsync([FromQuery] PatientAppointmentFilter? filter,
-        [FromQuery][Required] int page, [FromQuery][Required] int pageSize)
-    {
-        var result = await mediator.Send(new PatientGetPaginatedAppointmentsRequest
-        {
-            AppointmentFilter = filter,
-            Page = page,
-            PageSize = pageSize
-        },
-            HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
-    }
-
-    [Authorize(Roles = "Patient")]
-    [HttpGet("Appointments/{id}")]
-    public async Task<IActionResult> GetAppointmentAsync([FromRoute][Required] uint id)
-    {
-        var result = await mediator.Send(new GetAppointmentQuery { Id = id }, HttpContext.RequestAborted);
-        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
-    }
-
-    [Authorize(Roles = "Patient")]
     [HttpGet("Me")]
     public async Task<IActionResult> GetPatientAsync()
     {

@@ -17,6 +17,21 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
         return await _dbSet.FindAsync([id], cancellationToken);
     }
 
+    public async Task<IEnumerable<Appointment>> GetAppointmentsToOutdate(DateTime dateTime, CancellationToken cancellationToken)
+    {
+        return await _dbSet.Where(a => a.DateTimeStart <= dateTime &&
+        (a.Status == AppointmentStatus.WaitingUserConfirm || a.Status == AppointmentStatus.WaitingClinicConfirm))
+            .ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Appointment>> GetAppointmentsOnTime(DateTime dateTime, uint doctorId,
+        IEnumerable<AppointmentStatus> statuses, CancellationToken cancellationToken)
+    {
+        return await _dbSet.Where(a => a.DoctorId == doctorId &&
+        statuses.Contains(a.Status) &&
+        (a.DateTimeStart <= dateTime && a.DateTimeEnd >= dateTime)).ToListAsync(cancellationToken);
+    }
+
     public async Task<PaginatedCollection<Appointment>> GetPaginatedAsync(AppointmentFilter? appointmentFilter,
         int page, int pageSize, CancellationToken cancellationToken)
     {
@@ -121,6 +136,12 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
     public Task UpdateAsync(Appointment appointment, CancellationToken cancellationToken)
     {
         context.Update(appointment);
+        return context.SaveChangesAsync(cancellationToken);
+    }
+
+    public Task UpdateRangeAsync(IEnumerable<Appointment> appointments, CancellationToken cancellationToken)
+    {
+        context.UpdateRange(appointments);
         return context.SaveChangesAsync(cancellationToken);
     }
 

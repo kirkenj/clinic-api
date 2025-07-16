@@ -31,7 +31,7 @@ public class UserAccessService(
         }
 
         var idClaim = contextUser.FindFirst(t => t.Type.Equals(ClaimTypes.NameIdentifier));
-        if (!uint.TryParse(roleClaim?.Value, out var id))
+        if (!uint.TryParse(idClaim?.Value, out var id))
         {
             return Result.Failure<ValueTuple<uint, RoleType>>(BasicErrors.InvalidToken());
         }

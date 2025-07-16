@@ -23,7 +23,7 @@ public sealed class ApproveAppointmentCancellationByPatientCommandHandler(
         }
 
         var userAccessResult = await userAccessService.ValidateUserAccessAsync(
-            [RoleType.Patient, RoleType.Patient], cancellationToken);
+            [RoleType.Patient, RoleType.Receptionist], cancellationToken);
         if (userAccessResult.IsFailure)
         {
             return userAccessResult.Error;
@@ -44,7 +44,7 @@ public sealed class ApproveAppointmentCancellationByPatientCommandHandler(
             }
         }
 
-        return await appointmentService.ApproveAppointmentCancellationByPatient(
+        return await appointmentService.ApproveCancellationByPatient(
             request.AppointmentId, request.Otp, cancellationToken);
     }
 }
