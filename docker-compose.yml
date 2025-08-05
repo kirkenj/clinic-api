@@ -1,0 +1,72 @@
+version: '3.8'
+
+x-frontend-defaults: &frontend-defaults
+  restart: unless-stopped
+  depends_on:
+    - api
+  environment:
+    - REACT_APP_API_URL=${REACT_APP_API_URL}
+
+
+services:
+  database:
+    image: bitnami/postgresql:latest
+    container_name: my_app_database
+    user: root 
+    environment:
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_DATABASE=InnoDb
+      - POSTGRESQL_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postge-2:/bitnami/postgresql
+
+  api:
+    image: kirkenj/api:latest
+    container_name: my_app_api
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - SmtpEmailServiceOptions__ApiAddress=smtp.mail.ru
+      - SmtpEmailServiceOptions__ApiPort=465
+      - SmtpEmailServiceOptions__FromName=Inno-Clinic
+      - SmtpEmailServiceOptions__ApiLogin=${SMTP_LOGIN}
+      - SmtpEmailServiceOptions__ApiPassword=${SMTP_PASSWORD}
+      
+      - JwtOptions__Audience=${JWT_AUDIENCE}
+      - JwtOptions__DurationInMinutes=${JWT_DURATION_MINUTES}
+      - JwtOptions__Issuer=${JWT_ISSUER}
+      - JwtOptions__Key=${JWT_KEY}
+      - JwtOptions__SecurityAlgorithm=${JWT_SECURITY_ALGORITHM}
+      
+      - ConnectionStrings__ClinicConnection=Host=database;Port=5432;Database=InnoDb;User Id=postgres;Password=${POSTGRES_PASSWORD};
+    depends_on:
+      - database
+
+  frontend_admin:
+    <<: *frontend-defaults
+    image: kirkenj/front/admin:latest
+    container_name: my_app_frontend_admin
+    ports:
+      - "3000:80"
+
+  frontend_doctor:
+    <<: *frontend-defaults
+    image: kirkenj/front/doctor:latest
+    container_name: my_app_frontend_doctor
+    ports:
+      - "3001:80"
+
+  frontend_patient:
+    <<: *frontend-defaults
+    image: kirkenj/front/patient:latest
+    container_name: my_app_frontend_patient
+    ports:
+      - "3002:80"
+
+
+volumes:
+  postge-2:
+    external: true
