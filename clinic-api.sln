@@ -13,8 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clinic.Domain", "src\Clinic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clinic.Persistence", "src\Clinic.Persistence\Clinic.Persistence.csproj", "{748D588F-A09E-8823-6A72-98A4D87201B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clinic.Shared", "src\Clinic.Shared\Clinic.Shared.csproj", "{E3A8F9CC-B032-B913-C05D-4EFB4D84503C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,10 +39,6 @@ Global
 		{748D588F-A09E-8823-6A72-98A4D87201B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{748D588F-A09E-8823-6A72-98A4D87201B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{748D588F-A09E-8823-6A72-98A4D87201B1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E3A8F9CC-B032-B913-C05D-4EFB4D84503C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E3A8F9CC-B032-B913-C05D-4EFB4D84503C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E3A8F9CC-B032-B913-C05D-4EFB4D84503C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E3A8F9CC-B032-B913-C05D-4EFB4D84503C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,10 +8,13 @@ using Clinic.Infrastructure.Services.JwtService;
 using Clinic.Infrastructure.Services.OtpService;
 using Clinic.Infrastructure.Services.SlotService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Quartz;
+using Serilog;
+using Serilog.Sinks.Elasticsearch;
 using System.Text;
 
 namespace Clinic.Infrastructure;
@@ -19,7 +22,8 @@ namespace Clinic.Infrastructure;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection RegisterInfrastructureServices(this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ConfigureHostBuilder host)
     {
         services.AddTransient<ISlotService, SlotService>();
         services.AddTransient<IDateTimeProvider, DateTimeProvider>();
@@ -67,12 +71,34 @@ public static class ServiceCollectionExtensions
                 .WithIdentity("CancelUnconfirmedAppointments-Trigger")
                 .WithSimpleSchedule(x => x
                     .WithIntervalInMinutes(30)
-                    .RepeatForever()) 
-                .StartNow() 
+                    .RepeatForever())
+                .StartNow()
             );
         });
 
         services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+        var elasticUrl = new Uri(configuration.GetConnectionString("ElasticURL") ??
+            throw new Exception("Couldn't get ElasticURL"));
+
+        Console.WriteLine($"ELASTIC URL: {elasticUrl}");
+
+
+        Log.Logger = new LoggerConfiguration()
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+            .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(elasticUrl)
+            {
+                AutoRegisterTemplate = true,
+                AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv8,
+                IndexFormat = "app-logs-{0:yyyy.MM.dd}"
+            })
+            .CreateLogger();
+        
+        Serilog.Debugging.SelfLog.Enable(msg => Console.WriteLine(msg));
+        
+        host.UseSerilog();
+
         return services;
     }
 }

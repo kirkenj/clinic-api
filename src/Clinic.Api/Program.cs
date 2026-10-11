@@ -34,7 +34,7 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.RegisterApplicationServices(configuration);
 builder.Services.RegisterPersistenceServices(configuration);
-builder.Services.RegisterInfrastructureServices(configuration);
+builder.Services.RegisterInfrastructureServices(configuration, builder.Host);
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

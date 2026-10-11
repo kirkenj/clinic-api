@@ -1,5 +1,3 @@
-version: '3.8'
-
 x-frontend-defaults: &frontend-defaults
   restart: unless-stopped
   depends_on:
@@ -23,7 +21,7 @@ services:
       - postge-2:/bitnami/postgresql
 
   api:
-    image: kirkenj/api:latest
+    image: kirkenj/clinic-api:latest
     container_name: my_app_api
     ports:
       - "8080:8080"
@@ -42,8 +40,12 @@ services:
       - JwtOptions__SecurityAlgorithm=${JWT_SECURITY_ALGORITHM}
       
       - ConnectionStrings__ClinicConnection=Host=database;Port=5432;Database=InnoDb;User Id=postgres;Password=${POSTGRES_PASSWORD};
+      - ConnectionStrings__ElasticURL=http://elasticsearch:9200
     depends_on:
-      - database
+      database:
+        condition: service_started
+      elasticsearch:
+        condition: service_healthy
 
   frontend_admin:
     <<: *frontend-defaults
@@ -66,7 +68,37 @@ services:
     ports:
       - "3002:80"
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-s", "-f", "http://localhost:9200/_cluster/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    volumes:
+      - kibana_data:/usr/share/kibana/data
 
 volumes:
   postge-2:
     external: true
+  es_data:                                   
+  kibana_data:                                
