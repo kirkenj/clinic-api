@@ -17,96 +17,112 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
         return await _dbSet.FindAsync([id], cancellationToken);
     }
 
-    public async Task<ICollection<Appointment>> GetAllAsync(CancellationToken cancellationToken,
-        bool includeTracking = false)
+    public async Task<IEnumerable<Appointment>> GetAppointmentsToOutdate(DateTime dateTime, CancellationToken cancellationToken)
     {
-        return includeTracking
-            ? await _dbSet.AsNoTracking().ToListAsync(cancellationToken)
-            : await _dbSet.ToListAsync(cancellationToken);
+        return await _dbSet.Where(a => a.DateTimeStart <= dateTime &&
+        (a.Status == AppointmentStatus.WaitingUserConfirm || a.Status == AppointmentStatus.WaitingClinicConfirm))
+            .ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Appointment>> GetAppointmentsOnTime(DateTime dateTime, uint doctorId,
+        IEnumerable<AppointmentStatus> statuses, CancellationToken cancellationToken)
+    {
+        return await _dbSet.Where(a => a.DoctorId == doctorId &&
+        statuses.Contains(a.Status) &&
+        (a.DateTimeStart <= dateTime && a.DateTimeEnd >= dateTime)).ToListAsync(cancellationToken);
     }
 
     public async Task<PaginatedCollection<Appointment>> GetPaginatedAsync(AppointmentFilter? appointmentFilter,
         int page, int pageSize, CancellationToken cancellationToken)
     {
-        var set = _dbSet.AsQueryable();
+        var filter = _dbSet.AsQueryable();
         if (appointmentFilter is not null)
         {
             if (appointmentFilter.Ids is not null && appointmentFilter.Ids.Count != 0)
             {
-                set = set.Where(o => appointmentFilter.Ids.Contains(o.Id));
+                filter = filter.Where(a => appointmentFilter.Ids.Contains(a.Id));
             }
 
             if (appointmentFilter.DoctorIds is not null && appointmentFilter.DoctorIds.Count != 0)
             {
-                set = set.Where(o => appointmentFilter.DoctorIds.Contains(o.DoctorId));
+                filter = filter.Where(a => appointmentFilter.DoctorIds.Contains(a.DoctorId));
             }
 
             if (appointmentFilter.PatientIds is not null && appointmentFilter.PatientIds.Count != 0)
             {
-                set = set.Where(o => appointmentFilter.PatientIds.Contains(o.PatientId));
+                filter = filter.Where(a => appointmentFilter.PatientIds.Contains(a.PatientId));
             }
 
             if (appointmentFilter.ServiceIds is not null && appointmentFilter.ServiceIds.Count != 0)
             {
-                set = set.Where(o => appointmentFilter.ServiceIds.Contains(o.ServiceId));
+                filter = filter.Where(a => appointmentFilter.ServiceIds.Contains(a.ServiceId));
             }
 
             if (appointmentFilter.DateTimeStart is not null)
             {
-                set = set.Where(o => o.DateTimeStart >= appointmentFilter.DateTimeStart);
+                filter = filter.Where(a => a.DateTimeStart >= appointmentFilter.DateTimeStart);
             }
 
             if (appointmentFilter.DateTimeEnd is not null)
             {
-                set = set.Where(o => o.DateTimeStart <= appointmentFilter.DateTimeEnd);
+                filter = filter.Where(a => a.DateTimeStart <= appointmentFilter.DateTimeEnd);
             }
 
             if (appointmentFilter.IsApprovedByClinic is not null)
             {
-                set = set.Where(o => appointmentFilter.IsApprovedByClinic == o.IsApprovedByClinic);
+                filter = filter.Where(a => appointmentFilter.IsApprovedByClinic == a.IsApprovedByClinic);
             }
 
             if (appointmentFilter.IsApprovedByUser is not null)
             {
-                set = set.Where(o => appointmentFilter.IsApprovedByUser == o.IsApprovedByUser);
+                filter = filter.Where(a => appointmentFilter.IsApprovedByUser == a.IsApprovedByUser);
             }
 
             if (appointmentFilter.Statuses is not null && appointmentFilter.Statuses.Count > 0)
             {
-                set = set.Where(o => appointmentFilter.Statuses.Contains(o.Status));
+                filter = filter.Where(a => appointmentFilter.Statuses.Contains(a.Status));
             }
 
-            set = appointmentFilter.OrderDescending
-                ? set.OrderByDescending(GetSortProperty(appointmentFilter))
-                : set.OrderBy(GetSortProperty(appointmentFilter));
+            filter = appointmentFilter.OrderDescending
+                ? filter.OrderByDescending(GetSortProperty(appointmentFilter))
+                : filter.OrderBy(GetSortProperty(appointmentFilter));
         }
         else
         {
-            set = set.OrderBy(s => s.Id);
+            filter = filter.OrderByDescending(a => a.Id);
         }
 
-        var totalCount = await set.CountAsync(cancellationToken);
+        var isPatientFilterSpecified = appointmentFilter is not null &&
+                                appointmentFilter.PatientIds is not null &&
+                                appointmentFilter.PatientIds.Count > 0;
 
-        var collection = await set.AsNoTracking()
+        if (isPatientFilterSpecified)
+        {
+            filter = filter.Where(o => appointmentFilter!.PatientIds!.Contains(o.PatientId));
+        }
+
+        var totalCount = await filter.CountAsync(cancellationToken);
+
+        var filterResult = await filter.AsNoTracking()
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        return new PaginatedCollection<Appointment>(collection, page, pageSize, totalCount);
+        return new PaginatedCollection<Appointment>(filterResult, page, pageSize, totalCount);
     }
 
-    private Expression<Func<Appointment, object>> GetSortProperty(AppointmentFilter appointmentFilter)
+    private static Expression<Func<Appointment, object>> GetSortProperty(AppointmentFilter appointmentFilter)
     {
         return appointmentFilter.SortColumn switch
         {
             AppointmentSortColumn.Id => service => service.Id,
             AppointmentSortColumn.DotorId => service => service.DoctorId,
-            AppointmentSortColumn.PatientId => service => service.PatientId,
             AppointmentSortColumn.ServiceId => service => service.ServiceId,
             AppointmentSortColumn.DateTimeStart => service => service.DateTimeStart,
             AppointmentSortColumn.IsApprovedByUser => service => service.IsApprovedByUser,
             AppointmentSortColumn.IsApprovedByClinic => service => service.IsApprovedByClinic,
             AppointmentSortColumn.Status => service => service.Status,
+            AppointmentSortColumn.PatientId => service => service.PatientId,
             _ => service => service.Id
         };
     }
@@ -120,6 +136,12 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
     public Task UpdateAsync(Appointment appointment, CancellationToken cancellationToken)
     {
         context.Update(appointment);
+        return context.SaveChangesAsync(cancellationToken);
+    }
+
+    public Task UpdateRangeAsync(IEnumerable<Appointment> appointments, CancellationToken cancellationToken)
+    {
+        context.UpdateRange(appointments);
         return context.SaveChangesAsync(cancellationToken);
     }
 
@@ -137,14 +159,14 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
         CancellationToken cancellationToken)
     {
         return _dbSet.FirstOrDefaultAsync(a => a.DoctorId == doctorId &&
-                                               a.PatientId == patientId &&
-                                               a.ServiceId == serviceId &&
-                                               a.DateTimeStart == dateTimeStart &&
-                                               a.DateTimeEnd == dateTimeEnd &&
-                                               (a.Status == AppointmentStatus.Confirmed ||
-                                                a.Status == AppointmentStatus.WaitingUserConfirm ||
-                                                a.Status == AppointmentStatus.WaitingClinicConfirm),
-            cancellationToken);
+                                      a.PatientId == patientId &&
+                                      a.ServiceId == serviceId &&
+                                      a.DateTimeStart == dateTimeStart &&
+                                      a.DateTimeEnd == dateTimeEnd &&
+                                      (a.Status == AppointmentStatus.Confirmed ||
+                                       a.Status == AppointmentStatus.WaitingUserConfirm ||
+                                       a.Status == AppointmentStatus.WaitingClinicConfirm),
+                                 cancellationToken);
     }
 
     public async Task<PaginatedCollection<Appointment>> GetPatientsAppointments(uint patientId, int page, int pageSize,
@@ -186,9 +208,7 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
         CancellationToken cancellationToken)
     {
         return _dbSet.AnyAsync(a => a.PatientId == patientId &&
-                                    ((dateTimeStart <= a.DateTimeEnd && a.DateTimeStart <= dateTimeEnd) ||
-                                     (dateTimeStart >= a.DateTimeStart && dateTimeEnd <= a.DateTimeEnd) ||
-                                     (a.DateTimeStart >= dateTimeStart && a.DateTimeEnd <= dateTimeEnd)) &&
+                                    (dateTimeStart < a.DateTimeEnd && a.DateTimeStart < dateTimeEnd) &&
                                     a.Status == AppointmentStatus.Confirmed,
             cancellationToken);
     }
@@ -198,9 +218,7 @@ public sealed class AppointmentRepository(ClinnicContext context) : IAppointment
         CancellationToken cancellationToken)
     {
         return _dbSet.AnyAsync(a => a.DoctorId == doctorId &&
-                                    ((dateTimeStart <= a.DateTimeEnd && a.DateTimeStart <= dateTimeEnd) ||
-                                     (dateTimeStart >= a.DateTimeStart && dateTimeEnd <= a.DateTimeEnd) ||
-                                     (a.DateTimeStart >= dateTimeStart && a.DateTimeEnd <= dateTimeEnd)) &&
+                                    (dateTimeStart < a.DateTimeEnd && a.DateTimeStart < dateTimeEnd) &&
                                     a.Status == AppointmentStatus.Confirmed,
             cancellationToken);
     }

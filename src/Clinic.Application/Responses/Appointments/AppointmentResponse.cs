@@ -1,4 +1,5 @@
-﻿using Clinic.Domain.Entities;
+﻿using Clinic.Application.Responses.AppointmentResults;
+using Clinic.Domain.Entities;
 
 namespace Clinic.Application.Responses.Appointments;
 
@@ -8,8 +9,7 @@ public sealed record AppointmentResponse(
     uint DoctorId,
     uint ServiceId,
     DateTime DateTime,
-    string Status
-    )
+    string Status)
 {
     public static AppointmentResponse FromAppointment(Appointment appointment)
     {

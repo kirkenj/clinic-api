@@ -1,21 +1,13 @@
 ﻿using Clinic.Application.Abstractions;
-using Clinic.Application.Tools;
 using Clinic.Domain.Abstractions;
-using Clinic.Domain.Entities;
 using Clinic.Domain.Errors;
-using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Appointments.Commands.RescheduleByClinic;
 
 public sealed class RescheduleAppointmentCommandHandler(
-    IDoctorRepository doctorRepository,
-    IAppointmentRepository appointmentRepository,
-    IServiceRepository serviceRepository,
-    ISlotService slotService,
-    IPatientRepository patientRepository,
-    IEmailService emailService,
-    IDateTimeProvider dateTimeProvider,
+    IAppointmentService appointmentService,
+    IUserAccessService userAccessService,
     RescheduleAppointmentCommandValidator validator)
     : IRequestHandler<RescheduleAppointmentCommand, Result>
 {
@@ -28,116 +20,29 @@ public sealed class RescheduleAppointmentCommandHandler(
                 (validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        var slot = slotService.GetSlot(request.NewDateTime.ToUniversalTime());
-        if (slot == null)
+        var userAccessResult = await userAccessService.ValidateUserAccessAsync(
+            [RoleType.Receptionist, RoleType.Doctor], cancellationToken);
+        if (userAccessResult.IsFailure)
         {
-            return AppointmentErrors.NoSlotsFound(request.NewDateTime);
+            return userAccessResult.Error;
         }
 
-        if (slot.SlotStart <= dateTimeProvider.UtcNow())
+        if (userAccessResult.Value.Role == RoleType.Doctor)
         {
-            return AppointmentErrors.InvalidDate(request.NewDateTime);
+            var appointmentResult = await appointmentService.GetByIdAsync(
+                request.AppointmentId, cancellationToken);
+            if (appointmentResult.IsFailure)
+            {
+                return appointmentResult.Error;
+            }
+
+            if (appointmentResult.Value.DoctorId != userAccessResult.Value.Id)
+            {
+                return BasicErrors.NoAccess();
+            }
         }
 
-        var oldAppointment = await appointmentRepository.GetByIdAsync(request.AppointmentId, cancellationToken);
-        if (oldAppointment == null)
-        {
-            return AppointmentErrors.NotFound(request.AppointmentId);
-        }
-
-        if (!oldAppointment.IsApprovedByUser)
-        {
-            return AppointmentErrors.AppointmentIsNotApprovedByUser(oldAppointment.Id);
-        }
-
-        if (oldAppointment.Status is not (AppointmentStatus.Confirmed or AppointmentStatus.WaitingClinicConfirm))
-        {
-            return AppointmentErrors.InvalidStatus(oldAppointment.Status, AppointmentStatus.Confirmed,
-                AppointmentStatus.WaitingClinicConfirm);
-        }
-
-        var oldDoctor = await doctorRepository
-            .GetByIdAsync(oldAppointment.DoctorId, cancellationToken);
-
-        if (oldDoctor is null)
-        {
-            return DoctorErrors.NotFound(oldAppointment.DoctorId);
-        }
-
-        var newDoctor = oldAppointment.DoctorId != request.NewDoctorId
-            ? await doctorRepository.GetByIdAsync(request.NewDoctorId, cancellationToken)
-            : oldDoctor;
-
-        if (newDoctor is null)
-        {
-            return DoctorErrors.NotFound(request.NewDoctorId);
-        }
-
-        if (!newDoctor.IsActive)
-        {
-            return DoctorErrors.NotActive(request.NewDoctorId);
-        }
-
-        var patient = await patientRepository
-            .GetByIdAsync(oldAppointment.PatientId, cancellationToken);
-        if (patient is null)
-        {
-            return PatientErrors.NotFound(oldAppointment.DoctorId);
-        }
-
-        if (!patient.IsActive)
-        {
-            return PatientErrors.NotActive(oldAppointment.DoctorId);
-        }
-
-        var service = await serviceRepository
-            .GetByIdAsync(oldAppointment.ServiceId, cancellationToken);
-        if (service is null)
-        {
-            return Result.Failure<string>(ServiceErrors.NotFound(oldAppointment.ServiceId));
-        }
-
-        if (!service.IsActive)
-        {
-            return Result.Failure<string>(ServiceErrors.NotActive(oldAppointment.ServiceId));
-        }
-
-        var isDoctorSlotTaken = await appointmentRepository.ExistsApprovedWithDoctorAndDatetimeAsync
-            (request.NewDoctorId, slot.SlotStart, slot.SlotEnd, cancellationToken);
-        if (isDoctorSlotTaken)
-        {
-            return AppointmentErrors.DateTimeDoctorTaken(request.NewDoctorId, request.NewDateTime);
-        }
-
-        var isPatientSlotTaken = await appointmentRepository.ExistsApprovedWithPatientAndDatetimeAsync
-            (oldAppointment.PatientId, slot.SlotStart, slot.SlotEnd, cancellationToken);
-        if (isPatientSlotTaken)
-        {
-            return AppointmentErrors.DateTimePatientTaken(oldAppointment.PatientId, request.NewDateTime);
-        }
-
-        oldAppointment.Update(oldAppointment.DoctorId, oldAppointment.PatientId, oldAppointment.ServiceId,
-            oldAppointment.DateTimeStart, oldAppointment.DateTimeEnd, oldAppointment.IsApprovedByUser,
-            oldAppointment.IsApprovedByClinic, AppointmentStatus.Rescheduled);
-        await appointmentRepository.UpdateAsync(oldAppointment, cancellationToken);
-        var newAppointment = Appointment.Create(request.NewDoctorId, oldAppointment.PatientId, oldAppointment.ServiceId,
-            slot.SlotStart, slot.SlotEnd, true, true, AppointmentStatus.Confirmed);
-        await appointmentRepository.AddAsync(newAppointment, cancellationToken);
-
-        await Task.WhenAll(
-            emailService.SendAsync(oldDoctor.Email, Constants.SubjectAppointmentCancelled,
-                EmailBodyBuilder.BuildCancelledAppointmentContent(service.Name,
-                    patient.FirstName, patient.LastName, oldAppointment.DateTimeStart),
-                cancellationToken),
-            emailService.SendAsync(newDoctor.Email, Constants.SubjectNewAppointment,
-                EmailBodyBuilder.BuildNewAppointmentForDoctorContent(service.Name,
-                    patient.FirstName, patient.LastName, newAppointment.DateTimeStart),
-                cancellationToken),
-            emailService.SendAsync(patient.Email, Constants.SubjectAppointmentRescheduled,
-                EmailBodyBuilder.BuildAppointmentRescheduledContent(service.Name,
-                    oldDoctor.FirstName, oldDoctor.LastName, oldAppointment.DateTimeStart,
-                    newDoctor.FirstName, newDoctor.LastName, newAppointment.DateTimeStart),
-                cancellationToken));
-        return Result.Success();
+        return await appointmentService.RescheduleAppointmentAsync(request.AppointmentId,
+            request.NewDoctorId, request.NewDateTime, cancellationToken);
     }
 }

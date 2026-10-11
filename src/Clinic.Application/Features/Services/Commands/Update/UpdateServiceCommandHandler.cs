@@ -1,4 +1,5 @@
-﻿using Clinic.Application.Extensions;
+﻿using Clinic.Application.Abstractions;
+using Clinic.Application.Extensions;
 using Clinic.Application.Options;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
@@ -11,6 +12,7 @@ namespace Clinic.Application.Features.Services.Commands.Update;
 public sealed class UpdateServiceCommandHandler
     (IServiceRepository serviceRepository,
     ISpecializationRepository specializationRepository,
+    IUserAccessService userAccessService,
     UpdateServiceCommandValidator validator,
     IOptions<ServiceOptions> serviceOptions)
     : IRequestHandler<UpdateServiceCommand, Result>
@@ -22,6 +24,13 @@ public sealed class UpdateServiceCommandHandler
         if (!validationResult.IsValid)
         {
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
+
+        var userAccessResult = await userAccessService.ValidateUserAccessAsync(
+            [RoleType.Receptionist], cancellationToken);
+        if (userAccessResult.IsFailure)
+        {
+            return userAccessResult.Error;
         }
 
         var service = await serviceRepository.GetByIdAsync(request.Id, cancellationToken);

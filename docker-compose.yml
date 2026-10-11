@@ -1,0 +1,104 @@
+x-frontend-defaults: &frontend-defaults
+  restart: unless-stopped
+  depends_on:
+    - api
+  environment:
+    - REACT_APP_API_URL=${REACT_APP_API_URL}
+
+
+services:
+  database:
+    image: bitnami/postgresql:latest
+    container_name: my_app_database
+    user: root 
+    environment:
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_DATABASE=InnoDb
+      - POSTGRESQL_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postge-2:/bitnami/postgresql
+
+  api:
+    image: kirkenj/clinic-api:latest
+    container_name: my_app_api
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - SmtpEmailServiceOptions__ApiAddress=smtp.mail.ru
+      - SmtpEmailServiceOptions__ApiPort=465
+      - SmtpEmailServiceOptions__FromName=Inno-Clinic
+      - SmtpEmailServiceOptions__ApiLogin=${SMTP_LOGIN}
+      - SmtpEmailServiceOptions__ApiPassword=${SMTP_PASSWORD}
+      
+      - JwtOptions__Audience=${JWT_AUDIENCE}
+      - JwtOptions__DurationInMinutes=${JWT_DURATION_MINUTES}
+      - JwtOptions__Issuer=${JWT_ISSUER}
+      - JwtOptions__Key=${JWT_KEY}
+      - JwtOptions__SecurityAlgorithm=${JWT_SECURITY_ALGORITHM}
+      
+      - ConnectionStrings__ClinicConnection=Host=database;Port=5432;Database=InnoDb;User Id=postgres;Password=${POSTGRES_PASSWORD};
+      - ConnectionStrings__ElasticURL=http://elasticsearch:9200
+    depends_on:
+      database:
+        condition: service_started
+      elasticsearch:
+        condition: service_healthy
+
+  frontend_admin:
+    <<: *frontend-defaults
+    image: kirkenj/front/admin:latest
+    container_name: my_app_frontend_admin
+    ports:
+      - "3000:80"
+
+  frontend_doctor:
+    <<: *frontend-defaults
+    image: kirkenj/front/doctor:latest
+    container_name: my_app_frontend_doctor
+    ports:
+      - "3001:80"
+
+  frontend_patient:
+    <<: *frontend-defaults
+    image: kirkenj/front/patient:latest
+    container_name: my_app_frontend_patient
+    ports:
+      - "3002:80"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-s", "-f", "http://localhost:9200/_cluster/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    volumes:
+      - kibana_data:/usr/share/kibana/data
+
+volumes:
+  postge-2:
+    external: true
+  es_data:                                   
+  kibana_data:                                

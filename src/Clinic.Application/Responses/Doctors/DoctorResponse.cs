@@ -10,8 +10,7 @@ public sealed record DoctorResponse(
     string Email,
     string PhoneNumber,
     uint SpecializationId,
-    uint OfficeId,
-    bool IsActive
+    uint OfficeId
 )
 {
     public static DoctorResponse FromDoctor(Doctor doctor)
@@ -19,13 +18,12 @@ public sealed record DoctorResponse(
         return new DoctorResponse(
             doctor.Id,
             doctor.FirstName,
-            doctor.MiddleName,
             doctor.LastName,
+            doctor.MiddleName,
             doctor.Email,
             doctor.PhoneNumber,
-            doctor.OfficeId,
             doctor.SpecializationId,
-            doctor.IsActive
+            doctor.OfficeId
         );
     }
 }

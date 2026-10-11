@@ -2,7 +2,7 @@
 using Clinic.Domain.Abstractions;
 using MediatR;
 
-namespace Clinic.Application.Features.Appointments.Queries.Get;
+namespace Clinic.Application.Features.Appointments.Queries.Get.Staff;
 
 public sealed class GetAppointmentQuery : IRequest<Result<AppointmentResponse>>
 {

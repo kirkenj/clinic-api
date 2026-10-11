@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Features\Appointments\Queries\GetCurrentDoctorsAppointments\**" />
+    <EmbeddedResource Remove="Features\Appointments\Queries\GetCurrentDoctorsAppointments\**" />
+    <None Remove="Features\Appointments\Queries\GetCurrentDoctorsAppointments\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Clinic.Domain\Clinic.Domain.csproj" />
   </ItemGroup>
 

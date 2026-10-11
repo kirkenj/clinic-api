@@ -53,22 +53,22 @@ public class ReceptionistRepository(ClinnicContext context) : IReceptionistRepos
 
             if (!string.IsNullOrEmpty(receptionistFilter.Email))
             {
-                set = set.Where(s => s.Email.Contains(receptionistFilter.Email));
+                set = set.Where(x => EF.Functions.ILike(x.Email, $"%{receptionistFilter.Email}%"));
             }
 
             if (!string.IsNullOrEmpty(receptionistFilter.MiddleName))
             {
-                set = set.Where(s => s.MiddleName.Contains(receptionistFilter.MiddleName));
+                set = set.Where(x => EF.Functions.ILike(x.MiddleName, $"%{receptionistFilter.MiddleName}%"));
             }
 
             if (!string.IsNullOrEmpty(receptionistFilter.LastName))
             {
-                set = set.Where(s => s.LastName.Contains(receptionistFilter.LastName));
+                set = set.Where(x => EF.Functions.ILike(x.LastName, $"%{receptionistFilter.LastName}%"));
             }
 
             if (!string.IsNullOrEmpty(receptionistFilter.FirstName))
             {
-                set = set.Where(s => s.FirstName.Contains(receptionistFilter.FirstName));
+                set = set.Where(x => EF.Functions.ILike(x.FirstName, $"%{receptionistFilter.FirstName}%"));
             }
 
             if (!string.IsNullOrEmpty(receptionistFilter.PhoneNumber))

@@ -2,20 +2,14 @@
 using Clinic.Application.Tools;
 using Clinic.Domain.Abstractions;
 using Clinic.Domain.Errors;
-using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Appointments.Commands.SendOtpToCreateAppointment;
 
 public sealed class SendOtpToCreateAppointmentRequestHandler(
     SendOtpToCreateAppointmentRequestValidator validator,
-    IAppointmentRepository appointmentRepository,
-    IOtpService otpService,
-    IDoctorRepository doctorRepository,
-    IServiceRepository serviceRepository,
-    IPatientRepository patientRepository,
-    IDateTimeProvider dateTimeProvider,
-    IEmailService emailService) 
+    IAppointmentService appointmentService,
+    IUserAccessService userAccessService)
     : IRequestHandler<SendOtpToCreateAppointmentRequest, Result>
 {
     public async Task<Result> Handle(SendOtpToCreateAppointmentRequest request, CancellationToken cancellationToken)
@@ -27,51 +21,29 @@ public sealed class SendOtpToCreateAppointmentRequestHandler(
                 (validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        var appointment = await appointmentRepository.GetByIdAsync(request.AppointmentId, cancellationToken);
-        if (appointment is null)
+        var userAccessResult = await userAccessService.ValidateUserAccessAsync(
+            Constants.AllRoles, cancellationToken);
+        if (userAccessResult.IsFailure)
         {
-            return AppointmentErrors.NotFound(request.AppointmentId);
+            return userAccessResult.Error;
         }
 
-        if (appointment.Status != AppointmentStatus.WaitingUserConfirm)
+        if (userAccessResult.Value.Role == RoleType.Patient)
         {
-            return AppointmentErrors.InvalidStatus(appointment.Status, AppointmentStatus.WaitingUserConfirm);
+            var appointmentResult = await appointmentService.GetByIdAsync(
+                request.AppointmentId, cancellationToken);
+            if (appointmentResult.IsFailure)
+            {
+                return appointmentResult.Error;
+            }
+
+            if (appointmentResult.Value.PatientId != userAccessResult.Value.Id)
+            {
+                return BasicErrors.NoAccess();
+            }
         }
 
-        if (appointment.DateTimeStart <= dateTimeProvider.UtcNow())
-        {
-            return AppointmentErrors.InvalidDate(appointment.DateTimeStart);
-        }
-
-        var otpKey = $"ConfirmAppointmentCreationByPatient{appointment.PatientId}:{appointment.Id}";
-        var otpResult = await otpService.GenerateOtpAsync(otpKey, cancellationToken);
-        if (otpResult.IsFailure)
-        {
-            return otpResult.Error;
-        }
-
-        var doctor = await doctorRepository.GetByIdAsync(appointment.DoctorId, cancellationToken);
-        if (doctor is null)
-        {
-            return DoctorErrors.NotFound(appointment.DoctorId);
-        }
-
-        var service = await serviceRepository.GetByIdAsync(appointment.ServiceId, cancellationToken);
-        if (service is null)
-        {
-            return ServiceErrors.NotFound(appointment.ServiceId);
-        }
-
-        var patient = await patientRepository.GetByIdAsync(appointment.PatientId, cancellationToken);
-        if (patient is null)
-        {
-            return PatientErrors.NotFound(appointment.PatientId);
-        }
-
-        await emailService.SendAsync(patient.Email, Constants.SubjectConfirmAppointment,
-            EmailBodyBuilder.BuildConfirmAppointmentContent(service.Name, doctor.FirstName, 
-                doctor.LastName, service.Price, appointment.DateTimeStart, otpResult.Value),
-            cancellationToken);
-        return Result.Success();
+        return await appointmentService.SendOtpToCreateAppointment(
+            request.AppointmentId, cancellationToken);
     }
 }

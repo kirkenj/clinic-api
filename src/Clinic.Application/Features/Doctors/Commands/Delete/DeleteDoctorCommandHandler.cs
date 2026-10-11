@@ -1,22 +1,23 @@
-﻿using Clinic.Domain.Abstractions;
-using Clinic.Domain.Errors;
-using Clinic.Domain.Repositories;
+﻿using Clinic.Application.Abstractions;
+using Clinic.Domain.Abstractions;
 using MediatR;
 
 namespace Clinic.Application.Features.Doctors.Commands.Delete;
 
-public sealed class DeleteDoctorCommandHandler(IDoctorRepository doctorRepository)
+public sealed class DeleteDoctorCommandHandler
+    (IDoctorService doctorService,
+    IUserAccessService userAccessService)
     : IRequestHandler<DeleteDoctorCommand, Result>
 {
     public async Task<Result> Handle(DeleteDoctorCommand request, CancellationToken cancellationToken)
     {
-        var doctor = await doctorRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (doctor is null)
+        var userAccessResult = await userAccessService.ValidateUserAccessAsync(
+            [RoleType.Receptionist], cancellationToken);
+        if (userAccessResult.IsFailure)
         {
-            return DoctorErrors.NotFound(request.Id);
+            return userAccessResult.Error;
         }
 
-        await doctorRepository.DeleteAsync(doctor, cancellationToken);
-        return Result.Success();
+        return await doctorService.DeleteAsync(request.Id, cancellationToken);
     }
 }

@@ -6,6 +6,7 @@ using Clinic.Application.Features.Services.Queries.Get;
 using Clinic.Application.Features.Services.Queries.GetPaginated;
 using Clinic.Domain.Filters;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Clinic.Api.Controllers;
@@ -31,23 +32,26 @@ public sealed class ServiceController(IMediator mediator) : ControllerBase
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
+    [Authorize(Roles = "Receptionist")]
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteServiceAsync([FromRoute] [Required] uint id)
+    public async Task<IActionResult> DeleteServiceAsync([FromRoute][Required] uint id)
     {
         var result = await mediator.Send(new DeleteServiceCommand { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
+    [Authorize(Roles = "Receptionist")]
     [HttpPost]
-    public async Task<IActionResult> AddServiceAsync([FromBody] [Required] AddServiceCommand request)
+    public async Task<IActionResult> AddServiceAsync([FromBody][Required] AddServiceCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 
+    [Authorize(Roles = "Receptionist")]
     [HttpPut]
     public async Task<IActionResult> UpdateServiceAsync(
-        [FromBody] [Required] UpdateServiceCommand request)
+        [FromBody][Required] UpdateServiceCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);

@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Clinic.Application.Features.Receptionists.Commands.SignIn;
+﻿using Clinic.Application.Features.Receptionists.Commands.SignIn;
 using Clinic.Application.Features.Receptionists.Commands.ValidateSignIn;
+using Clinic.Application.Features.Receptionists.Queries.GetCurrent;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Clinic.Api.Controllers;
 
@@ -13,7 +14,7 @@ public sealed class ReceptionistAuthController(IMediator mediator) : ControllerB
 {
     [HttpPost("send-sign-in-code")]
     public async Task<ActionResult<string>> SendSignInOtpAsync(
-        [Required] [FromBody] SendReceptionistSignInOtpCommand request)
+        [Required][FromBody] SendReceptionistSignInOtpCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
@@ -21,7 +22,7 @@ public sealed class ReceptionistAuthController(IMediator mediator) : ControllerB
 
     [HttpPost("confirm-sign-in-code")]
     public async Task<ActionResult<string>> ConfirmSignInOtpAsync(
-        [Required] [FromBody] ConfirmReceptionistSignInOtpCommand request)
+        [Required][FromBody] ConfirmReceptionistSignInOtpCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
@@ -32,5 +33,13 @@ public sealed class ReceptionistAuthController(IMediator mediator) : ControllerB
     public ActionResult<string> CheckToken()
     {
         return NoContent();
+    }
+
+    [Authorize(Roles = "Receptionist")]
+    [HttpGet("Me")]
+    public async Task<IActionResult> GetReceptionistAsync()
+    {
+        var result = await mediator.Send(new GetCurrentReceptionistQuery(), HttpContext.RequestAborted);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 }

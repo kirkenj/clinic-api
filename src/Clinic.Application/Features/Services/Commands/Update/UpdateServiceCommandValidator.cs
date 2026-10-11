@@ -10,7 +10,7 @@ public sealed class UpdateServiceCommandValidator : AbstractValidator<UpdateServ
         RuleFor(m => m.Id)
             .NotEmpty();
         RuleFor(m => m.Name)
-            .TitleField();
+            .TitleField(50);
         RuleFor(m => m.Price)
             .Price();
         RuleFor(m => m.SpecializationId)

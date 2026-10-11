@@ -52,7 +52,7 @@ public sealed class OfficeRepository(ClinnicContext context) : IOfficeRepository
 
             if (!string.IsNullOrEmpty(officeFilter.Address))
             {
-                set = set.Where(s => s.Address.Contains(officeFilter.Address));
+                set = set.Where(x => EF.Functions.ILike(x.Address, $"%{officeFilter.Address}%"));
             }
 
             if (!string.IsNullOrEmpty(officeFilter.PhoneNumber))

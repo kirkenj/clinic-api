@@ -5,8 +5,8 @@ namespace Clinic.Application.Features.Patients.Commands.ConfirmSignUp;
 
 public sealed class ConfirmPatientSignUpCommand : IRequest<Result>
 {
-    public string Email { get; private set; } = default!;
-    public string Otp { get; private set; } = default!;
+    public string Email { get; set; } = default!;
+    public string Otp { get; set; } = default!;
 
     public void TrimStringProperties()
     {

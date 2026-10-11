@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Clinic.Application.Abstractions;
 using Clinic.Application.Options;
+using Clinic.Application.Services;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,11 @@ public static class ServiceCollectionExtensions
 
         ValidatorOptions.Global.LanguageManager.Enabled = false;
         services.AddValidatorsFromAssembly(executingAssembly);
+
+        services.AddScoped<IAppointmentService, AppointmentService>();
+        services.AddScoped<IDoctorService, DoctorService>();
+        services.AddScoped<IReceptionistService, ReceptionistService>();
+        services.AddScoped<IPatientService, PatientService>();
         return services;
     }
 }

@@ -1,16 +1,12 @@
 ﻿using Clinic.Application.Abstractions;
 using Clinic.Domain.Abstractions;
-using Clinic.Domain.Errors;
-using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Patients.Commands.ConfirmSignIn;
 
 public sealed class ConfirmPatientSignInOtpCommandHandler(
     ConfirmPatientSignInOtpCommandValidator validator,
-    IOtpService otpService,
-    IPatientRepository patientRepository,
-    IJwtService jwtService)
+    IPatientService patientService)
     : IRequestHandler<ConfirmPatientSignInOtpCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(ConfirmPatientSignInOtpCommand request,
@@ -24,24 +20,6 @@ public sealed class ConfirmPatientSignInOtpCommandHandler(
                 validationResult.Errors.Select(e => e.ErrorMessage)));
         }
 
-        var otpKey = $"PatientSignInRequest:{request.Email}";
-        var otpGenerationResult = await otpService.CheckOtpAsync(otpKey, request.Otp, cancellationToken);
-        if (otpGenerationResult.IsFailure)
-        {
-            return Result.Failure<string>(otpGenerationResult.Error);
-        }
-
-        var patient = await patientRepository.GetByEmailAsync(request.Email, cancellationToken);
-        if (patient is null)
-        {
-            return Result.Failure<string>(PatientErrors.NotFound(request.Email));
-        }
-
-        if (!patient.IsActive)
-        {
-            return Result.Failure<string>(PatientErrors.NotActive(patient.Id));
-        }
-
-        return Result.Success(jwtService.GenerateToken(patient.Id, RoleType.Patient));
+        return await patientService.ConfirmSignIn(request.Email, request.Otp, cancellationToken);
     }
 }

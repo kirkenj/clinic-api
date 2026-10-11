@@ -4,16 +4,14 @@ namespace Clinic.Application.Responses.Specializations;
 
 public sealed record SpecializationResponse(
     uint Id,
-    string Name,
-    bool IsActive
+    string Name
 )
 {
     public static SpecializationResponse FromSpecialization(Specialization specialization)
     {
         return new SpecializationResponse(
             specialization.Id,
-            specialization.Name,
-            specialization.IsActive
+            specialization.Name
         );
     }
 }

@@ -1,4 +1,5 @@
-﻿using Clinic.Domain.Abstractions;
+﻿using Clinic.Application.Abstractions;
+using Clinic.Domain.Abstractions;
 using Clinic.Domain.Entities;
 using Clinic.Domain.Errors;
 using Clinic.Domain.Repositories;
@@ -10,6 +11,7 @@ public sealed class AddAppointmentResultCommandHandler(
     IAppointmentResultRepository appointmentResultRepository,
     IAppointmentRepository appointmentRepository,
     IDateTimeProvider dateTimeProvider,
+    IUserAccessService userAccessService,
     AddAppointmentResultCommandValidator validator)
     : IRequestHandler<AddAppointmentResultCommand, Result>
 {
@@ -22,10 +24,23 @@ public sealed class AddAppointmentResultCommandHandler(
             return Error.ValidationError(validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
+        var userResult = await userAccessService.ValidateUserAccessAsync(
+            [RoleType.Doctor, RoleType.Receptionist], cancellationToken);
+        if (userResult.IsFailure)
+        {
+            return userResult.Error;
+        }
+
         var appointment = await appointmentRepository.GetByIdAsync(request.AppointmentId, cancellationToken);
         if (appointment is null)
         {
             return AppointmentErrors.NotFound(request.AppointmentId);
+        }
+
+        if (userResult.Value.Role == RoleType.Doctor && 
+            userResult.Value.Id != appointment.DoctorId)
+        {
+            return BasicErrors.NoAccess();
         }
 
         if (appointment.Status != AppointmentStatus.Confirmed)

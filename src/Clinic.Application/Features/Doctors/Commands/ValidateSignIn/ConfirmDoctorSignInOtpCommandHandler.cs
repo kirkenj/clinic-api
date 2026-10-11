@@ -1,16 +1,12 @@
 ﻿using Clinic.Application.Abstractions;
 using Clinic.Domain.Abstractions;
-using Clinic.Domain.Errors;
-using Clinic.Domain.Repositories;
 using MediatR;
 
 namespace Clinic.Application.Features.Doctors.Commands.ValidateSignIn;
 
-public sealed class ConfirmDoctorSignInOtpCommandHandler(
-    ConfirmDoctorSignInOtpCommandValidator validator,
-    IOtpService otpService,
-    IDoctorRepository doctorRepository,
-    IJwtService jwtService)
+public sealed class ConfirmDoctorSignInOtpCommandHandler
+    (ConfirmDoctorSignInOtpCommandValidator validator,
+    IDoctorService doctorService)
     : IRequestHandler<ConfirmDoctorSignInOtpCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(ConfirmDoctorSignInOtpCommand request, CancellationToken cancellationToken)
@@ -23,24 +19,6 @@ public sealed class ConfirmDoctorSignInOtpCommandHandler(
                 validationResult.Errors.Select(e => e.ErrorMessage)));
         }
 
-        var otpKey = $"DoctorSignInRequest:{request.Email}";
-        var otpGenerationResult = await otpService.CheckOtpAsync(otpKey, request.Otp, cancellationToken);
-        if (otpGenerationResult.IsFailure)
-        {
-            return Result.Failure<string>(otpGenerationResult.Error);
-        }
-
-        var doctor = await doctorRepository.GetByEmailAsync(request.Email, cancellationToken);
-        if (doctor is null)
-        {
-            return Result.Failure<string>(DoctorErrors.NotFound(request.Email));
-        }
-
-        if (!doctor.IsActive)
-        {
-            return Result.Failure<string>(DoctorErrors.NotActive(doctor.Id));
-        }
-
-        return Result.Success(jwtService.GenerateToken(doctor.Id, RoleType.Doctor));
+        return await doctorService.ValidateSignInAsync(request.Email, request.Otp, cancellationToken);
     }
 }

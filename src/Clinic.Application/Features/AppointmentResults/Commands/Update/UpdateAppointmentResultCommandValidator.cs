@@ -6,8 +6,6 @@ public sealed class UpdateAppointmentResultCommandValidator : AbstractValidator<
 {
     public UpdateAppointmentResultCommandValidator()
     {
-        RuleFor(c => c.Id)
-            .NotEmpty();
         RuleFor(c => c.AppointmentId)
             .NotEmpty();
         RuleFor(m => m.Complaints)

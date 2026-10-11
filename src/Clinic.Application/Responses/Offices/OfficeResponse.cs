@@ -5,8 +5,7 @@ namespace Clinic.Application.Responses.Offices;
 public sealed record OfficeResponse(
     uint Id,
     string Address,
-    string PhoneNumber,
-    bool IsActive
+    string PhoneNumber
 )
 {
     public static OfficeResponse FromOffice(Office office)
@@ -14,8 +13,7 @@ public sealed record OfficeResponse(
         return new OfficeResponse(
             office.Id,
             office.Address,
-            office.PhoneNumber,
-            office.IsActive
+            office.PhoneNumber
         );
     }
 }

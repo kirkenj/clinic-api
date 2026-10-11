@@ -1,5 +1,4 @@
-﻿using Clinic.Application.Features.Receptionists.Commands.Update;
-using Clinic.Application.Features.Receptionists.Queries.Get;
+﻿using Clinic.Application.Features.Receptionists.Queries.Get;
 using Clinic.Application.Features.Receptionists.Queries.GetPaginated;
 using Clinic.Domain.Filters;
 using MediatR;
@@ -31,12 +30,5 @@ public sealed class ReceptionistController(IMediator mediator) : ControllerBase
     {
         var result = await mediator.Send(new GetReceptionistQuery { Id = id }, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
-    }
-
-    [HttpPut]
-    public async Task<IActionResult> UpdateReceptionistAsync([FromBody][Required] UpdateReceptionistCommand request)
-    {
-        var result = await mediator.Send(request, HttpContext.RequestAborted);
-        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 }

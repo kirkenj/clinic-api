@@ -5,7 +5,6 @@ namespace Clinic.Application.Features.AppointmentResults.Commands.Update;
 
 public sealed class UpdateAppointmentResultCommand : IRequest<Result>
 {
-    public uint Id { get; set; }
     public string Complaints { get; set; } = default!;
     public string Conclusion { get; set; } = default!;
     public string Recommendations { get; set; } = default!;

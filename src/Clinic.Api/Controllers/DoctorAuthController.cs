@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Clinic.Application.Features.Doctors.Commands.SignIn;
+﻿using Clinic.Application.Features.Doctors.Commands.SignIn;
 using Clinic.Application.Features.Doctors.Commands.ValidateSignIn;
+using Clinic.Application.Features.Doctors.Queries.GetCurrent;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Clinic.Api.Controllers;
 
@@ -13,7 +14,7 @@ public sealed class DoctorAuthController(IMediator mediator) : ControllerBase
 {
     [HttpPost("send-sign-in-code")]
     public async Task<ActionResult<string>> SendSignInOtpAsync(
-        [Required] [FromBody] SendDoctorSignInOtpCommand request)
+        [Required][FromBody] SendDoctorSignInOtpCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
@@ -21,7 +22,7 @@ public sealed class DoctorAuthController(IMediator mediator) : ControllerBase
 
     [HttpPost("confirm-sign-in-code")]
     public async Task<ActionResult<string>> ConfirmSignInOtpAsync(
-        [Required] [FromBody] ConfirmDoctorSignInOtpCommand request)
+        [Required][FromBody] ConfirmDoctorSignInOtpCommand request)
     {
         var result = await mediator.Send(request, HttpContext.RequestAborted);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
@@ -32,5 +33,13 @@ public sealed class DoctorAuthController(IMediator mediator) : ControllerBase
     public ActionResult<string> CheckToken()
     {
         return NoContent();
+    }
+
+    [Authorize(Roles = "Doctor")]
+    [HttpGet("Me")]
+    public async Task<IActionResult> GetDoctorAsync()
+    {
+        var result = await mediator.Send(new GetCurrentDoctorQuery(), HttpContext.RequestAborted);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 }
